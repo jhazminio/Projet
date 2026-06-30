@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Échange ton savoir</title>
+  <style>
+    /* Reset et base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --cyan: #22d3ee;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Liens */
+    a { color: inherit; text-decoration: none; }
+
+    /* ── NAVBAR ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 4rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 11, 26, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .nav-logo .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .9rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      color: var(--text-muted);
+      font-size: .95rem;
+    }
+
+    .nav-links li:hover { color: var(--text); cursor: pointer; }
+
+    .nav-actions { display: flex; gap: .8rem; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .5rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .9rem;
+      transition: border-color .2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--purple); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none;
+      color: #fff;
+      padding: .5rem 1.3rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .9rem;
+      font-weight: 600;
+      transition: opacity .2s;
+    }
+
+    .btn-primary:hover { opacity: .88; }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 3rem;
+      padding: 5rem 4rem 4rem;
+      position: relative;
+    }
+
+    /* Halo violet en arrière-plan */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: -80px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(168,85,247,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Pastille "Troc de compétences" */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: .4rem 1rem;
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-badge span.dot {
+      width: 7px; height: 7px;
+      background: var(--purple);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .hero h1 {
+      font-size: 3.4rem;
+      font-weight: 800;
+      line-height: 1.12;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero h1 .accent { color: var(--purple-light); }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 500px;
+      margin-bottom: 2rem;
+    }
+
+    .hero p strong { color: var(--text); font-weight: 600; }
+
+    .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .btn-hero-primary {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none;
+      color: #fff;
+      padding: .85rem 1.8rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: opacity .2s;
+    }
+
+    .btn-hero-primary:hover { opacity: .88; }
+
+    .btn-hero-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .85rem 1.8rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: border-color .2s;
+    }
+
+    .btn-hero-ghost:hover { border-color: var(--purple); }
+
+    /* Statistiques sous les boutons */
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .hero-stats div { display: flex; flex-direction: column; }
+
+    .stat-number {
+      font-size: 1.7rem;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-top: .1rem;
+    }
+
+    /* Carte flottante côté droit */
+    .hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    /* Badge +1 jeton en haut à droite */
+    .floating-badge {
+      position: absolute;
+      top: -18px; right: -18px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 10px;
+      padding: .55rem 1rem;
+      font-size: .85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+
+    /* En-tête de la carte (avatar + nom) */
+    .card-user {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .avatar {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .9rem;
+    }
+
+    .card-user-info strong { display: block; font-size: 1rem; }
+    .card-user-info span { font-size: .82rem; color: var(--text-muted); }
+
+    .status-badge {
+      margin-left: auto;
+      background: rgba(34,211,238,.15);
+      color: var(--cyan);
+      border: 1px solid rgba(34,211,238,.3);
+      border-radius: 6px;
+      padding: .25rem .7rem;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    /* Blocs propose / recherche dans la carte */
+    .card-skill {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+
+    .card-skill .skill-label {
+      font-size: .7rem;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: .4rem;
+    }
+
+    .card-skill strong { font-size: 1rem; display: block; margin-bottom: .3rem; }
+    .card-skill span { font-size: .82rem; color: var(--text-muted); }
+
+    /* Icône flèche entre les deux blocs */
+    .card-arrow {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      padding: .5rem 0;
+    }
+
+    /* ── SECTION COMPÉTENCES ── */
+    .section { padding: 5rem 4rem; }
+
+    .section-tag {
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      font-weight: 600;
+      margin-bottom: .7rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .section-header h2 { font-size: 2rem; font-weight: 800; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .55rem 1.3rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .9rem;
+      transition: border-color .2s;
+    }
+
+    .btn-outline:hover { border-color: var(--purple); }
+
+    /* Grille des 4 cartes compétences */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+    }
+
+    .skill-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform .2s, border-color .2s;
+      cursor: pointer;
+    }
+
+    .skill-card:hover { transform: translateY(-4px); border-color: var(--purple); }
+
+    /* Image illustrative en haut de la carte */
+    .skill-thumb {
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Couleurs de fond par catégorie */
+    .skill-thumb.code   { background: linear-gradient(135deg, #0f0c29, #302b63); }
+    .skill-thumb.music  { background: linear-gradient(135deg, #3a1c71, #6a0572); }
+    .skill-thumb.maths  { background: linear-gradient(135deg, #134e5e, #1a6b4a); }
+    .skill-thumb.langues { background: linear-gradient(135deg, #0a6473, #135e72); }
+
+    .skill-thumb .cat-label {
+      position: absolute;
+      top: .7rem; left: .7rem;
+      background: rgba(0,0,0,.45);
+      border-radius: 6px;
+      padding: .2rem .55rem;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+
+    /* Illustration code (barres colorées) */
+    .code-lines { display: flex; flex-direction: column; gap: 5px; padding: 1rem; }
+    .code-lines span {
+      height: 6px; border-radius: 3px;
+      background: linear-gradient(90deg, #a855f7, #22d3ee);
+    }
+
+    /* Illustration musique */
+    .music-icon { font-size: 3.5rem; }
+
+    /* Illustration maths */
+    .maths-text {
+      font-family: 'Georgia', serif;
+      text-align: center;
+      font-size: .85rem;
+      line-height: 1.8;
+      color: #d1fae5;
+    }
+
+    /* Illustration langues (bulles de chat) */
+    .lang-bubbles { display: flex; flex-direction: column; gap: .45rem; padding: .5rem; }
+
+    .bubble {
+      padding: .3rem .7rem;
+      border-radius: 99px;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    .bubble.left  { background: var(--purple); align-self: flex-start; }
+    .bubble.right { background: #fff; color: #111; align-self: flex-end; }
+
+    /* Bas de la carte : nom + auteur */
+    .skill-info { padding: 1rem 1.1rem; }
+    .skill-info strong { display: block; font-size: .98rem; margin-bottom: .65rem; }
+
+    .skill-author {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .author-left { display: flex; align-items: center; gap: .5rem; }
+
+    .avatar-sm {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      font-size: .7rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .avatar-sm.lm { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    .avatar-sm.sl { background: linear-gradient(135deg, #059669, #34d399); }
+    .avatar-sm.yd { background: linear-gradient(135deg, #b45309, #f59e0b); }
+    .avatar-sm.tr { background: linear-gradient(135deg, #dc2626, #f87171); }
+
+    .author-name { font-size: .82rem; color: var(--text-muted); }
+
+    .token-badge {
+      display: flex; align-items: center; gap: .3rem;
+      font-size: .82rem; font-weight: 700;
+    }
+
+    .coin { font-size: 1rem; }
+
+    /* ── COMMENT ÇA MARCHE ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+
+    .step-number {
+      width: 40px; height: 40px;
+      background: var(--purple);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .step-card h3 { font-size: 1.05rem; margin-bottom: .6rem; }
+    .step-card p { font-size: .88rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── TÉMOIGNAGES ── */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .testi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem;
+    }
+
+    .stars { color: #f59e0b; font-size: 1rem; margin-bottom: .9rem; }
+
+    .testi-card blockquote {
+      font-size: .9rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .testi-author {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .testi-author-left { display: flex; align-items: center; gap: .7rem; }
+
+    .avatar-testi {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      font-size: .8rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .avatar-testi.cd { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    .avatar-testi.ik { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .avatar-testi.sl { background: linear-gradient(135deg, #059669, #34d399); }
+
+    .testi-name { font-size: .88rem; font-weight: 600; }
+    .testi-school { font-size: .75rem; color: var(--text-muted); }
+
+    .exchange-tag {
+      background: rgba(168,85,247,.15);
+      border: 1px solid rgba(168,85,247,.3);
+      color: var(--purple-light);
+      border-radius: 6px;
+      padding: .25rem .65rem;
+      font-size: .75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── CTA FINAL ── */
+    .cta-section {
+      margin: 0 4rem 5rem;
+      background: linear-gradient(135deg, rgba(168,85,247,.25), rgba(236,72,153,.15));
+      border: 1px solid rgba(168,85,247,.3);
+      border-radius: 20px;
+      padding: 4rem;
+      text-align: center;
+    }
+
+    .cta-section h2 { font-size: 2.2rem; font-weight: 800; margin-bottom: .8rem; }
+    .cta-section p { color: var(--text-muted); font-size: .95rem; margin-bottom: 2rem; }
+
+    .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      color: var(--text-muted);
+      font-size: .82rem;
+    }
+
+    .footer-logo { display: flex; align-items: center; gap: .6rem; font-weight: 700; color: var(--text); font-size: .9rem; }
+
+    .footer-links { display: flex; gap: 1.8rem; }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
+      .hero h1 { font-size: 2.3rem; }
+      .section { padding: 3rem 1.5rem; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .steps-grid, .testimonials-grid { grid-template-columns: 1fr; }
+      .cta-section { margin: 0 1.5rem 3rem; padding: 2.5rem 1.5rem; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ BARRE DE NAVIGATION ═══ -->
+  <nav>
+    <div class="nav-logo">
+      <div class="logo-icon">S</div>
+      SkillSwap
+    </div>
+    <ul class="nav-links">
+      <li onclick="window.location.href='explorer.html'">Explorer</li>
+      <li onclick="document.querySelector('.steps-grid').scrollIntoView({behavior:'smooth'})">Comment ça marche</li>
+      <li onclick="document.querySelector('.testimonials-grid').scrollIntoView({behavior:'smooth'})">Témoignages</li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-ghost">Se connecter</button>
+      <button class="btn-primary" onclick="window.location.href='inscription.html'">Créer mon compte</button>
+    </div>
+  </nav>
+
+  <!-- ═══ SECTION HÉRO ═══ -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Troc de compétences entre étudiants · 68 compétences
+      </div>
+
+      <h1>
+        Échange ton <span class="accent">savoir</span>,<br>
+        pas ton argent.
+      </h1>
+
+      <p>
+        Code, langues, design, musique, maths… chacun propose les
+        compétences qu'il maîtrise et apprend celles qui lui manquent.
+        Chaque heure vaut des <strong>jetons de temps</strong> — pas un centime ne
+        change de main.
+      </p>
+
+      <div class="hero-buttons">
+        <button class="btn-hero-primary" onclick="window.location.href='inscription.html'">Créer mon compte</button>
+        <button class="btn-hero-ghost" onclick="window.location.href='explorer.html'">Explorer sans compte →</button>
+      </div>
+
+      <div class="hero-stats">
+        <div>
+          <span class="stat-number">2 400+</span>
+          <span class="stat-label">étudiants actifs</span>
+        </div>
+        <div>
+          <span class="stat-number">68</span>
+          <span class="stat-label">compétences</span>
+        </div>
+        <div>
+          <span class="stat-number">4.9★</span>
+          <span class="stat-label">satisfaction</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carte de profil flottante -->
+    <div class="hero-card">
+      <div class="floating-badge">+1 jeton 🪙</div>
+
+      <div class="card-user">
+        <div class="avatar">LM</div>
+        <div class="card-user-info">
+          <strong>Léa Martin</strong>
+          <span>Étudiante en informatique</span>
+        </div>
+        <div class="status-badge">En ligne</div>
+      </div>
+
+      <div class="card-skill">
+        <div class="skill-label">Propose</div>
+        <strong>Python pour débutants</strong>
+        <span>1 jeton / heure · ⭐ 4.9</span>
+      </div>
+
+      <div class="card-arrow">⇅</div>
+
+      <div class="card-skill">
+        <div class="skill-label">Recherche</div>
+        <strong>Anglais conversationnel</strong>
+        <span>Niveau intermédiaire</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION COMPÉTENCES EN ÉCHANGE ═══ -->
+  <section class="section">
+    <div class="section-tag">Ce qui s'échange en ce moment</div>
+    <div class="section-header">
+      <h2>Des dizaines de compétences à troquer</h2>
+      <button class="btn-outline">Tout explorer →</button>
+    </div>
+
+    <div class="skills-grid">
+
+      <!-- Carte Code -->
+      <div class="skill-card">
+        <div class="skill-thumb code">
+          <span class="cat-label">Code.</span>
+          <div class="code-lines">
+            <span style="width:80%"></span>
+            <span style="width:55%"></span>
+            <span style="width:70%"></span>
+            <span style="width:45%"></span>
+            <span style="width:65%"></span>
+            <span style="width:90%"></span>
+          </div>
+        </div>
+        <div class="skill-info">
+          <strong>Python pour débutants</strong>
+          <div class="skill-author">
+            <div class="author-left">
+              <div class="avatar-sm lm">LM</div>
+              <span class="author-name">Léa Martin</span>
+            </div>
+            <div class="token-badge">1 <span class="coin">🪙</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte Musique -->
+      <div class="skill-card">
+        <div class="skill-thumb music">
+          <span class="cat-label">Musique 🎵</span>
+          <span class="music-icon">🎸</span>
+        </div>
+        <div class="skill-info">
+          <strong>Guitare acoustique</strong>
+          <div class="skill-author">
+            <div class="author-left">
+              <div class="avatar-sm sl">SL</div>
+              <span class="author-name">Sofia Lopez</span>
+            </div>
+            <div class="token-badge">1 <span class="coin">🪙</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte Maths -->
+      <div class="skill-card">
+        <div class="skill-thumb maths">
+          <span class="cat-label">Maths</span>
+          <div class="maths-text">
+            a² + b² = c²<br>
+            ∫ x dx = ½x²<br>
+            π ≈ 3.14159<br>
+            ∑ⁿ √2 ∞ f(x)
+          </div>
+        </div>
+        <div class="skill-info">
+          <strong>Algèbre linéaire</strong>
+          <div class="skill-author">
+            <div class="author-left">
+              <div class="avatar-sm yd">YD</div>
+              <span class="author-name">Yanis Dubois</span>
+            </div>
+            <div class="token-badge">1 <span class="coin">🪙</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte Langues -->
+      <div class="skill-card">
+        <div class="skill-thumb langues">
+          <span class="cat-label">Langues</span>
+          <div class="lang-bubbles">
+            <div class="bubble left">Hello</div>
+            <div class="bubble right">Bonjour</div>
+            <div class="bubble left">Hola</div>
+            <div class="bubble right">你好 · 文</div>
+          </div>
+        </div>
+        <div class="skill-info">
+          <strong>Anglais conversationnel</strong>
+          <div class="skill-author">
+            <div class="author-left">
+              <div class="avatar-sm tr">TR</div>
+              <span class="author-name">Tom Reyes</span>
+            </div>
+            <div class="token-badge">1 <span class="coin">🪙</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Comment ça marche -->
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Publie ce que tu sais</h3>
+        <p>Code, langue, instrument, design… décris ta compétence et fixe son coût en jetons.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Trouve ton binôme</h3>
+        <p>Parcours les profils, propose un échange et planifie un créneau qui vous arrange.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Échange &amp; valide</h3>
+        <p>Après le cours, vous validez des deux côtés. Un QCM confirme — chacun gagne 1 jeton.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION TÉMOIGNAGES ═══ -->
+  <section class="section" style="padding-top: 0;">
+    <div class="section-tag">Ils ont échangé sur SkillSwap</div>
+    <h2 style="font-size:2rem; font-weight:800; margin-bottom:2.5rem;">Ce qu'en disent les étudiants</h2>
+
+    <div class="testimonials-grid">
+
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "J'ai appris Python en 4 séances et donné des cours d'anglais en retour.
+          Zéro euro dépensé, un super binôme trouvé."
+        </blockquote>
+        <div class="testi-author">
+          <div class="testi-author-left">
+            <div class="avatar-testi cd">CD</div>
+            <div>
+              <div class="testi-name">Camille D.</div>
+              <div class="testi-school">L3 Informatique · Lyon</div>
+            </div>
+          </div>
+          <span class="exchange-tag">Python ⇌ Anglais</span>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "Timide à l'oral, j'osais pas prendre de cours payants. Ici l'échange
+          met à l'aise, on est entre étudiants."
+        </blockquote>
+        <div class="testi-author">
+          <div class="testi-author-left">
+            <div class="avatar-testi ik">IK</div>
+            <div>
+              <div class="testi-name">Inès K.</div>
+              <div class="testi-school">M1 Design · Paris</div>
+            </div>
+          </div>
+          <span class="exchange-tag">Design ⇌ Espagnol</span>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>
+          "Le système de jetons est malin : ça force la réciprocité.
+          J'enseigne la guitare, j'apprends les maths."
+        </blockquote>
+        <div class="testi-author">
+          <div class="testi-author-left">
+            <div class="avatar-testi sl">SL</div>
+            <div>
+              <div class="testi-name">Sofia L.</div>
+              <div class="testi-school">L2 Musicologie · Bordeaux</div>
+            </div>
+          </div>
+          <span class="exchange-tag">Guitare ⇌ Maths</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ APPEL À L'ACTION FINAL ═══ -->
+  <div class="cta-section">
+    <h2>Prêt à échanger ton premier savoir ?</h2>
+    <p>Rejoins 2 400+ étudiants. 2 jetons offerts à l'inscription.</p>
+    <div class="cta-buttons">
+      <button class="btn-hero-primary" onclick="window.location.href='inscription.html'">Créer mon compte gratuitement</button>
+      <button class="btn-hero-ghost" onclick="window.location.href='explorer.html'">Explorer d'abord →</button>
+    </div>
+  </div>
+
+  <!-- ═══ PIED DE PAGE ═══ -->
+  <footer>
+    <div class="footer-logo">
+      <div class="logo-icon" style="width:28px;height:28px;font-size:.75rem;">S</div>
+      SkillSwap
+    </div>
+    <div class="footer-links">
+      <a href="#">À propos</a>
+      <a href="#">Confidentialité</a>
+      <a href="#">CGU</a>
+      <a href="#">Contact</a>
+    </div>
+    <span>© 2026 SkillSwap – Tous droits réservés</span>
+  </footer>
+
+</body>
+</html>

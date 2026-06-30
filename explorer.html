@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Découvrir des compétences</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --sidebar: #120f22;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --cyan: #22d3ee;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 180px;
+      min-height: 100vh;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 1.4rem 1rem;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+      padding: .2rem .3rem;
+    }
+
+    .logo-icon {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .8rem;
+    }
+
+    .sidebar-nav { display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .6rem .8rem;
+      border-radius: 8px;
+      font-size: .88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      position: relative;
+    }
+
+    .sidebar-item:hover { background: var(--bg-card); color: var(--text); }
+
+    .sidebar-item.active {
+      background: rgba(168,85,247,.15);
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    /* Pastille de notification */
+    .badge {
+      margin-left: auto;
+      background: var(--purple);
+      color: #fff;
+      border-radius: 99px;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: .1rem .4rem;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* Zone en bas de sidebar : solde + profil */
+    .sidebar-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    .token-balance {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .8rem 1rem;
+      margin-bottom: .8rem;
+    }
+
+    .token-balance .label { font-size: .72rem; color: var(--text-muted); margin-bottom: .25rem; }
+    .token-balance .amount { font-size: 1.3rem; font-weight: 800; }
+    .token-balance .unit { font-size: .78rem; color: var(--text-muted); margin-left: .2rem; }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .5rem .6rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .user-pill:hover { background: var(--bg-card); }
+
+    .avatar-pill {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: var(--bg-card2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .user-pill-info { flex: 1; }
+    .user-pill-name { font-size: .82rem; font-weight: 600; color: var(--text-muted); }
+    .user-pill-status { font-size: .7rem; color: var(--text-muted); }
+
+    .btn-connect-sm {
+      width: 100%;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none;
+      color: #fff;
+      padding: .55rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 600;
+      margin-top: .5rem;
+      transition: opacity .2s;
+    }
+
+    .btn-connect-sm:hover { opacity: .88; }
+
+    /* ── CONTENU PRINCIPAL ── */
+    .main {
+      margin-left: 180px;
+      flex: 1;
+      padding: 2.5rem 3rem;
+    }
+
+    /* En-tête de la page + bouton Thème */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.8rem;
+    }
+
+    .page-header h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: .3rem; }
+    .page-header p { font-size: .88rem; color: var(--text-muted); }
+    .page-header p a { color: var(--purple-light); }
+
+    /* Barre de recherche */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .65rem 1rem;
+      margin-bottom: 1rem;
+      transition: border-color .2s;
+    }
+
+    .search-bar:focus-within { border-color: var(--purple); }
+
+    .search-icon { color: var(--text-muted); font-size: 1rem; flex-shrink: 0; }
+
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: .95rem;
+    }
+
+    .search-input::placeholder { color: var(--text-muted); }
+
+    .search-clear {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0;
+      line-height: 1;
+      display: none;
+    }
+
+    .search-clear.visible { display: block; }
+    .search-clear:hover { color: var(--text); }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-size: .95rem;
+    }
+
+    /* Filtres par catégorie */
+    .filters {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .filter-btn {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: .4rem 1rem;
+      border-radius: 99px;
+      cursor: pointer;
+      font-size: .85rem;
+      transition: all .15s;
+    }
+
+    .filter-btn:hover { border-color: var(--purple); color: var(--text); }
+
+    .filter-btn.active {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Grille des cartes de compétences */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.3rem;
+    }
+
+    .skill-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .2s, border-color .2s;
+    }
+
+    .skill-card:hover { transform: translateY(-3px); border-color: var(--purple); }
+
+    /* Vignette illustrative */
+    .thumb {
+      height: 140px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .thumb.code    { background: linear-gradient(135deg, #0f0c29, #302b63); }
+    .thumb.langues { background: linear-gradient(135deg, #0a6473, #135e72); }
+    .thumb.design  { background: linear-gradient(135deg, #3b0764, #7e22ce); }
+    .thumb.music   { background: linear-gradient(135deg, #3a1c71, #6a0572); }
+    .thumb.maths   { background: linear-gradient(135deg, #134e5e, #1a6b4a); }
+    .thumb.mkt     { background: linear-gradient(135deg, #831843, #be185d); }
+
+    /* Tag catégorie sur la vignette */
+    .cat-tag {
+      position: absolute;
+      top: .65rem; left: .65rem;
+      padding: .2rem .55rem;
+      border-radius: 5px;
+      font-size: .7rem;
+      font-weight: 600;
+    }
+
+    .cat-tag.code    { background: rgba(99,102,241,.5); }
+    .cat-tag.langues { background: rgba(20,184,166,.5); }
+    .cat-tag.design  { background: rgba(168,85,247,.5); }
+    .cat-tag.music   { background: rgba(236,72,153,.5); }
+    .cat-tag.maths   { background: rgba(16,185,129,.5); }
+    .cat-tag.mkt     { background: rgba(245,158,11,.5); }
+
+    /* Note étoile en haut à droite */
+    .rating {
+      position: absolute;
+      top: .65rem; right: .65rem;
+      font-size: .78rem;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    /* Illustrations CSS réutilisées */
+    .code-lines { display: flex; flex-direction: column; gap: 5px; padding: 1rem; }
+    .code-lines span { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #a855f7, #22d3ee); }
+
+    .lang-bubbles { display: flex; flex-direction: column; gap: .4rem; padding: .4rem; }
+    .bubble { padding: .25rem .65rem; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+    .bubble.left  { background: var(--purple); align-self: flex-start; }
+    .bubble.right { background: #fff; color: #111; align-self: flex-end; }
+
+    .design-shapes { display: flex; gap: .5rem; align-items: center; }
+    .shape-sq { width: 40px; height: 40px; background: var(--purple); border-radius: 6px; }
+    .shape-ci { width: 38px; height: 38px; background: var(--pink); border-radius: 50%; }
+    .shape-ln { width: 6px; height: 55px; background: var(--cyan); border-radius: 3px; }
+
+    .music-icon { font-size: 3.2rem; }
+
+    .maths-text {
+      font-family: 'Georgia', serif;
+      text-align: center;
+      font-size: .8rem;
+      line-height: 1.8;
+      color: #d1fae5;
+    }
+
+    .chart { display: flex; align-items: flex-end; gap: 6px; padding: .5rem; }
+    .bar {
+      border-radius: 4px 4px 0 0;
+      width: 18px;
+      background: linear-gradient(180deg, var(--pink), var(--purple));
+    }
+
+    /* Bas de la carte */
+    .card-body { padding: .9rem 1rem; }
+    .card-body h3 { font-size: .98rem; font-weight: 700; margin-bottom: .7rem; }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .avatar-sm {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      font-size: .68rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .av-lm { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    .av-tr { background: linear-gradient(135deg, #dc2626, #f87171); }
+    .av-ik { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .av-kb { background: linear-gradient(135deg, #0284c7, #38bdf8); }
+    .av-sl { background: linear-gradient(135deg, #059669, #34d399); }
+    .av-yd { background: linear-gradient(135deg, #b45309, #f59e0b); }
+    .av-cp { background: linear-gradient(135deg, #0891b2, #22d3ee); }
+    .av-nv { background: linear-gradient(135deg, #7c3aed, #ec4899); }
+
+    .author-info { flex: 1; }
+    .author-name { font-size: .8rem; font-weight: 600; }
+    .author-level { font-size: .72rem; color: var(--text-muted); }
+
+    .token-info {
+      display: flex;
+      align-items: center;
+      gap: .2rem;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    .coin { font-size: .95rem; }
+
+    /* ── MODAL DE CONNEXION ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .modal-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .modal-logo {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.1rem;
+      margin: 0 auto 1.2rem;
+    }
+
+    .modal h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: .6rem; }
+    .modal p  { font-size: .88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; }
+
+    .modal input {
+      width: 100%;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .8rem 1rem;
+      color: var(--text);
+      font-size: .92rem;
+      outline: none;
+      margin-bottom: .75rem;
+      transition: border-color .2s;
+    }
+
+    .modal input::placeholder { color: var(--text-muted); }
+    .modal input:focus { border-color: var(--purple); }
+
+    .btn-modal-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none;
+      color: #fff;
+      padding: .85rem;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: .6rem;
+      transition: opacity .2s;
+    }
+
+    .btn-modal-primary:hover { opacity: .88; }
+
+    .btn-modal-ghost {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .85rem;
+      border-radius: 10px;
+      font-size: .95rem;
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+
+    .btn-modal-ghost:hover { border-color: var(--purple); }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 1.5rem; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="logo-icon">S</div>
+      SkillSwap
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-item active">
+        <span>•</span> Découvrir
+      </div>
+      <div class="sidebar-item" onclick="ouvrirModal()">
+        <span>•</span> Mon profil
+      </div>
+      <div class="sidebar-item" onclick="ouvrirModal()">
+        <span>•</span> Messages
+        <span class="badge">2</span>
+      </div>
+      <div class="sidebar-item" onclick="ouvrirModal()">
+        <span>•</span> Mes jetons
+      </div>
+    </nav>
+
+    <!-- Solde jetons + profil invité -->
+    <div class="sidebar-bottom">
+      <div class="token-balance">
+        <div class="label">Solde de jetons</div>
+        <div>
+          <span class="amount">8</span>
+          <span class="unit">jetons</span>
+        </div>
+      </div>
+      <div class="user-pill">
+        <div class="avatar-pill">👤</div>
+        <div class="user-pill-info">
+          <div class="user-pill-name">Invité</div>
+          <div class="user-pill-status">Mode exploration</div>
+        </div>
+      </div>
+      <button class="btn-connect-sm" onclick="ouvrirModal()">Se connecter</button>
+    </div>
+  </aside>
+
+  <!-- ═══ CONTENU PRINCIPAL ═══ -->
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h1>Découvrir des compétences</h1>
+        <p>Trouve un binôme et échange 1h pour 1h. <a href="#" onclick="ouvrirModal()">Aucun login requis pour explorer.</a></p>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <!-- Barra de búsqueda por texto -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" type="text" placeholder="Rechercher une compétence, un auteur…" oninput="rechercher(this.value)" />
+      <button class="search-clear" id="searchClear" onclick="effacerRecherche()" title="Effacer">✕</button>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filtrer(this,'tout')">Tout</button>
+      <button class="filter-btn" onclick="filtrer(this,'code')">Code</button>
+      <button class="filter-btn" onclick="filtrer(this,'langues')">Langues</button>
+      <button class="filter-btn" onclick="filtrer(this,'design')">Design</button>
+      <button class="filter-btn" onclick="filtrer(this,'music')">Musique</button>
+      <button class="filter-btn" onclick="filtrer(this,'maths')">Maths</button>
+    </div>
+
+    <!-- Grille des compétences -->
+    <div class="grid" id="grid">
+
+      <!-- Python -->
+      <div class="skill-card" data-cat="code" onclick="ouvrirModal()">
+        <div class="thumb code">
+          <span class="cat-tag code">Code</span>
+          <span class="rating">⭐ 4.9</span>
+          <div class="code-lines">
+            <span style="width:80%"></span>
+            <span style="width:55%"></span>
+            <span style="width:70%"></span>
+            <span style="width:45%"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>Python pour débutants</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-lm">LM</div>
+            <div class="author-info">
+              <div class="author-name">Léa Martin</div>
+              <div class="author-level">Intermédiaire</div>
+            </div>
+            <div class="token-info">1 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anglais -->
+      <div class="skill-card" data-cat="langues" onclick="ouvrirModal()">
+        <div class="thumb langues">
+          <span class="cat-tag langues">Langues</span>
+          <span class="rating">⭐ 4.8</span>
+          <div class="lang-bubbles">
+            <div class="bubble left">Hello</div>
+            <div class="bubble right">Bonjour</div>
+            <div class="bubble left">Hola</div>
+            <div class="bubble right">你好 · 文</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>Anglais conversationnel</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-tr">TR</div>
+            <div class="author-info">
+              <div class="author-name">Tom Reyes</div>
+              <div class="author-level">Tous niveaux</div>
+            </div>
+            <div class="token-info">1 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UI Design -->
+      <div class="skill-card" data-cat="design" onclick="ouvrirModal()">
+        <div class="thumb design">
+          <span class="cat-tag design">Design</span>
+          <span class="rating">⭐ 5</span>
+          <div class="design-shapes">
+            <div class="shape-sq"></div>
+            <div class="shape-ci"></div>
+            <div class="shape-ln"></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>UI Design &amp; Figma</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-ik">IK</div>
+            <div class="author-info">
+              <div class="author-name">Inès Khalil</div>
+              <div class="author-level">Débutant à avancé</div>
+            </div>
+            <div class="token-info">2 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Java -->
+      <div class="skill-card" data-cat="code" onclick="ouvrirModal()">
+        <div class="thumb code">
+          <span class="cat-tag code">Code</span>
+          <span class="rating">⭐ 4.7</span>
+          <div class="code-lines">
+            <span style="width:60%"></span>
+            <span style="width:85%"></span>
+            <span style="width:50%"></span>
+            <span style="width:75%"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>Java &amp; POO</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-kb">KB</div>
+            <div class="author-info">
+              <div class="author-name">Karim Benali</div>
+              <div class="author-level">Intermédiaire</div>
+            </div>
+            <div class="token-info">1 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guitare -->
+      <div class="skill-card" data-cat="music" onclick="ouvrirModal()">
+        <div class="thumb music">
+          <span class="cat-tag music">Musique</span>
+          <span class="rating">⭐ 4.9</span>
+          <span class="music-icon">🎸</span>
+        </div>
+        <div class="card-body">
+          <h3>Guitare acoustique</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-sl">SL</div>
+            <div class="author-info">
+              <div class="author-name">Sofia Lopez</div>
+              <div class="author-level">Débutant</div>
+            </div>
+            <div class="token-info">1 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Algèbre -->
+      <div class="skill-card" data-cat="maths" onclick="ouvrirModal()">
+        <div class="thumb maths">
+          <span class="cat-tag maths">Maths</span>
+          <span class="rating">⭐ 4.6</span>
+          <div class="maths-text">
+            a² + b² = c²<br>
+            ∫ x dx = ½x²<br>
+            π ≈ 3.14159<br>
+            ∑ⁿ √2 ∞ f(x)
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>Algèbre linéaire</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-yd">YD</div>
+            <div class="author-info">
+              <div class="author-name">Yanis Dubois</div>
+              <div class="author-level">Licence</div>
+            </div>
+            <div class="token-info">1 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Espagnol -->
+      <div class="skill-card" data-cat="langues" onclick="ouvrirModal()">
+        <div class="thumb langues">
+          <span class="cat-tag langues">Langues</span>
+          <span class="rating">⭐ 4.8</span>
+          <div class="lang-bubbles">
+            <div class="bubble left">Hello</div>
+            <div class="bubble right">Bonjour</div>
+            <div class="bubble left">Hola</div>
+            <div class="bubble right">你好 · 文</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>Espagnol express</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-cp">CP</div>
+            <div class="author-info">
+              <div class="author-name">Clara Pérez</div>
+              <div class="author-level">Débutant</div>
+            </div>
+            <div class="token-info">1 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marketing -->
+      <div class="skill-card" data-cat="mkt" onclick="ouvrirModal()">
+        <div class="thumb mkt">
+          <span class="cat-tag mkt" style="background:rgba(245,158,11,.5);">Marketing</span>
+          <span class="rating">⭐ 4.7</span>
+          <div class="chart">
+            <div class="bar" style="height:30px"></div>
+            <div class="bar" style="height:50px"></div>
+            <div class="bar" style="height:42px"></div>
+            <div class="bar" style="height:65px"></div>
+            <div class="bar" style="height:55px"></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>Growth &amp; Marketing</h3>
+          <div class="card-footer">
+            <div class="avatar-sm av-nv">NV</div>
+            <div class="author-info">
+              <div class="author-name">Noah Vidal</div>
+              <div class="author-level">Intermédiaire</div>
+            </div>
+            <div class="token-info">2 <span class="coin">🪙</span><span style="font-size:.72rem;color:var(--text-muted);font-weight:400"> par heure</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ═══ MODAL DE CONNEXION ═══ -->
+  <div class="modal-overlay" id="modal" onclick="fermerModalSiDehors(event)">
+    <div class="modal">
+      <div class="modal-logo">S</div>
+      <h2>Connecte-toi pour échanger</h2>
+      <p>
+        Tu peux explorer tous les profils librement. Pour
+        contacter quelqu'un et planifier un échange, crée ton
+        compte étudiant.
+      </p>
+      <input type="email" placeholder="Email universitaire" />
+      <input type="password" placeholder="Mot de passe" />
+      <button class="btn-modal-primary" onclick="window.location.href='profil.html'">Se connecter</button>
+      <button class="btn-modal-ghost" onclick="fermerModal()">Continuer à explorer</button>
+    </div>
+  </div>
+
+  <script>
+    /* Ouvrir / fermer le modal de connexion */
+    function ouvrirModal() {
+      document.getElementById('modal').classList.add('visible');
+    }
+
+    function fermerModal() {
+      document.getElementById('modal').classList.remove('visible');
+    }
+
+    /* Fermer en cliquant en dehors du modal */
+    function fermerModalSiDehors(e) {
+      if (e.target === document.getElementById('modal')) fermerModal();
+    }
+
+    /* Catégorie active pour combiner avec la recherche */
+    let catActive = 'tout';
+
+    function filtrer(btn, cat) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      catActive = cat;
+      appliquerFiltres();
+    }
+
+    function rechercher(val) {
+      document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
+      appliquerFiltres();
+    }
+
+    function effacerRecherche() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchClear').classList.remove('visible');
+      appliquerFiltres();
+    }
+
+    function appliquerFiltres() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const cards = document.querySelectorAll('.skill-card');
+      let visible = 0;
+
+      cards.forEach(card => {
+        const texte = card.innerText.toLowerCase();
+        const catOk = catActive === 'tout' || card.dataset.cat === catActive;
+        const texteOk = query === '' || texte.includes(query);
+        const show = catOk && texteOk;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      /* Mensaje si no hay resultados */
+      let noRes = document.getElementById('no-results');
+      if (!noRes) {
+        noRes = document.createElement('div');
+        noRes.id = 'no-results';
+        noRes.className = 'no-results';
+        noRes.textContent = 'Aucune compétence ne correspond à ta recherche.';
+        document.getElementById('grid').appendChild(noRes);
+      }
+      noRes.style.display = visible === 0 ? '' : 'none';
+    }
+  </script>
+
+</body>
+</html>

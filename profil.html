@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Mon profil</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --sidebar: #120f22;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --cyan: #22d3ee;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── SIDEBAR (identique à explorer.html) ── */
+    .sidebar {
+      width: 180px;
+      min-height: 100vh;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 1.4rem 1rem;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+      padding: .2rem .3rem;
+    }
+
+    .logo-icon {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .8rem;
+    }
+
+    .sidebar-nav { display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .6rem .8rem;
+      border-radius: 8px;
+      font-size: .88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .sidebar-item:hover { background: var(--bg-card); color: var(--text); }
+
+    .sidebar-item.active {
+      background: rgba(168,85,247,.15);
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    .badge {
+      margin-left: auto;
+      background: var(--purple);
+      color: #fff;
+      border-radius: 99px;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: .1rem .4rem;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .sidebar-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    .token-balance {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .8rem 1rem;
+      margin-bottom: .8rem;
+    }
+
+    .token-balance .label { font-size: .72rem; color: var(--text-muted); margin-bottom: .25rem; }
+    .token-balance .amount { font-size: 1.3rem; font-weight: 800; }
+    .token-balance .unit  { font-size: .78rem; color: var(--text-muted); margin-left: .2rem; }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .5rem .6rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .user-pill:hover { background: var(--bg-card); }
+
+    .avatar-pill {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700;
+    }
+
+    .user-pill-name   { font-size: .82rem; font-weight: 600; }
+    .user-pill-status { font-size: .7rem; color: var(--text-muted); }
+
+    .settings-btn {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .8rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: auto;
+    }
+
+    /* ── CONTENU PRINCIPAL ── */
+    .main {
+      margin-left: 180px;
+      flex: 1;
+      padding: 2.5rem 3rem;
+    }
+
+    /* ── CARTE EN-TÊTE DU PROFIL ── */
+    .profile-header {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    /* Halo derrière l'avatar */
+    .profile-header::before {
+      content: '';
+      position: absolute;
+      top: -40px; left: -40px;
+      width: 250px; height: 250px;
+      background: radial-gradient(circle, rgba(168,85,247,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .profile-avatar {
+      width: 72px; height: 72px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .profile-info { flex: 1; }
+
+    .profile-info h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: .3rem; }
+    .profile-info .school { font-size: .88rem; color: var(--text-muted); margin-bottom: .6rem; }
+
+    .profile-meta {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-rating { font-size: .85rem; color: #fbbf24; font-weight: 600; }
+    .meta-rating span { color: var(--text-muted); font-weight: 400; }
+
+    .verified-badge {
+      background: rgba(34,211,238,.15);
+      color: var(--cyan);
+      border: 1px solid rgba(34,211,238,.3);
+      border-radius: 6px;
+      padding: .2rem .65rem;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    /* Solde affiché en haut à droite */
+    .profile-balance {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: .3rem;
+    }
+
+    .profile-balance .bal-label { font-size: .75rem; color: var(--text-muted); }
+
+    .bal-amount {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .coin-icon { font-size: 1.5rem; }
+
+    /* ── SECTION COMPÉTENCES ── */
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .section-title h3 { font-size: 1.2rem; font-weight: 700; }
+
+    .section-actions { display: flex; gap: .6rem; }
+
+    .btn-edit {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .4rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .85rem;
+      transition: border-color .2s;
+    }
+
+    .btn-edit:hover { border-color: var(--purple); }
+
+    .btn-publish {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none;
+      color: #fff;
+      padding: .4rem 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 600;
+      transition: opacity .2s;
+    }
+
+    .btn-publish:hover { opacity: .88; }
+
+    /* Grille propose / apprend */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .skills-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .panel-title {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Une ligne de compétence */
+    .skill-row {
+      display: flex;
+      align-items: flex-start;
+      gap: .8rem;
+      padding: .85rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skill-row:last-child { border-bottom: none; }
+
+    /* Pastille de statut */
+    .skill-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .skill-dot.active   { background: #34d399; }
+    .skill-dot.inactive { background: var(--pink); }
+    .skill-dot.learning { background: var(--purple); }
+    .skill-dot.wanted   { background: var(--text-muted); }
+
+    .skill-row-info { flex: 1; }
+    .skill-row-name { font-size: .95rem; font-weight: 600; margin-bottom: .15rem; }
+    .skill-row-cat  { font-size: .76rem; color: var(--text-muted); margin-bottom: .3rem; }
+    .skill-row-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.5; }
+
+    .skill-row-tokens {
+      display: flex;
+      align-items: center;
+      gap: .2rem;
+      font-size: .85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .skill-row-status {
+      font-size: .76rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 1.5rem; }
+      .profile-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="logo-icon">S</div>
+      SkillSwap
+    </a>
+
+    <nav class="sidebar-nav">
+      <a href="explorer.html" class="sidebar-item">
+        <span>•</span> Découvrir
+      </a>
+      <div class="sidebar-item active">
+        <span>•</span> Mon profil
+      </div>
+      <div class="sidebar-item" onclick="afficherToast('Messages — bientôt disponible')">
+        <span>•</span> Messages
+        <span class="badge">2</span>
+      </div>
+      <div class="sidebar-item" onclick="afficherToast('Mes jetons — bientôt disponible')">
+        <span>•</span> Mes jetons
+      </div>
+      <div class="sidebar-item" onclick="afficherToast('Admin — bientôt disponible')">
+        <span>•</span> Admin
+        <span class="badge">3</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="token-balance">
+        <div class="label">Solde de jetons</div>
+        <div>
+          <span class="amount">8</span>
+          <span class="unit">jetons</span>
+        </div>
+      </div>
+      <div class="user-pill">
+        <div class="avatar-pill">MD</div>
+        <div style="flex:1">
+          <div class="user-pill-name">Maxime<br>Dubois</div>
+          <div class="user-pill-status">• Connecté</div>
+        </div>
+        <button class="settings-btn" onclick="afficherToast('Paramètres — bientôt disponible')">⚙</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ CONTENU PRINCIPAL ═══ -->
+  <main class="main">
+
+    <!-- En-tête du profil -->
+    <div class="profile-header">
+      <div class="profile-avatar">MD</div>
+
+      <div class="profile-info">
+        <h2>Maxime Dubois</h2>
+        <div class="school">Étudiant·e · Université de Lyon</div>
+        <div class="profile-meta">
+          <span class="meta-rating">⭐ 4.9 <span>· 24 échanges</span></span>
+          <span class="verified-badge">Membre vérifié</span>
+        </div>
+      </div>
+
+      <div class="profile-balance">
+        <span class="bal-label">Solde</span>
+        <div class="bal-amount">
+          8 <span class="coin-icon">🪙</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Mes compétences -->
+    <div class="section-title">
+      <h3>Mes compétences</h3>
+      <div class="section-actions">
+        <button class="btn-edit" onclick="afficherToast('Modification — bientôt disponible')">Modifier</button>
+        <button class="btn-publish" onclick="afficherToast('Publication — bientôt disponible')">+ Publier une compétence</button>
+      </div>
+    </div>
+
+    <div class="skills-grid">
+
+      <!-- Ce que je propose -->
+      <div class="skills-panel">
+        <div class="panel-title">Ce que je propose</div>
+
+        <div class="skill-row">
+          <div class="skill-dot active"></div>
+          <div class="skill-row-info">
+            <div class="skill-row-name">Anglais conversationnel</div>
+            <div class="skill-row-cat">Langues</div>
+            <div class="skill-row-desc">
+              Sessions 100% parlées pour gagner en aisance. On travaille la prononciation et
+              le vocabulaire du quotidien.
+            </div>
+          </div>
+          <div class="skill-row-tokens">1 🪙</div>
+        </div>
+
+        <div class="skill-row">
+          <div class="skill-dot inactive"></div>
+          <div class="skill-row-info">
+            <div class="skill-row-name">Aide en design / Figma</div>
+            <div class="skill-row-cat">Design</div>
+            <div class="skill-row-desc">
+              De la grille aux composants : auto-layout, variantes et bonnes pratiques d'un
+              design system.
+            </div>
+          </div>
+          <div class="skill-row-tokens">2 🪙</div>
+        </div>
+      </div>
+
+      <!-- Ce que j'apprends -->
+      <div class="skills-panel">
+        <div class="panel-title">Ce que j'apprends</div>
+
+        <div class="skill-row">
+          <div class="skill-dot learning"></div>
+          <div class="skill-row-info">
+            <div class="skill-row-name">Python pour débutants</div>
+            <div class="skill-row-cat">Code</div>
+          </div>
+          <div class="skill-row-status">En cours</div>
+        </div>
+
+        <div class="skill-row">
+          <div class="skill-dot wanted"></div>
+          <div class="skill-row-info">
+            <div class="skill-row-name">Guitare acoustique</div>
+            <div class="skill-row-cat">Musique</div>
+          </div>
+          <div class="skill-row-status">Souhaité</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Toast de notification -->
+  <style>
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .88rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function afficherToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+  </script>
+
+</body>
+</html>

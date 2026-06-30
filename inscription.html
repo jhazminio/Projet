@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Créer mon compte</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 4rem;
+      z-index: 100;
+      background: rgba(13, 11, 26, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .9rem;
+    }
+
+    /* ── CÔTÉ GAUCHE (texte) ── */
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 4rem 4rem;
+      position: relative;
+    }
+
+    /* Halo violet derrière */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: -100px;
+      transform: translateY(-50%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(168,85,247,.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .left-panel h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+
+    .left-panel h1 .accent {
+      color: var(--purple-light);
+    }
+
+    .left-panel p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 2rem;
+    }
+
+    .left-panel p strong { color: var(--text); }
+
+    /* Avantages listés */
+    .perks { display: flex; flex-direction: column; gap: .85rem; }
+
+    .perk {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-size: .92rem;
+      color: var(--text-muted);
+    }
+
+    .perk-icon { font-size: 1.1rem; }
+
+    /* ── CÔTÉ DROIT (formulaire) ── */
+    .right-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 3rem 4rem;
+      background: rgba(255,255,255,.02);
+      border-left: 1px solid var(--border);
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 600px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+    }
+
+    /* Ligne avec deux champs côte à côte */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+
+    .form-group label {
+      font-size: .8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .form-group input {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      color: var(--text);
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
+    }
+
+    .form-group input::placeholder { color: var(--text-muted); }
+    .form-group input:focus { border-color: var(--purple); }
+
+    /* Zone de sélection des compétences */
+    .skills-section { margin-bottom: 1.2rem; }
+
+    .skills-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .7rem;
+    }
+
+    .skills-header label {
+      font-size: .8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .skills-counter {
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+
+    /* Grille de chips de compétences */
+    .skills-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .chip {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: .35rem .9rem;
+      font-size: .82rem;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+      user-select: none;
+    }
+
+    .chip:hover { border-color: var(--purple); color: var(--purple-light); }
+
+    /* Chip sélectionné */
+    .chip.selected {
+      background: rgba(168,85,247,.2);
+      border-color: var(--purple);
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    /* Champ "Autre compétence" */
+    .autre-group {
+      display: flex;
+      gap: .7rem;
+      margin-top: .8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .autre-input {
+      flex: 1;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .7rem 1rem;
+      color: var(--text);
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .autre-input::placeholder { color: var(--text-muted); }
+    .autre-input:focus { border-color: var(--purple); }
+
+    .btn-add {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .7rem 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .9rem;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: border-color .2s;
+    }
+
+    .btn-add:hover { border-color: var(--purple); }
+
+    /* Bouton principal */
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border: none;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s;
+      margin-bottom: 1rem;
+    }
+
+    .btn-submit:hover { opacity: .88; }
+
+    /* Lien "Déjà membre" */
+    .login-link {
+      text-align: center;
+      font-size: .85rem;
+      color: var(--text-muted);
+    }
+
+    .login-link a { color: var(--purple-light); font-weight: 600; }
+    .login-link a:hover { text-decoration: underline; }
+
+    @media (max-width: 900px) {
+      body { grid-template-columns: 1fr; }
+      .left-panel { padding: 7rem 2rem 2rem; }
+      .right-panel { padding: 2rem; border-left: none; border-top: 1px solid var(--border); }
+      .form-row { grid-template-columns: 1fr; }
+      nav { padding: 1rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">S</div>
+      SkillSwap
+    </a>
+  </nav>
+
+  <!-- ═══ PANNEAU GAUCHE ═══ -->
+  <div class="left-panel">
+    <h1>Crée ton <span class="accent">compte<br>étudiant</span></h1>
+
+    <p>
+      Inscris-toi avec ton email personnel. Pour rejoindre la
+      communauté, tu dois proposer <strong>au moins une
+      compétence</strong> — c'est ce que tu pourras échanger.
+    </p>
+
+    <div class="perks">
+      <div class="perk">
+        <span class="perk-icon">🎁</span>
+        2 jetons offerts à l'inscription
+      </div>
+      <div class="perk">
+        <span class="perk-icon">🪙</span>
+        Donne 1h, gagne 1 jeton
+      </div>
+      <div class="perk">
+        <span class="perk-icon">🔒</span>
+        Profil visible, contact réservé aux membres
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PANNEAU DROIT (formulaire) ═══ -->
+  <div class="right-panel">
+    <div class="form-card">
+
+      <!-- Ligne prénom/nom + université -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prénom &amp; nom</label>
+          <input type="text" placeholder="Camille Durand" />
+        </div>
+        <div class="form-group">
+          <label>Université</label>
+          <input type="text" placeholder="Université de Lyon" />
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group" style="margin-bottom:1.2rem;">
+        <label>Email personnel</label>
+        <input type="email" placeholder="camille.durand@email.com" />
+      </div>
+
+      <!-- Sélection des compétences -->
+      <div class="skills-section">
+        <div class="skills-header">
+          <label>Compétences que tu proposes · min. 1</label>
+          <span class="skills-counter" id="counter">0 sélectionnée(s)</span>
+        </div>
+        <div class="skills-chips" id="chips">
+          <span class="chip" onclick="toggleChip(this)">Musique</span>
+          <span class="chip" onclick="toggleChip(this)">Programmation</span>
+          <span class="chip" onclick="toggleChip(this)">Sport</span>
+          <span class="chip" onclick="toggleChip(this)">Mathématiques</span>
+          <span class="chip" onclick="toggleChip(this)">Langues</span>
+          <span class="chip" onclick="toggleChip(this)">Danse</span>
+          <span class="chip" onclick="toggleChip(this)">Informatique</span>
+          <span class="chip" onclick="toggleChip(this)">Sciences</span>
+          <span class="chip" onclick="toggleChip(this)">Arts</span>
+          <span class="chip" onclick="toggleChip(this)">Théâtre</span>
+          <span class="chip" onclick="toggleChip(this)">Photographie</span>
+          <span class="chip" onclick="toggleChip(this)">Dessin</span>
+        </div>
+      </div>
+
+      <!-- Champ pour compétence personnalisée -->
+      <div class="autre-group">
+        <input class="autre-input" id="autreInput" type="text" placeholder="Ex. : Blender, Droit, Cuisine…" />
+        <button class="btn-add" onclick="ajouterAutre()">+ Ajouter</button>
+      </div>
+
+      <!-- Bouton de soumission -->
+      <button class="btn-submit" onclick="soumettre()">Créer mon compte</button>
+
+      <p class="login-link">Déjà membre ? <a href="#" onclick="afficherConnexion()">Se connecter</a></p>
+    </div>
+  </div>
+
+  <script>
+    /* Sélectionner / désélectionner un chip */
+    function toggleChip(el) {
+      el.classList.toggle('selected');
+      const nb = document.querySelectorAll('.chip.selected').length;
+      document.getElementById('counter').textContent = nb + ' sélectionnée(s)';
+    }
+
+    /* Ajouter une compétence personnalisée */
+    function ajouterAutre() {
+      const input = document.getElementById('autreInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const chip = document.createElement('span');
+      chip.className = 'chip selected';
+      chip.textContent = val;
+      chip.onclick = function() { toggleChip(this); };
+      document.getElementById('chips').appendChild(chip);
+      input.value = '';
+      const nb = document.querySelectorAll('.chip.selected').length;
+      document.getElementById('counter').textContent = nb + ' sélectionnée(s)';
+    }
+
+    /* Validation minimale avant soumission */
+    function soumettre() {
+      const nb = document.querySelectorAll('.chip.selected').length;
+      if (nb === 0) {
+        alert('Sélectionne au moins une compétence.');
+        return;
+      }
+      window.location.href = 'explorer.html';
+    }
+
+    /* Ajouter via la touche Entrée dans le champ "Autre" */
+    document.getElementById('autreInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') ajouterAutre();
+    });
+
+    /* Ouvrir le mini-modal de connexion */
+    function afficherConnexion() {
+      document.getElementById('modal-connexion').classList.add('visible');
+    }
+
+    function fermerConnexion(e) {
+      if (!e || e.target === document.getElementById('modal-connexion'))
+        document.getElementById('modal-connexion').classList.remove('visible');
+    }
+  </script>
+
+  <!-- Mini-modal connexion rapide -->
+  <style>
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 300; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .modal-overlay.visible { opacity: 1; pointer-events: all; }
+    .modal-box { background: #1a1728; border: 1px solid #2e2a42; border-radius: 20px; padding: 2.2rem; width: 100%; max-width: 380px; text-align: center; }
+    .modal-box .logo-icon { width: 46px; height: 46px; background: linear-gradient(135deg,#a855f7,#ec4899); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; margin: 0 auto 1rem; }
+    .modal-box h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: .5rem; }
+    .modal-box p  { font-size: .85rem; color: #9490a8; margin-bottom: 1.2rem; }
+    .modal-box input { width: 100%; background: #211d30; border: 1px solid #2e2a42; border-radius: 8px; padding: .75rem 1rem; color: #f1f0f5; font-size: .9rem; outline: none; margin-bottom: .7rem; transition: border-color .2s; }
+    .modal-box input:focus { border-color: #a855f7; }
+    .modal-box input::placeholder { color: #9490a8; }
+    .btn-modal-p { width: 100%; background: linear-gradient(135deg,#a855f7,#ec4899); border: none; color: #fff; padding: .8rem; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; margin-bottom: .6rem; }
+    .btn-modal-g { width: 100%; background: transparent; border: 1px solid #2e2a42; color: #f1f0f5; padding: .8rem; border-radius: 10px; font-size: .9rem; cursor: pointer; }
+  </style>
+
+  <div class="modal-overlay" id="modal-connexion" onclick="fermerConnexion(event)">
+    <div class="modal-box">
+      <div class="logo-icon">S</div>
+      <h2>Connecte-toi</h2>
+      <p>Tu as déjà un compte ? Entre tes identifiants pour accéder à ton profil.</p>
+      <input type="email" placeholder="Email universitaire" />
+      <input type="password" placeholder="Mot de passe" />
+      <button class="btn-modal-p" onclick="window.location.href='profil.html'">Se connecter</button>
+      <button class="btn-modal-g" onclick="fermerConnexion()">Annuler</button>
+    </div>
+  </div>
+
+</body>
+</html>
