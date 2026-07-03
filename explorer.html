@@ -86,34 +86,9 @@
       font-weight: 600;
     }
 
-    /* Pastille de notification */
-    .badge {
-      margin-left: auto;
-      background: var(--purple);
-      color: #fff;
-      border-radius: 99px;
-      font-size: .68rem;
-      font-weight: 700;
-      padding: .1rem .4rem;
-      min-width: 18px;
-      text-align: center;
-    }
+    .sidebar-bottom { border-top: 1px solid var(--border); padding-top: 1rem; }
 
-    /* Zone en bas de sidebar : profil */
-    .sidebar-bottom {
-      border-top: 1px solid var(--border);
-      padding-top: 1rem;
-    }
-
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      padding: .5rem .6rem;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
+    .user-pill { display: flex; align-items: center; gap: .6rem; padding: .5rem .6rem; border-radius: 8px; cursor: pointer; }
     .user-pill:hover { background: var(--bg-card); }
 
     .avatar-pill {
@@ -123,159 +98,112 @@
       display: flex; align-items: center; justify-content: center;
       font-size: .75rem; font-weight: 700;
       color: var(--text-muted);
+      overflow: hidden;
     }
+    .avatar-pill img { width: 100%; height: 100%; object-fit: cover; }
 
     .user-pill-info { flex: 1; }
     .user-pill-name { font-size: .82rem; font-weight: 600; color: var(--text-muted); }
     .user-pill-status { font-size: .7rem; color: var(--text-muted); }
 
     .logout-btn {
-      background: var(--bg-card2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      width: 24px; height: 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: .8rem;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted);
+      width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: .8rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .logout-btn:hover { border-color: var(--purple); color: var(--text); }
 
     .btn-connect-sm {
-      width: 100%;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border: none;
-      color: #fff;
-      padding: .55rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: .85rem;
-      font-weight: 600;
-      margin-top: .5rem;
-      transition: opacity .2s;
+      width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .55rem; border-radius: 8px; cursor: pointer; font-size: .85rem; font-weight: 600;
+      margin-top: .5rem; transition: opacity .2s;
     }
-
     .btn-connect-sm:hover { opacity: .88; }
 
     /* ── CONTENU PRINCIPAL ── */
-    .main {
-      margin-left: 180px;
-      flex: 1;
-      padding: 2.5rem 3rem;
-    }
+    .main { margin-left: 180px; flex: 1; padding: 2.5rem 3rem; }
 
-    .page-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 1.8rem;
-    }
-
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.8rem; }
     .page-header h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: .3rem; }
     .page-header p { font-size: .88rem; color: var(--text-muted); }
     .page-header p a { color: var(--purple-light); }
 
-    /* Barre de recherche */
     .search-bar {
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: .65rem 1rem;
-      margin-bottom: 2rem;
-      transition: border-color .2s;
+      display: flex; align-items: center; gap: .7rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: .65rem 1rem; margin-bottom: 1rem; transition: border-color .2s;
     }
-
     .search-bar:focus-within { border-color: var(--purple); }
-
     .search-icon { color: var(--text-muted); font-size: 1rem; flex-shrink: 0; }
-
-    .search-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-size: .95rem;
-    }
-
+    .search-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-size: .95rem; }
     .search-input::placeholder { color: var(--text-muted); }
-
-    .search-clear {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 1.1rem;
-      padding: 0;
-      line-height: 1;
-      display: none;
-    }
-
+    .search-clear { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 0; line-height: 1; display: none; }
     .search-clear.visible { display: block; }
     .search-clear:hover { color: var(--text); }
 
-    .no-results {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--text-muted);
-      font-size: .95rem;
+    .no-results { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: .95rem; }
+
+    /* Filtres par catégorie */
+    .filters { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .filter-btn {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted);
+      padding: .4rem 1rem; border-radius: 99px; cursor: pointer; font-size: .85rem; transition: all .15s;
     }
+    .filter-btn:hover { border-color: var(--purple); color: var(--text); }
+    .filter-btn.active { background: var(--purple); border-color: var(--purple); color: #fff; font-weight: 600; }
 
     /* Grille des cartes de compétences */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.3rem;
-    }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.3rem; }
 
     .skill-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform .2s, border-color .2s;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; cursor: pointer; transition: transform .2s, border-color .2s;
     }
-
     .skill-card:hover { transform: translateY(-3px); border-color: var(--purple); }
 
-    /* Vignette illustrative générique (couleur dérivée de l'auteur) */
-    .thumb {
-      height: 110px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .thumb { height: 140px; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+    .thumb.Musique       { background: linear-gradient(135deg, #3a1c71, #6a0572); }
+    .thumb.Programmation { background: linear-gradient(135deg, #0f0c29, #302b63); }
+    .thumb.Sport         { background: linear-gradient(135deg, #b91c1c, #f97316); }
+    .thumb.Mathématiques { background: linear-gradient(135deg, #134e5e, #1a6b4a); }
+    .thumb.Langues       { background: linear-gradient(135deg, #0a6473, #135e72); }
+    .thumb.Danse         { background: linear-gradient(135deg, #9d174d, #db2777); }
+    .thumb.Informatique  { background: linear-gradient(135deg, #1e3a8a, #2563eb); }
+    .thumb.Sciences      { background: linear-gradient(135deg, #065f46, #10b981); }
+    .thumb.Arts          { background: linear-gradient(135deg, #3b0764, #7e22ce); }
+    .thumb.Théâtre       { background: linear-gradient(135deg, #7c2d12, #c2410c); }
+    .thumb.Photographie  { background: linear-gradient(135deg, #1e1b4b, #4338ca); }
+    .thumb.Dessin        { background: linear-gradient(135deg, #831843, #be185d); }
+    .thumb.Autre         { background: linear-gradient(135deg, #27272a, #3f3f46); }
+
+    .thumb-icon { font-size: 3.2rem; }
+
+    .cat-tag {
+      position: absolute; top: .65rem; left: .65rem; padding: .2rem .6rem; border-radius: 6px;
+      font-size: .7rem; font-weight: 700; background: rgba(0,0,0,.4); color: #fff;
     }
 
-    .skill-initial {
-      font-size: 2.6rem;
-      font-weight: 800;
-      color: rgba(255,255,255,.85);
-    }
+    .rating { position: absolute; top: .65rem; right: .65rem; font-size: .78rem; font-weight: 700; color: #fbbf24; background: rgba(0,0,0,.35); padding: .15rem .5rem; border-radius: 6px; }
+
+    .code-lines { display: flex; flex-direction: column; gap: 5px; padding: 1rem; width: 70%; }
+    .code-lines span { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #a855f7, #22d3ee); }
+    .lang-bubbles { display: flex; flex-direction: column; gap: .4rem; padding: .4rem; }
+    .bubble { padding: .25rem .65rem; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+    .bubble.left  { background: var(--purple); align-self: flex-start; }
+    .bubble.right { background: #fff; color: #111; align-self: flex-end; }
+    .design-shapes { display: flex; gap: .5rem; align-items: center; }
+    .shape-sq { width: 40px; height: 40px; background: var(--purple); border-radius: 6px; }
+    .shape-ci { width: 38px; height: 38px; background: var(--pink); border-radius: 50%; }
+    .shape-ln { width: 6px; height: 55px; background: var(--cyan); border-radius: 3px; }
+    .maths-text { font-family: 'Georgia', serif; text-align: center; font-size: .8rem; line-height: 1.8; color: #d1fae5; }
 
     /* Bas de la carte */
     .card-body { padding: .9rem 1rem; }
     .card-body h3 { font-size: .98rem; font-weight: 700; margin-bottom: .7rem; }
+    .card-footer { display: flex; align-items: center; gap: .6rem; }
 
-    .card-footer {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-
-    .avatar-sm {
-      width: 28px; height: 28px;
-      border-radius: 7px;
-      font-size: .68rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
+    .avatar-sm { width: 28px; height: 28px; border-radius: 7px; font-size: .68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+    .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
 
     .av-1 { background: linear-gradient(135deg, #7c3aed, #a855f7); }
     .av-2 { background: linear-gradient(135deg, #dc2626, #f87171); }
@@ -286,116 +214,43 @@
     .av-7 { background: linear-gradient(135deg, #0891b2, #22d3ee); }
     .av-8 { background: linear-gradient(135deg, #7c3aed, #ec4899); }
 
-    .thumb.av-1 { background: linear-gradient(135deg, #4c1d95, #a855f7); }
-    .thumb.av-2 { background: linear-gradient(135deg, #7f1d1d, #f87171); }
-    .thumb.av-3 { background: linear-gradient(135deg, #831843, #f43f5e); }
-    .thumb.av-4 { background: linear-gradient(135deg, #0c4a6e, #38bdf8); }
-    .thumb.av-5 { background: linear-gradient(135deg, #064e3b, #34d399); }
-    .thumb.av-6 { background: linear-gradient(135deg, #78350f, #f59e0b); }
-    .thumb.av-7 { background: linear-gradient(135deg, #164e63, #22d3ee); }
-    .thumb.av-8 { background: linear-gradient(135deg, #4c1d95, #ec4899); }
-
     .author-info { flex: 1; min-width: 0; }
     .author-name { font-size: .8rem; font-weight: 600; }
     .author-level { font-size: .72rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ── MODALS ── */
+    .token-info { display: flex; align-items: center; gap: .2rem; font-size: .8rem; font-weight: 700; flex-shrink: 0; }
+    .own-badge { font-size: .65rem; font-weight: 700; color: var(--purple-light); background: rgba(168,85,247,.15); border-radius: 6px; padding: .15rem .5rem; margin-left: .4rem; }
+
+    /* ── MODAL CONNEXION ── */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.6);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s;
+      position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; z-index: 200;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
     }
-
-    .modal-overlay.visible {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2.5rem;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    .modal-logo {
-      width: 48px; height: 48px;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 1.1rem;
-      margin: 0 auto 1.2rem;
-    }
-
+    .modal-overlay.visible { opacity: 1; pointer-events: all; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 400px; text-align: center; }
+    .modal-logo { width: 48px; height: 48px; background: linear-gradient(135deg, var(--purple), var(--pink)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; margin: 0 auto 1.2rem; }
     .modal h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: .6rem; }
     .modal p  { font-size: .88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; }
-
     .modal input {
-      width: 100%;
-      background: var(--bg-card2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .8rem 1rem;
-      color: var(--text);
-      font-size: .92rem;
-      outline: none;
-      margin-bottom: .75rem;
-      transition: border-color .2s;
+      width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
+      padding: .8rem 1rem; color: var(--text); font-size: .92rem; outline: none; margin-bottom: .75rem; transition: border-color .2s;
     }
-
     .modal input::placeholder { color: var(--text-muted); }
     .modal input:focus { border-color: var(--purple); }
-
     .btn-modal-primary {
-      width: 100%;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border: none;
-      color: #fff;
-      padding: .85rem;
-      border-radius: 10px;
-      font-size: .95rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-bottom: .6rem;
-      transition: opacity .2s;
+      width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .85rem; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; margin-bottom: .6rem; transition: opacity .2s;
     }
-
     .btn-modal-primary:hover { opacity: .88; }
     .btn-modal-primary:disabled { opacity: .5; cursor: not-allowed; }
-
-    .btn-modal-ghost {
-      width: 100%;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: .85rem;
-      border-radius: 10px;
-      font-size: .95rem;
-      cursor: pointer;
-      transition: border-color .2s;
-    }
-
+    .btn-modal-ghost { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: .85rem; border-radius: 10px; font-size: .95rem; cursor: pointer; transition: border-color .2s; }
     .btn-modal-ghost:hover { border-color: var(--purple); }
-
     .signup-hint { margin-top: 1rem; font-size: .8rem; color: var(--text-muted); }
     .signup-hint a { color: var(--purple-light); font-weight: 600; }
     .signup-hint a:hover { text-decoration: underline; }
 
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 600px) {
       .sidebar { display: none; }
       .main { margin-left: 0; padding: 1.5rem; }
@@ -413,21 +268,12 @@
     </a>
 
     <nav class="sidebar-nav">
-      <div class="sidebar-item active">
-        <span>•</span> Découvrir
-      </div>
-      <div class="sidebar-item" onclick="navItem('profil')">
-        <span>•</span> Mon profil
-      </div>
-      <div class="sidebar-item" onclick="navItem('messages')">
-        <span>•</span> Messages
-      </div>
-      <div class="sidebar-item" onclick="navItem('jetons')">
-        <span>•</span> Mes jetons
-      </div>
+      <div class="sidebar-item active"><span>•</span> Découvrir</div>
+      <div class="sidebar-item" onclick="navItem('profil')"><span>•</span> Mon profil</div>
+      <div class="sidebar-item" onclick="navItem('messages')"><span>•</span> Messages</div>
+      <div class="sidebar-item" onclick="navItem('jetons')"><span>•</span> Mes jetons</div>
     </nav>
 
-    <!-- Profil (invité ou connecté, données réelles) -->
     <div class="sidebar-bottom" id="sidebarBottom"></div>
   </aside>
 
@@ -440,14 +286,14 @@
       </div>
     </div>
 
-    <!-- Barre de recherche -->
     <div class="search-bar">
       <span class="search-icon">🔍</span>
       <input class="search-input" id="searchInput" type="text" placeholder="Rechercher une compétence, un auteur…" oninput="rechercher(this.value)" />
       <button class="search-clear" id="searchClear" onclick="effacerRecherche()" title="Effacer">✕</button>
     </div>
 
-    <!-- Grille des compétences (chargée depuis la base de données) -->
+    <div class="filters" id="filters"></div>
+
     <div class="grid" id="grid">
       <div class="no-results">Chargement…</div>
     </div>
@@ -458,32 +304,12 @@
     <div class="modal">
       <div class="modal-logo">S</div>
       <h2>Connecte-toi pour échanger</h2>
-      <p>
-        Tu peux explorer tous les profils librement. Pour
-        contacter quelqu'un et planifier un échange, connecte-toi
-        à ton compte.
-      </p>
+      <p>Tu peux explorer tous les profils librement. Pour contacter quelqu'un et planifier un échange, connecte-toi à ton compte.</p>
       <input type="email" id="loginEmail" placeholder="Email" />
       <input type="password" id="loginPass" placeholder="Mot de passe" />
       <button class="btn-modal-primary" id="btnLogin" onclick="connexionExplorer()">Se connecter</button>
       <button class="btn-modal-ghost" onclick="fermerModal()">Continuer à explorer</button>
       <p class="signup-hint">Pas encore de compte ? <a href="inscription.html">Créer un compte</a></p>
-    </div>
-  </div>
-
-  <!-- ═══ MODAL DÉTAIL COMPÉTENCE ═══ -->
-  <div class="modal-overlay" id="modalDetail" onclick="fermerDetailSiDehors(event)">
-    <div class="modal" style="max-width:420px; text-align:left;">
-      <h2 id="detailSkill" style="font-size:1.3rem; margin-bottom:1.3rem;"></h2>
-      <div style="display:flex; align-items:center; gap:.7rem; margin-bottom:1.8rem;">
-        <div id="detailAvatar" class="avatar-sm" style="width:34px;height:34px;font-size:.78rem;"></div>
-        <div>
-          <div id="detailAuthorName" style="font-weight:600; font-size:.92rem;"></div>
-          <div id="detailAuthorLevel" style="font-size:.78rem; color:var(--text-muted);"></div>
-        </div>
-      </div>
-      <button class="btn-modal-primary" onclick="proposerEchange()">🤝 Proposer un échange</button>
-      <button class="btn-modal-ghost" onclick="fermerDetail()">Fermer</button>
     </div>
   </div>
 
@@ -495,6 +321,27 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    const CATEGORIES = [
+      'Musique', 'Programmation', 'Sport', 'Mathématiques', 'Langues', 'Danse',
+      'Informatique', 'Sciences', 'Arts', 'Théâtre', 'Photographie', 'Dessin',
+    ];
+
+    const CAT_ICON_HTML = {
+      Musique: '<span class="thumb-icon">🎸</span>',
+      Programmation: '<div class="code-lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:70%"></span><span style="width:45%"></span></div>',
+      Sport: '<span class="thumb-icon">🏀</span>',
+      Mathématiques: '<div class="maths-text">a² + b² = c²<br>∫ x dx = ½x²<br>π ≈ 3.14159</div>',
+      Langues: '<div class="lang-bubbles"><div class="bubble left">Hello</div><div class="bubble right">Bonjour</div></div>',
+      Danse: '<span class="thumb-icon">💃</span>',
+      Informatique: '<span class="thumb-icon">💻</span>',
+      Sciences: '<span class="thumb-icon">🔬</span>',
+      Arts: '<div class="design-shapes"><div class="shape-sq"></div><div class="shape-ci"></div><div class="shape-ln"></div></div>',
+      Théâtre: '<span class="thumb-icon">🎭</span>',
+      Photographie: '<span class="thumb-icon">📷</span>',
+      Dessin: '<span class="thumb-icon">✏️</span>',
+      Autre: '<span class="thumb-icon">✨</span>',
+    };
+
     /* ══ Utilisateur connecté (données réelles, stockées après login/inscription) ══ */
     function getUser() {
       try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; }
@@ -513,6 +360,11 @@
     function avatarClass(idUser) {
       const n = ((parseInt(idUser, 10) || 0) % 8 + 8) % 8 + 1;
       return 'av-' + n;
+    }
+
+    function avatarHtml(photo, init) {
+      if (photo) return `<img src="${photo}" alt="">`;
+      return escapeHtml(init);
     }
 
     function escapeHtml(str) {
@@ -575,7 +427,7 @@
       if (user) {
         el.innerHTML = `
           <div class="user-pill">
-            <div class="avatar-pill" style="background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; cursor:pointer;" onclick="window.location.href='profil.html'">${escapeHtml(initiales(user.prenomUser, user.nomUser))}</div>
+            <div class="avatar-pill" style="cursor:pointer;" onclick="window.location.href='profil.html'">${avatarHtml(user.photo, initiales(user.prenomUser, user.nomUser))}</div>
             <div class="user-pill-info" style="cursor:pointer;" onclick="window.location.href='profil.html'">
               <div class="user-pill-name" style="color:var(--text)">${escapeHtml((user.prenomUser || '') + ' ' + (user.nomUser || ''))}</div>
               <div class="user-pill-status">• Connecté</div>
@@ -595,6 +447,22 @@
       }
     }
 
+    /* ══ Filtres par catégorie ══ */
+    let catActive = 'tout';
+
+    function initFiltres() {
+      const el = document.getElementById('filters');
+      el.innerHTML = '<button class="filter-btn active" data-cat="tout" onclick="filtrer(this,\'tout\')">Tout</button>' +
+        CATEGORIES.map(c => `<button class="filter-btn" data-cat="${c}" onclick="filtrer(this,'${c}')">${c}</button>`).join('');
+    }
+
+    function filtrer(btn, cat) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      catActive = cat;
+      appliquerFiltres();
+    }
+
     /* ══ Chargement des compétences depuis la base de données ══ */
     let allSkills = [];
 
@@ -608,9 +476,8 @@
           grid.innerHTML = `<div class="no-results">${escapeHtml(data.erreur || 'Erreur de chargement.')}</div>`;
           return;
         }
-        const user = getUser();
-        allSkills = user ? data.filter(item => String(item.idUser) !== String(user.idUser)) : data;
-        afficherSkills(allSkills);
+        allSkills = data;
+        appliquerFiltres();
       } catch (e) {
         grid.innerHTML = '<div class="no-results">Impossible de contacter le serveur. Vérifie que PHP (et MySQL) sont bien lancés.</div>';
       }
@@ -620,26 +487,27 @@
       const av = avatarClass(item.idUser);
       const init = initiales(item.prenomUser, item.nomUser);
       const nomComplet = `${item.prenomUser} ${item.nomUser}`;
+      const cat = item.categorie || 'Autre';
+      const user = getUser();
+      const estMoi = user && String(item.idUser) === String(user.idUser);
+      const ratingHtml = item.nbAvis > 0 ? `⭐ ${Number(item.noteMoyenne).toFixed(1)}` : 'Nouveau';
+
       return `
-        <div class="skill-card"
-             data-user-id="${item.idUser}"
-             data-skill="${escapeHtml(item.competence)}"
-             data-author-name="${escapeHtml(nomComplet)}"
-             data-author-univ="${escapeHtml(item.universite || '')}"
-             data-av="${av}"
-             data-init="${init}"
-             onclick="clicCarte(this)">
-          <div class="thumb ${av}">
-            <span class="skill-initial">${escapeHtml(item.competence.charAt(0).toUpperCase())}</span>
+        <div class="skill-card" onclick="window.location.href='competence.html?idEchange=${item.idEchange}'">
+          <div class="thumb ${cat}">
+            <span class="cat-tag">${escapeHtml(cat)}</span>
+            <span class="rating">${ratingHtml}</span>
+            ${CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre}
           </div>
           <div class="card-body">
-            <h3>${escapeHtml(item.competence)}</h3>
+            <h3>${escapeHtml(item.competence)}${estMoi ? '<span class="own-badge">Ta publication</span>' : ''}</h3>
             <div class="card-footer">
-              <div class="avatar-sm ${av}">${escapeHtml(init)}</div>
+              <div class="avatar-sm ${av}">${avatarHtml(item.photo, init)}</div>
               <div class="author-info">
                 <div class="author-name">${escapeHtml(nomComplet)}</div>
                 <div class="author-level">${escapeHtml(item.universite || 'Étudiant·e')}</div>
               </div>
+              <div class="token-info">${item.coutHeure} <span>🪙</span></div>
             </div>
           </div>
         </div>`;
@@ -654,53 +522,29 @@
       grid.innerHTML = list.map(carteHTML).join('');
     }
 
+    function appliquerFiltres() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filtered = allSkills.filter(item => {
+        const catOk = catActive === 'tout' || item.categorie === catActive;
+        const texteOk = q === '' ||
+          item.competence.toLowerCase().includes(q) ||
+          item.nomUser.toLowerCase().includes(q) ||
+          item.prenomUser.toLowerCase().includes(q) ||
+          (item.universite || '').toLowerCase().includes(q);
+        return catOk && texteOk;
+      });
+      afficherSkills(filtered);
+    }
+
     function rechercher(val) {
       document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
-      const q = val.trim().toLowerCase();
-      const filtered = q === '' ? allSkills : allSkills.filter(item =>
-        item.competence.toLowerCase().includes(q) ||
-        item.nomUser.toLowerCase().includes(q) ||
-        item.prenomUser.toLowerCase().includes(q) ||
-        (item.universite || '').toLowerCase().includes(q)
-      );
-      afficherSkills(filtered);
+      appliquerFiltres();
     }
 
     function effacerRecherche() {
       document.getElementById('searchInput').value = '';
       document.getElementById('searchClear').classList.remove('visible');
-      afficherSkills(allSkills);
-    }
-
-    /* ══ Détail d'une compétence / proposer un échange ══ */
-    let currentDetailCard = null;
-
-    function clicCarte(el) {
-      if (!estConnecte()) { ouvrirModal(); return; }
-      currentDetailCard = el;
-      document.getElementById('detailSkill').textContent = el.dataset.skill;
-      document.getElementById('detailAvatar').textContent = el.dataset.init;
-      document.getElementById('detailAvatar').className = 'avatar-sm ' + el.dataset.av;
-      document.getElementById('detailAuthorName').textContent = el.dataset.authorName;
-      document.getElementById('detailAuthorLevel').textContent = el.dataset.authorUniv || 'Étudiant·e';
-      document.getElementById('modalDetail').classList.add('visible');
-    }
-
-    function fermerDetail() { document.getElementById('modalDetail').classList.remove('visible'); }
-    function fermerDetailSiDehors(e) { if (e.target === document.getElementById('modalDetail')) fermerDetail(); }
-
-    function proposerEchange() {
-      const el = currentDetailCard;
-      if (!el) return;
-      const params = new URLSearchParams({
-        open: el.dataset.userId,
-        name: el.dataset.authorName,
-        init: el.dataset.init,
-        av: el.dataset.av,
-        skill: el.dataset.skill,
-        cat: ''
-      });
-      window.location.href = 'messages.html?' + params.toString();
+      appliquerFiltres();
     }
 
     function afficherToast(msg) {
@@ -712,6 +556,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       renderSidebarBottom();
+      initFiltres();
       chargerCompetences();
     });
   </script>

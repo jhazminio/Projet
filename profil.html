@@ -397,6 +397,7 @@
         <h2 id="profileName"></h2>
         <div class="school" id="profileSchool"></div>
         <div class="email" id="profileEmail"></div>
+        <div class="rating-line" id="profileRating" style="font-size:.85rem;color:#fbbf24;font-weight:600;margin-top:.5rem;"></div>
       </div>
       <button class="btn-edit" onclick="ouvrirEditerProfil()">Modifier mon profil</button>
     </div>
@@ -542,6 +543,20 @@
       document.getElementById('profileName').textContent = `${user.prenomUser} ${user.nomUser}`;
       document.getElementById('profileSchool').textContent = user.universite ? `Étudiant·e · ${user.universite}` : 'Étudiant·e';
       document.getElementById('profileEmail').textContent = user.email || '';
+    }
+
+    async function chargerNote() {
+      const el = document.getElementById('profileRating');
+      try {
+        const rep = await fetch(`api/avis.php?action=statsUtilisateur&idUser=${user.idUser}`);
+        const stats = await rep.json();
+        if (!rep.ok) { el.textContent = ''; return; }
+        el.innerHTML = stats.totalAvis > 0
+          ? `⭐ ${stats.moyenne} <span style="color:var(--text-muted);font-weight:400">· ${stats.totalAvis} avis · ${stats.totalEchanges} échanges</span>`
+          : `<span style="color:var(--text-muted);font-weight:400">Pas encore d'avis · ${stats.totalEchanges} échanges</span>`;
+      } catch (e) {
+        el.textContent = '';
+      }
     }
 
     /* ══ Illustrations par catégorie (aperçu dans le modal Publier) ══ */
@@ -818,6 +833,7 @@
     if (user) {
       initCatRow();
       afficherProfil();
+      chargerNote();
       chargerCompetences();
       chargerSessions();
     }

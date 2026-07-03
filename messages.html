@@ -399,8 +399,8 @@
       document.getElementById('chatHead').style.display = 'flex';
       document.getElementById('chatFoot').style.display = 'flex';
       document.getElementById('chatHead').innerHTML = `
-        <div class="avatar-conv ${av}">${avatarHtml(photo, init)}</div>
-        <div class="chat-head-name">${escapeHtml(nom)}</div>`;
+        <div class="avatar-conv ${av}" style="cursor:pointer;" onclick="window.location.href='utilisateur.html?id=${idUser}'">${avatarHtml(photo, init)}</div>
+        <div class="chat-head-name" style="cursor:pointer;" onclick="window.location.href='utilisateur.html?id=${idUser}'">${escapeHtml(nom)}</div>`;
       renderConvList();
       await Promise.all([chargerMessages(), chargerSession()]);
     }
@@ -530,7 +530,8 @@
         }
         inner += `</div>`;
         if (s.qcmValide) {
-          inner += `<div class="sess-note success">🎉 QCM validé ! ${s.coutHeure} jeton${s.coutHeure > 1 ? 's' : ''} versé${s.coutHeure > 1 ? 's' : ''}.</div>`;
+          inner += `<div class="sess-note success">🎉 QCM validé ! ${s.coutHeure} jeton${s.coutHeure > 1 ? 's' : ''} versé${s.coutHeure > 1 ? 's' : ''}.</div>
+          <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${activeConv.idUser}'">⭐ Laisser un avis</button>`;
         } else if (s.qcmScore !== null && s.qcmScore !== undefined) {
           inner += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
         }

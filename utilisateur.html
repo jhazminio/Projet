@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Profil</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --cyan: #22d3ee;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 3rem;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+    textarea { font-family: inherit; }
+
+    .btn-back {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      padding: .55rem 1rem; border-radius: 10px; cursor: pointer; font-size: .85rem; transition: border-color .2s; margin-bottom: 1.6rem;
+    }
+    .btn-back:hover { border-color: var(--purple); }
+
+    .wrap { max-width: 900px; }
+
+    .profile-header {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 18px; padding: 2rem 2.5rem;
+      display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;
+    }
+    .profile-avatar {
+      width: 72px; height: 72px; border-radius: 18px; background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.4rem; flex-shrink: 0; overflow: hidden;
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-info { flex: 1; min-width: 200px; }
+    .profile-info h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: .3rem; }
+    .profile-info .school { font-size: .88rem; color: var(--text-muted); margin-bottom: .6rem; }
+    .profile-meta { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+    .meta-rating { font-size: .85rem; color: #fbbf24; font-weight: 600; }
+    .meta-rating span { color: var(--text-muted); font-weight: 400; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .7rem 1.3rem; border-radius: 10px; cursor: pointer; font-size: .88rem; font-weight: 700; transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: .88; }
+
+    .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; margin-top: 2rem; }
+    .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+
+    .skill-row { display: flex; align-items: center; gap: .9rem; padding: .85rem 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .skill-row:last-child { border-bottom: none; }
+    .skill-row:hover .skill-row-name { color: var(--purple-light); }
+    .skill-cat-badge { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: rgba(168,85,247,.15); color: var(--purple-light); border-radius: 6px; padding: .2rem .5rem; flex-shrink: 0; }
+    .skill-row-info { flex: 1; min-width: 0; }
+    .skill-row-name { font-size: .95rem; font-weight: 600; }
+    .skill-row-cost { font-size: .85rem; font-weight: 700; flex-shrink: 0; }
+
+    .avis-row { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+    .avis-row:last-child { border-bottom: none; }
+    .avis-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; }
+    .avis-author { font-size: .88rem; font-weight: 600; }
+    .avis-stars { color: #fbbf24; font-size: .85rem; }
+    .avis-comment { font-size: .85rem; color: var(--text-muted); line-height: 1.5; }
+    .avis-date { font-size: .72rem; color: var(--text-muted); margin-top: .3rem; }
+
+    .empty-state { color: var(--text-muted); font-size: .88rem; padding: .5rem 0; }
+
+    .review-form { margin-top: 1rem; }
+    .review-target { font-size: .85rem; color: var(--text-muted); margin-bottom: .8rem; }
+    .star-picker { display: flex; gap: .4rem; margin-bottom: 1rem; }
+    .star-btn { background: none; border: none; font-size: 1.6rem; cursor: pointer; opacity: .35; transition: opacity .15s; }
+    .star-btn.active { opacity: 1; }
+    .review-form textarea {
+      width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
+      padding: .75rem 1rem; color: var(--text); font-size: .88rem; outline: none; margin-bottom: 1rem; resize: vertical;
+    }
+    .review-form textarea:focus { border-color: var(--purple); }
+
+    .empty-page { text-align: center; padding: 4rem; color: var(--text-muted); }
+
+    @media (max-width: 600px) {
+      body { padding: 1.5rem; }
+      .profile-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="btn-back" onclick="history.back()">← Retour</button>
+
+  <div class="wrap" id="wrap">
+    <div class="empty-page">Chargement…</div>
+  </div>
+
+  <style>
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .88rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; max-width: 90vw; text-align: center; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str == null ? '' : String(str);
+      return div.innerHTML;
+    }
+    function initiales(prenom, nom) { return ((prenom || '?')[0] + (nom || '')[0]).toUpperCase(); }
+    function getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; } }
+    function avatarHtml(photo, init) { return photo ? `<img src="${photo}" alt="">` : escapeHtml(init); }
+
+    function afficherToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const idProfil = params.get('id');
+    const moi = getUser();
+
+    let etoileChoisie = 0;
+    let sessionAEvaluer = null;
+
+    async function charger() {
+      const wrap = document.getElementById('wrap');
+
+      if (!idProfil) { wrap.innerHTML = '<div class="empty-page">Profil introuvable.</div>'; return; }
+      if (moi && String(moi.idUser) === String(idProfil)) { window.location.href = 'profil.html'; return; }
+
+      try {
+        const [competencesRes, statsRes, avisRes] = await Promise.all([
+          fetch(`api/competences.php?action=mesCompetences&idUser=${idProfil}`),
+          fetch(`api/avis.php?action=statsUtilisateur&idUser=${idProfil}`),
+          fetch(`api/avis.php?action=pourUtilisateur&idUser=${idProfil}`),
+        ]);
+        const competences = await competencesRes.json();
+        const stats = await statsRes.json();
+        const avisListe = await avisRes.json();
+
+        if (competences.length === 0 && !competencesRes.ok) {
+          wrap.innerHTML = `<div class="empty-page">${escapeHtml(competences.erreur || 'Profil introuvable.')}</div>`;
+          return;
+        }
+
+        // Infos de base déduites des compétences publiées (pas d'endpoint dédié "utilisateur")
+        const premiere = competences[0];
+        let nomComplet = 'Étudiant·e', universite = '', init = '?';
+        if (premiere) {
+          nomComplet = `${premiere.prenomUser || ''} ${premiere.nomUser || ''}`.trim();
+          universite = premiere.universite || '';
+          init = initiales(premiere.prenomUser, premiere.nomUser);
+        }
+        const photo = premiere ? premiere.photo : null;
+
+        const ratingTxt = stats.totalAvis > 0
+          ? `⭐ ${stats.moyenne} <span>· ${stats.totalAvis} avis</span>`
+          : `<span>Pas encore d'avis</span>`;
+
+        let html = `
+          <div class="profile-header">
+            <div class="profile-avatar">${avatarHtml(photo, init)}</div>
+            <div class="profile-info">
+              <h2>${escapeHtml(nomComplet)}</h2>
+              <div class="school">${universite ? 'Étudiant·e · ' + escapeHtml(universite) : 'Étudiant·e'}</div>
+              <div class="profile-meta">
+                <span class="meta-rating">${ratingTxt}</span>
+                <span class="meta-rating">${stats.totalEchanges} échange${stats.totalEchanges === 1 ? '' : 's'} réalisé${stats.totalEchanges === 1 ? '' : 's'}</span>
+              </div>
+            </div>
+            ${moi ? `<button class="btn-primary" onclick="contacter('${idProfil}', '${nomComplet.replace(/'/g, "\\'")}', '${init}')">💬 Envoyer un message</button>` : ''}
+          </div>
+
+          <div class="section-title">Ce que ${escapeHtml((premiere && premiere.prenomUser) || 'cette personne')} propose</div>
+          <div class="panel">
+            <div id="listeCompetences">
+              ${competences.length === 0
+                ? '<div class="empty-state">Aucune compétence publiée pour l’instant.</div>'
+                : competences.map(c => `
+                  <div class="skill-row" onclick="window.location.href='competence.html?idEchange=${c.idEchange}'">
+                    <span class="skill-cat-badge">${escapeHtml(c.categorie || 'Autre')}</span>
+                    <div class="skill-row-info"><div class="skill-row-name">${escapeHtml(c.competence)}</div></div>
+                    <div class="skill-row-cost">${c.coutHeure} 🪙/h</div>
+                  </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="section-title">Avis reçus</div>
+          <div class="panel">
+            <div id="listeAvis">
+              ${avisListe.length === 0
+                ? '<div class="empty-state">Aucun avis pour l’instant.</div>'
+                : avisListe.map(a => `
+                  <div class="avis-row">
+                    <div class="avis-head">
+                      <span class="avis-author">${escapeHtml(a.prenomUser)} ${escapeHtml(a.nomUser)}</span>
+                      <span class="avis-stars">${'★'.repeat(a.note)}${'☆'.repeat(5 - a.note)}</span>
+                    </div>
+                    ${a.commentaire ? `<div class="avis-comment">${escapeHtml(a.commentaire)}</div>` : ''}
+                    <div class="avis-date">${escapeHtml(a.competence)} · ${new Date(a.dateAvis).toLocaleDateString('fr-FR')}</div>
+                  </div>`).join('')}
+            </div>
+          </div>
+
+          <div id="zoneLaisserAvis"></div>`;
+
+        wrap.innerHTML = html;
+
+        if (moi) chargerZoneAvis();
+      } catch (e) {
+        wrap.innerHTML = '<div class="empty-page">Impossible de contacter le serveur. Vérifie que PHP et MySQL sont lancés.</div>';
+      }
+    }
+
+    function contacter(idUser, nom, init) {
+      const p = new URLSearchParams({ open: idUser, name: nom, init: init, skill: '' });
+      window.location.href = 'messages.html?' + p.toString();
+    }
+
+    // N'affiche le formulaire d'avis que si une session validée avec CE profil n'a pas encore été évaluée
+    async function chargerZoneAvis() {
+      const zone = document.getElementById('zoneLaisserAvis');
+      try {
+        const rep = await fetch(`api/avis.php?action=sessionsAEvaluer&idUser=${moi.idUser}`);
+        const sessions = await rep.json();
+        sessionAEvaluer = sessions.find(s => String(s.idAutre) === String(idProfil));
+
+        if (!sessionAEvaluer) return;
+
+        zone.innerHTML = `
+          <div class="section-title">Laisser un avis</div>
+          <div class="panel review-form">
+            <div class="review-target">Après ta session « ${escapeHtml(sessionAEvaluer.competence)} » avec ${escapeHtml(sessionAEvaluer.autrePrenom)} ${escapeHtml(sessionAEvaluer.autreNom)}, comment ça s'est passé ?</div>
+            <div class="star-picker" id="starPicker">
+              ${[1, 2, 3, 4, 5].map(n => `<button type="button" class="star-btn" data-n="${n}" onclick="choisirEtoile(${n})">★</button>`).join('')}
+            </div>
+            <textarea id="commentaireAvis" rows="3" placeholder="Un commentaire sur cette session (facultatif)…"></textarea>
+            <button class="btn-primary" style="width:100%" onclick="envoyerAvis()">Envoyer mon avis</button>
+          </div>`;
+      } catch (e) {
+        // silencieux : la zone d'avis est un bonus, pas bloquant
+      }
+    }
+
+    function choisirEtoile(n) {
+      etoileChoisie = n;
+      document.querySelectorAll('.star-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.n) <= n));
+    }
+
+    async function envoyerAvis() {
+      if (!sessionAEvaluer) return;
+      if (etoileChoisie === 0) { afficherToast('Choisis une note de 1 à 5 étoiles.'); return; }
+
+      const commentaire = document.getElementById('commentaireAvis').value.trim();
+
+      try {
+        const rep = await fetch('api/avis.php?action=laisser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idSession: sessionAEvaluer.idSession, idAuteur: moi.idUser, note: etoileChoisie, commentaire })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+
+        afficherToast('Avis envoyé, merci !');
+        charger();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      }
+    }
+
+    charger();
+  </script>
+
+</body>
+</html>

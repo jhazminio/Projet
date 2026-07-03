@@ -20,6 +20,17 @@ function categorieValide(string $cat): string
     return in_array($cat, CATEGORIES, true) ? $cat : 'Autre';
 }
 
+const NOTE_SUBQUERY = '
+    (SELECT AVG(a.note) FROM AVIS a
+       JOIN SESSION_ECHANGE s ON s.idSession = a.idSession
+       WHERE s.idEchange = e.idEchange AND a.idCible = e.idUser) AS noteMoyenne,
+    (SELECT COUNT(*) FROM AVIS a
+       JOIN SESSION_ECHANGE s ON s.idSession = a.idSession
+       WHERE s.idEchange = e.idEchange AND a.idCible = e.idUser) AS nbAvis,
+    (SELECT COUNT(*) FROM SESSION_ECHANGE s
+       WHERE s.idEchange = e.idEchange AND s.statut = \'validee\') AS nbEchanges
+';
+
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
@@ -51,7 +62,8 @@ function liste(PDO $pdo): void
     $stmt = $pdo->query(
         'SELECT e.idEchange, e.dateEchange, e.categorie, e.description, e.coutHeure,
                 u.idUser, u.nomUser, u.prenomUser, u.universite, u.photo,
-                c.idCompetences, c.nom AS competence
+                c.idCompetences, c.nom AS competence,
+                ' . NOTE_SUBQUERY . '
          FROM ECHANGE e
          JOIN USER u ON u.idUser = e.idUser
          JOIN COMPETENCES c ON c.idCompetences = e.idComp
@@ -70,8 +82,9 @@ function detail(PDO $pdo): void
 
     $stmt = $pdo->prepare(
         'SELECT e.idEchange, e.categorie, e.description, e.coutHeure,
-                u.idUser, u.nomUser, u.prenomUser, u.universite,
-                c.idCompetences, c.nom AS competence
+                u.idUser, u.nomUser, u.prenomUser, u.universite, u.photo,
+                c.idCompetences, c.nom AS competence,
+                ' . NOTE_SUBQUERY . '
          FROM ECHANGE e
          JOIN USER u ON u.idUser = e.idUser
          JOIN COMPETENCES c ON c.idCompetences = e.idComp
@@ -87,7 +100,7 @@ function detail(PDO $pdo): void
     echo json_encode($row);
 }
 
-// Compétences publiées par un utilisateur précis (pour Mon profil)
+// Compétences publiées par un utilisateur précis (pour Mon profil / profil public)
 function mesCompetences(PDO $pdo): void
 {
     $idUser = (int) ($_GET['idUser'] ?? 0);
@@ -97,8 +110,10 @@ function mesCompetences(PDO $pdo): void
 
     $stmt = $pdo->prepare(
         'SELECT e.idEchange, e.dateEchange, e.categorie, e.description, e.coutHeure,
+                u.idUser, u.nomUser, u.prenomUser, u.universite, u.photo,
                 c.idCompetences, c.nom AS competence
          FROM ECHANGE e
+         JOIN USER u ON u.idUser = e.idUser
          JOIN COMPETENCES c ON c.idCompetences = e.idComp
          WHERE e.idUser = ?
          ORDER BY e.dateEchange DESC'

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Détail de la compétence</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --cyan: #22d3ee;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 3rem;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.6rem; }
+
+    .btn-back {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      padding: .55rem 1rem; border-radius: 10px; cursor: pointer; font-size: .85rem; transition: border-color .2s;
+    }
+    .btn-back:hover { border-color: var(--purple); }
+
+    .layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; max-width: 1100px; }
+
+    .main-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+
+    .thumb { height: 220px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .thumb-icon { font-size: 5rem; }
+
+    .thumb.Musique       { background: linear-gradient(135deg, #3a1c71, #6a0572); }
+    .thumb.Programmation { background: linear-gradient(135deg, #0f0c29, #302b63); }
+    .thumb.Sport         { background: linear-gradient(135deg, #b91c1c, #f97316); }
+    .thumb.Mathématiques { background: linear-gradient(135deg, #134e5e, #1a6b4a); }
+    .thumb.Langues       { background: linear-gradient(135deg, #0a6473, #135e72); }
+    .thumb.Danse         { background: linear-gradient(135deg, #9d174d, #db2777); }
+    .thumb.Informatique  { background: linear-gradient(135deg, #1e3a8a, #2563eb); }
+    .thumb.Sciences      { background: linear-gradient(135deg, #065f46, #10b981); }
+    .thumb.Arts          { background: linear-gradient(135deg, #3b0764, #7e22ce); }
+    .thumb.Théâtre       { background: linear-gradient(135deg, #7c2d12, #c2410c); }
+    .thumb.Photographie  { background: linear-gradient(135deg, #1e1b4b, #4338ca); }
+    .thumb.Dessin        { background: linear-gradient(135deg, #831843, #be185d); }
+    .thumb.Autre         { background: linear-gradient(135deg, #27272a, #3f3f46); }
+
+    .code-lines { display: flex; flex-direction: column; gap: 6px; padding: 1.4rem; width: 60%; }
+    .code-lines span { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #a855f7, #22d3ee); }
+    .lang-bubbles { display: flex; flex-direction: column; gap: .5rem; padding: .5rem; }
+    .bubble { padding: .3rem .8rem; border-radius: 99px; font-size: .85rem; font-weight: 600; }
+    .bubble.left  { background: var(--purple); align-self: flex-start; }
+    .bubble.right { background: #fff; color: #111; align-self: flex-end; }
+    .design-shapes { display: flex; gap: .7rem; align-items: center; }
+    .shape-sq { width: 54px; height: 54px; background: var(--purple); border-radius: 8px; }
+    .shape-ci { width: 50px; height: 50px; background: var(--pink); border-radius: 50%; }
+    .shape-ln { width: 8px; height: 72px; background: var(--cyan); border-radius: 4px; }
+    .maths-text { font-family: 'Georgia', serif; text-align: center; font-size: 1.05rem; line-height: 1.8; color: #d1fae5; }
+
+    .content { padding: 1.6rem 2rem 2rem; }
+
+    .cat-badge {
+      display: inline-block; background: rgba(168,85,247,.15); color: var(--purple-light);
+      border-radius: 6px; padding: .3rem .8rem; font-size: .78rem; font-weight: 700; margin-bottom: 1rem;
+    }
+
+    .content h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: .6rem; }
+
+    .meta-line { font-size: .88rem; color: var(--text-muted); margin-bottom: 1.4rem; }
+    .meta-line strong { color: #fbbf24; }
+
+    .description { font-size: .92rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.6rem; }
+
+    .info-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; }
+    .info-chip { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1rem; }
+    .info-chip .label { font-size: .85rem; font-weight: 700; margin-bottom: .3rem; }
+    .info-chip .sub { font-size: .76rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* ── Colonne de droite ── */
+    .side-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; height: fit-content; }
+
+    .author-block { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 1.4rem; cursor: pointer; }
+    .author-avatar {
+      width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem;
+      margin-bottom: .8rem; overflow: hidden;
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-name { font-size: 1rem; font-weight: 700; }
+    .author-name:hover { color: var(--purple-light); }
+    .author-sub { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
+
+    .cost-box { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: center; margin-bottom: 1.2rem; }
+    .cost-box .bal-label { font-size: .78rem; color: var(--text-muted); margin-bottom: .4rem; }
+    .cost-box .bal-amount { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: .4rem; }
+
+    .btn-primary {
+      width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .9rem; border-radius: 10px; font-size: .95rem; font-weight: 700; cursor: pointer; transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+    .hint { text-align: center; font-size: .78rem; color: var(--text-muted); margin-top: .8rem; }
+
+    .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+
+    @media (max-width: 900px) {
+      body { padding: 1.5rem; }
+      .layout { grid-template-columns: 1fr; }
+      .info-chips { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <button class="btn-back" onclick="window.location.href='explorer.html'">← Retour</button>
+  </div>
+
+  <div id="contenu" class="layout">
+    <div class="empty-state">Chargement…</div>
+  </div>
+
+  <style>
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .88rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; max-width: 90vw; text-align: center; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const CAT_ICON_HTML = {
+      Musique: '<span class="thumb-icon">🎸</span>',
+      Programmation: '<div class="code-lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:70%"></span><span style="width:45%"></span></div>',
+      Sport: '<span class="thumb-icon">🏀</span>',
+      Mathématiques: '<div class="maths-text">a² + b² = c²<br>∫ x dx = ½x²<br>π ≈ 3.14159</div>',
+      Langues: '<div class="lang-bubbles"><div class="bubble left">Hello</div><div class="bubble right">Bonjour</div></div>',
+      Danse: '<span class="thumb-icon">💃</span>',
+      Informatique: '<span class="thumb-icon">💻</span>',
+      Sciences: '<span class="thumb-icon">🔬</span>',
+      Arts: '<div class="design-shapes"><div class="shape-sq"></div><div class="shape-ci"></div><div class="shape-ln"></div></div>',
+      Théâtre: '<span class="thumb-icon">🎭</span>',
+      Photographie: '<span class="thumb-icon">📷</span>',
+      Dessin: '<span class="thumb-icon">✏️</span>',
+      Autre: '<span class="thumb-icon">✨</span>',
+    };
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str == null ? '' : String(str);
+      return div.innerHTML;
+    }
+    function initiales(prenom, nom) { return ((prenom || '?')[0] + (nom || '')[0]).toUpperCase(); }
+    function getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; } }
+    function avatarHtml(photo, init) { return photo ? `<img src="${photo}" alt="">` : escapeHtml(init); }
+
+    function afficherToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const idEchange = params.get('idEchange');
+
+    async function charger() {
+      const conteneur = document.getElementById('contenu');
+      if (!idEchange) {
+        conteneur.innerHTML = '<div class="empty-state">Compétence introuvable.</div>';
+        return;
+      }
+
+      try {
+        const rep = await fetch(`api/competences.php?action=detail&idEchange=${idEchange}`);
+        const item = await rep.json();
+        if (!rep.ok) {
+          conteneur.innerHTML = `<div class="empty-state">${escapeHtml(item.erreur || 'Compétence introuvable.')}</div>`;
+          return;
+        }
+
+        const user = getUser();
+        const estMoi = user && String(item.idUser) === String(user.idUser);
+        const cat = item.categorie || 'Autre';
+        const init = initiales(item.prenomUser, item.nomUser);
+        const nomComplet = `${item.prenomUser} ${item.nomUser}`;
+        const ratingTxt = item.nbAvis > 0 ? `⭐ ${Number(item.noteMoyenne).toFixed(1)} · ${item.nbAvis} avis` : 'Pas encore d’avis';
+
+        document.title = `SkillSwap – ${item.competence}`;
+
+        conteneur.innerHTML = `
+          <div class="main-col">
+            <div class="thumb ${cat}">${CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre}</div>
+            <div class="content">
+              <span class="cat-badge">${escapeHtml(cat)}</span>
+              <h1>${escapeHtml(item.competence)}</h1>
+              <div class="meta-line">${ratingTxt} · ${item.nbEchanges} échange${item.nbEchanges === 1 ? '' : 's'} réalisé${item.nbEchanges === 1 ? '' : 's'}</div>
+              <p class="description">${item.description ? escapeHtml(item.description) : "Aucune description fournie pour l'instant."}</p>
+              <div class="info-chips">
+                <div class="info-chip"><div class="label">1h / séance</div><div class="sub">en visio ou sur le campus</div></div>
+                <div class="info-chip"><div class="label">Format libre</div><div class="sub">virtuel ou présentiel, à définir</div></div>
+                <div class="info-chip"><div class="label">${item.coutHeure} jeton${item.coutHeure > 1 ? 's' : ''}</div><div class="sub">rendu en donnant à ton tour</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="side-col">
+            <div class="author-block" onclick="window.location.href='utilisateur.html?id=${item.idUser}'">
+              <div class="author-avatar">${avatarHtml(item.photo, init)}</div>
+              <div class="author-name">${escapeHtml(nomComplet)}</div>
+              <div class="author-sub">${escapeHtml(item.universite || 'Étudiant·e')}</div>
+            </div>
+
+            <div class="cost-box">
+              <div class="bal-label">Coût de l'échange</div>
+              <div class="bal-amount">${item.coutHeure} jeton${item.coutHeure > 1 ? 's' : ''}/h 🪙</div>
+            </div>
+
+            ${estMoi
+              ? `<p class="hint">C'est ta propre publication.</p>`
+              : `<button class="btn-primary" onclick="proposerEchange('${item.idUser}', '${escapeHtml(nomComplet).replace(/'/g, "\\'")}', '${init}')">🤝 Proposer un échange</button>
+                 <p class="hint">Tu seras mis·e en relation directement.</p>`}
+          </div>`;
+      } catch (e) {
+        conteneur.innerHTML = '<div class="empty-state">Impossible de contacter le serveur. Vérifie que PHP et MySQL sont lancés.</div>';
+      }
+    }
+
+    function proposerEchange(idUser, nom, init) {
+      const user = getUser();
+      if (!user) { window.location.href = 'explorer.html'; return; }
+      const p = new URLSearchParams({ open: idUser, name: nom, init: init, skill: '' });
+      window.location.href = 'messages.html?' + p.toString();
+    }
+
+    charger();
+  </script>
+
+</body>
+</html>
