@@ -10,6 +10,26 @@ function erreur(int $code, string $message): void
     exit;
 }
 
+// Fait correspondre une compétence choisie à l'inscription (chip du formulaire,
+// ou saisie libre) à l'une des catégories utilisées dans le reste de l'app.
+function categorieDepuisChip(string $nomComp): string
+{
+    $correspondances = [
+        'musique'        => 'Musique',
+        'programmation'  => 'Code',
+        'informatique'   => 'Code',
+        'langues'        => 'Langues',
+        'mathématiques'  => 'Maths',
+        'mathematiques'  => 'Maths',
+        'arts'           => 'Design',
+        'dessin'         => 'Design',
+        'photographie'   => 'Design',
+        'marketing'      => 'Marketing',
+    ];
+
+    return $correspondances[mb_strtolower(trim($nomComp))] ?? 'Autre';
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     erreur(405, 'Méthode non autorisée.');
 }
@@ -95,7 +115,7 @@ function inscription(PDO $pdo, array $data): void
                 $idComp = $pdo->lastInsertId();
             }
 
-            $stmtLinkComp->execute([$idUser, $idComp, 'Autre', 1]);
+            $stmtLinkComp->execute([$idUser, $idComp, categorieDepuisChip($nomComp), 1]);
         }
 
         // Bonus de bienvenue
