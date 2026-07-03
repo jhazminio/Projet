@@ -100,7 +100,7 @@ function inscription(PDO $pdo, array $data): void
 
         // Bonus de bienvenue
         $stmt = $pdo->prepare(
-            'INSERT INTO JETON_HISTORIQUE (idUser, montant, motif) VALUES (?, 2, ?)'
+            'INSERT INTO JETON_HISTORIQUE (idUser, montant, motif) VALUES (?, 3, ?)'
         );
         $stmt->execute([$idUser, 'Bonus de bienvenue']);
 

@@ -51,6 +51,8 @@
     .avatar-pill img { width: 100%; height: 100%; object-fit: cover; }
     .user-pill-name { font-size: .82rem; font-weight: 600; }
     .user-pill-status { font-size: .7rem; color: var(--text-muted); }
+    .logout-btn { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted); width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: .8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logout-btn:hover { border-color: var(--purple); color: var(--text); }
 
     /* ── MAIN ── */
     .main { margin-left: 180px; flex: 1; padding: 2rem 2.4rem; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -213,12 +215,13 @@
       <div class="sidebar-item" onclick="window.location.href='jetons.html'"><span>•</span> Mes jetons</div>
     </nav>
     <div class="sidebar-bottom">
-      <div class="user-pill" onclick="window.location.href='profil.html'">
-        <div class="avatar-pill" id="sidebarAvatar"></div>
-        <div style="flex:1">
+      <div class="user-pill">
+        <div class="avatar-pill" id="sidebarAvatar" style="cursor:pointer;" onclick="window.location.href='profil.html'"></div>
+        <div style="flex:1; cursor:pointer;" onclick="window.location.href='profil.html'">
           <div class="user-pill-name" id="sidebarName"></div>
           <div class="user-pill-status">• Connecté</div>
         </div>
+        <button class="logout-btn" onclick="deconnexion()" title="Se déconnecter">⎋</button>
       </div>
     </div>
   </aside>
@@ -327,6 +330,7 @@
     function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
     function closeModalOutside(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
     function getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; } }
+    function deconnexion() { localStorage.removeItem('user'); window.location.href = 'index.html'; }
 
     const user = getUser();
     if (!user || !user.idUser) { window.location.href = 'explorer.html'; }

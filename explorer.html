@@ -129,6 +129,19 @@
     .user-pill-name { font-size: .82rem; font-weight: 600; color: var(--text-muted); }
     .user-pill-status { font-size: .7rem; color: var(--text-muted); }
 
+    .logout-btn {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .8rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logout-btn:hover { border-color: var(--purple); color: var(--text); }
+
     .btn-connect-sm {
       width: 100%;
       background: linear-gradient(135deg, var(--purple), var(--pink));
@@ -488,6 +501,11 @@
     }
     function estConnecte() { return !!getUser(); }
 
+    function deconnexion() {
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    }
+
     function initiales(prenom, nom) {
       return ((prenom || '?')[0] + (nom || '')[0]).toUpperCase();
     }
@@ -556,12 +574,13 @@
       const el = document.getElementById('sidebarBottom');
       if (user) {
         el.innerHTML = `
-          <div class="user-pill" onclick="window.location.href='profil.html'">
-            <div class="avatar-pill" style="background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff;">${escapeHtml(initiales(user.prenomUser, user.nomUser))}</div>
-            <div class="user-pill-info">
+          <div class="user-pill">
+            <div class="avatar-pill" style="background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; cursor:pointer;" onclick="window.location.href='profil.html'">${escapeHtml(initiales(user.prenomUser, user.nomUser))}</div>
+            <div class="user-pill-info" style="cursor:pointer;" onclick="window.location.href='profil.html'">
               <div class="user-pill-name" style="color:var(--text)">${escapeHtml((user.prenomUser || '') + ' ' + (user.nomUser || ''))}</div>
               <div class="user-pill-status">• Connecté</div>
             </div>
+            <button class="logout-btn" onclick="deconnexion()" title="Se déconnecter">⎋</button>
           </div>`;
       } else {
         el.innerHTML = `
