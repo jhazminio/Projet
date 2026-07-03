@@ -32,8 +32,9 @@
 
     a { color: inherit; text-decoration: none; }
     button { font-family: inherit; }
+    textarea { font-family: inherit; }
 
-    /* ── SIDEBAR (identique à explorer.html) ── */
+    /* ── SIDEBAR ── */
     .sidebar {
       width: 180px;
       min-height: 100vh;
@@ -86,10 +87,7 @@
       font-weight: 600;
     }
 
-    .sidebar-bottom {
-      border-top: 1px solid var(--border);
-      padding-top: 1rem;
-    }
+    .sidebar-bottom { border-top: 1px solid var(--border); padding-top: 1rem; }
 
     .user-pill {
       display: flex;
@@ -108,7 +106,9 @@
       background: linear-gradient(135deg, #7c3aed, #a855f7);
       display: flex; align-items: center; justify-content: center;
       font-size: .7rem; font-weight: 700;
+      overflow: hidden;
     }
+    .avatar-pill img { width: 100%; height: 100%; object-fit: cover; }
 
     .user-pill-name   { font-size: .82rem; font-weight: 600; }
     .user-pill-status { font-size: .7rem; color: var(--text-muted); }
@@ -127,11 +127,7 @@
     .logout-btn:hover { border-color: var(--purple); color: var(--text); }
 
     /* ── CONTENU PRINCIPAL ── */
-    .main {
-      margin-left: 180px;
-      flex: 1;
-      padding: 2.5rem 3rem;
-    }
+    .main { margin-left: 180px; flex: 1; padding: 2.5rem 3rem; }
 
     /* ── CARTE EN-TÊTE DU PROFIL ── */
     .profile-header {
@@ -144,6 +140,7 @@
       gap: 1.5rem;
       margin-bottom: 2rem;
       position: relative;
+      flex-wrap: wrap;
     }
 
     .profile-header::before {
@@ -162,15 +159,28 @@
       display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 1.4rem;
       flex-shrink: 0;
+      overflow: hidden;
     }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .profile-info { flex: 1; }
-
+    .profile-info { flex: 1; min-width: 200px; }
     .profile-info h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: .3rem; }
     .profile-info .school { font-size: .88rem; color: var(--text-muted); }
     .profile-info .email { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
 
-    /* ── SECTION COMPÉTENCES ── */
+    .btn-edit {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .5rem 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .85rem;
+      transition: border-color .2s;
+    }
+    .btn-edit:hover { border-color: var(--purple); }
+
+    /* ── SECTIONS ── */
     .section-title {
       display: flex;
       align-items: center;
@@ -179,74 +189,136 @@
       flex-wrap: wrap;
       gap: .8rem;
     }
-
     .section-title h3 { font-size: 1.2rem; font-weight: 700; }
 
     .btn-publish {
       background: linear-gradient(135deg, var(--purple), var(--pink));
       border: none;
       color: #fff;
-      padding: .4rem 1.1rem;
+      padding: .5rem 1.2rem;
       border-radius: 8px;
       cursor: pointer;
       font-size: .85rem;
       font-weight: 600;
       transition: opacity .2s;
     }
-
     .btn-publish:hover { opacity: .88; }
 
-    .skills-panel {
+    .panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.5rem;
-      max-width: 560px;
+      margin-bottom: 2.2rem;
     }
 
-    /* Une ligne de compétence */
     .skill-row {
       display: flex;
-      align-items: center;
-      gap: .8rem;
-      padding: .85rem 0;
+      align-items: flex-start;
+      gap: .9rem;
+      padding: .9rem 0;
       border-bottom: 1px solid var(--border);
     }
-
     .skill-row:last-child { border-bottom: none; }
 
-    .skill-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #34d399;
-      flex-shrink: 0;
+    .skill-cat-badge {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+      background: rgba(168,85,247,.15); color: var(--purple-light);
+      border-radius: 6px; padding: .2rem .5rem; flex-shrink: 0; margin-top: 2px;
     }
 
-    .skill-row-info { flex: 1; }
-    .skill-row-name { font-size: .95rem; font-weight: 600; }
-    .skill-row-date { font-size: .76rem; color: var(--text-muted); margin-top: .15rem; }
+    .skill-row-info { flex: 1; min-width: 0; }
+    .skill-row-name { font-size: .95rem; font-weight: 600; margin-bottom: .2rem; }
+    .skill-row-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: .3rem; }
+    .skill-row-meta { font-size: .74rem; color: var(--text-muted); }
+
+    .skill-row-actions { display: flex; gap: .4rem; flex-shrink: 0; }
+    .icon-btn {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted);
+      width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: .85rem;
+      display: flex; align-items: center; justify-content: center; transition: all .15s;
+    }
+    .icon-btn:hover { border-color: var(--purple); color: var(--text); }
+    .icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .icon-btn.danger:hover { border-color: var(--pink); color: var(--pink); }
+
+    .status-badge {
+      font-size: .72rem; font-weight: 700; border-radius: 6px; padding: .25rem .6rem; flex-shrink: 0;
+    }
+    .status-badge.proposee   { background: rgba(245,158,11,.15); color: #f59e0b; }
+    .status-badge.en_cours   { background: rgba(34,211,238,.15); color: var(--cyan); }
+    .status-badge.terminee   { background: rgba(168,85,247,.15); color: var(--purple-light); }
+    .status-badge.validee    { background: rgba(52,211,153,.15); color: #34d399; }
+    .status-badge.annulee    { background: rgba(244,63,94,.15); color: #f43f5e; }
 
     .empty-state { color: var(--text-muted); font-size: .88rem; padding: .5rem 0; }
 
-    /* ── MODAL PUBLIER ── */
+    /* ── MODALS ── */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
       display: flex; align-items: center; justify-content: center; z-index: 300;
-      opacity: 0; pointer-events: none; transition: opacity .25s;
+      opacity: 0; pointer-events: none; transition: opacity .25s; padding: 2rem;
     }
     .modal-overlay.visible { opacity: 1; pointer-events: all; }
     .modal-box {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
-      padding: 2.2rem; width: 100%; max-width: 400px;
+      padding: 2.2rem; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto;
     }
     .modal-box h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: .5rem; }
     .modal-box p { font-size: .85rem; color: var(--text-muted); margin-bottom: 1.2rem; }
-    .modal-box input {
+
+    .field-label { font-size: .78rem; color: var(--text-muted); font-weight: 600; margin-bottom: .5rem; display: block; }
+
+    .modal-box input[type="text"], .modal-box input[type="password"], .modal-box textarea {
       width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
-      padding: .75rem 1rem; color: var(--text); font-size: .9rem; outline: none; margin-bottom: 1rem;
-      transition: border-color .2s;
+      padding: .75rem 1rem; color: var(--text); font-size: .9rem; outline: none; margin-bottom: 1.1rem;
+      transition: border-color .2s; resize: vertical;
     }
-    .modal-box input:focus { border-color: var(--purple); }
+    .modal-box input:focus, .modal-box textarea:focus { border-color: var(--purple); }
+
+    /* Aperçu illustré selon la catégorie */
+    .cat-preview {
+      height: 100px; border-radius: 12px; margin-bottom: 1.1rem;
+      display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+    }
+    .cat-preview.Code      { background: linear-gradient(135deg, #0f0c29, #302b63); }
+    .cat-preview.Langues   { background: linear-gradient(135deg, #0a6473, #135e72); }
+    .cat-preview.Design    { background: linear-gradient(135deg, #3b0764, #7e22ce); }
+    .cat-preview.Musique   { background: linear-gradient(135deg, #3a1c71, #6a0572); }
+    .cat-preview.Maths     { background: linear-gradient(135deg, #134e5e, #1a6b4a); }
+    .cat-preview.Marketing { background: linear-gradient(135deg, #831843, #be185d); }
+    .cat-preview.Autre     { background: linear-gradient(135deg, #27272a, #3f3f46); }
+
+    .code-lines { display: flex; flex-direction: column; gap: 5px; padding: 1rem; width: 70%; }
+    .code-lines span { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #a855f7, #22d3ee); }
+    .lang-bubbles { display: flex; flex-direction: column; gap: .4rem; padding: .4rem; }
+    .bubble { padding: .25rem .65rem; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+    .bubble.left  { background: var(--purple); align-self: flex-start; }
+    .bubble.right { background: #fff; color: #111; align-self: flex-end; }
+    .design-shapes { display: flex; gap: .5rem; align-items: center; }
+    .shape-sq { width: 34px; height: 34px; background: var(--purple); border-radius: 6px; }
+    .shape-ci { width: 32px; height: 32px; background: var(--pink); border-radius: 50%; }
+    .shape-ln { width: 6px; height: 46px; background: var(--cyan); border-radius: 3px; }
+    .music-icon { font-size: 2.6rem; }
+    .maths-text { font-family: 'Georgia', serif; text-align: center; font-size: .72rem; line-height: 1.6; color: #d1fae5; }
+    .chart { display: flex; align-items: flex-end; gap: 5px; padding: .4rem; }
+    .bar { border-radius: 4px 4px 0 0; width: 14px; background: linear-gradient(180deg, var(--pink), var(--purple)); }
+    .autre-icon { font-size: 2.4rem; }
+
+    .cat-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.1rem; }
+    .cat-btn {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      padding: .45rem 1rem; border-radius: 99px; cursor: pointer; font-size: .82rem; transition: all .15s;
+    }
+    .cat-btn.selected { background: rgba(168,85,247,.2); border-color: var(--purple); color: var(--purple-light); font-weight: 600; }
+
+    .cost-row { display: flex; gap: .6rem; margin-bottom: 1.3rem; }
+    .cost-btn {
+      flex: 1; background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      padding: .7rem; border-radius: 10px; cursor: pointer; font-size: .88rem; transition: all .15s;
+    }
+    .cost-btn.selected { border-color: var(--purple); background: rgba(168,85,247,.15); color: var(--purple-light); font-weight: 600; }
+
     .btn-modal-p {
       width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
       padding: .8rem; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; margin-bottom: .6rem;
@@ -260,11 +332,25 @@
     }
     .btn-modal-g:hover { border-color: var(--purple); }
 
+    .photo-picker { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.1rem; }
+    .photo-preview {
+      width: 64px; height: 64px; border-radius: 16px; background: var(--bg-card2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .btn-file {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      padding: .55rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem;
+    }
+    .btn-file:hover { border-color: var(--purple); }
+
+    hr.sep { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
+
     @media (max-width: 600px) {
       .sidebar { display: none; }
       .main { margin-left: 0; padding: 1.5rem; }
       .profile-header { flex-direction: column; align-items: flex-start; }
-      .skills-panel { max-width: 100%; }
     }
   </style>
 </head>
@@ -278,18 +364,10 @@
     </a>
 
     <nav class="sidebar-nav">
-      <a href="explorer.html" class="sidebar-item">
-        <span>•</span> Découvrir
-      </a>
-      <div class="sidebar-item active">
-        <span>•</span> Mon profil
-      </div>
-      <div class="sidebar-item" onclick="window.location.href='messages.html'">
-        <span>•</span> Messages
-      </div>
-      <div class="sidebar-item" onclick="afficherToast('Mes jetons — bientôt disponible')">
-        <span>•</span> Mes jetons
-      </div>
+      <a href="explorer.html" class="sidebar-item"><span>•</span> Découvrir</a>
+      <div class="sidebar-item active"><span>•</span> Mon profil</div>
+      <div class="sidebar-item" onclick="window.location.href='messages.html'"><span>•</span> Messages</div>
+      <div class="sidebar-item" onclick="window.location.href='jetons.html'"><span>•</span> Mes jetons</div>
     </nav>
 
     <div class="sidebar-bottom">
@@ -307,7 +385,6 @@
   <!-- ═══ CONTENU PRINCIPAL ═══ -->
   <main class="main">
 
-    <!-- En-tête du profil -->
     <div class="profile-header">
       <div class="profile-avatar" id="profileAvatar"></div>
       <div class="profile-info">
@@ -315,29 +392,87 @@
         <div class="school" id="profileSchool"></div>
         <div class="email" id="profileEmail"></div>
       </div>
+      <button class="btn-edit" onclick="ouvrirEditerProfil()">Modifier mon profil</button>
     </div>
 
-    <!-- Section Mes compétences -->
+    <!-- Mes compétences -->
     <div class="section-title">
       <h3>Mes compétences</h3>
       <button class="btn-publish" onclick="ouvrirPublier()">+ Publier une compétence</button>
     </div>
+    <div class="panel">
+      <div id="listeCompetences"><div class="empty-state">Chargement…</div></div>
+    </div>
 
-    <div class="skills-panel">
-      <div id="listeCompetences">
-        <div class="empty-state">Chargement…</div>
-      </div>
+    <!-- Ce que je reçois -->
+    <div class="section-title">
+      <h3>Ce que je reçois</h3>
+    </div>
+    <div class="panel">
+      <div id="listeSessions"><div class="empty-state">Chargement…</div></div>
     </div>
   </main>
 
-  <!-- ═══ MODAL PUBLIER UNE COMPÉTENCE ═══ -->
-  <div class="modal-overlay" id="modalPublier" onclick="fermerPublierSiDehors(event)">
+  <!-- ═══ MODAL PUBLIER / MODIFIER UNE COMPÉTENCE ═══ -->
+  <div class="modal-overlay" id="modalPublier" onclick="fermerSiDehors(event,'modalPublier')">
     <div class="modal-box">
-      <h2>Publier une compétence</h2>
-      <p>Indique la compétence que tu proposes d'enseigner aux autres étudiant·e·s.</p>
-      <input type="text" id="inputCompetence" placeholder="Ex. : Python, Anglais, Guitare…" />
-      <button class="btn-modal-p" id="btnPublier" onclick="publierCompetence()">Publier</button>
-      <button class="btn-modal-g" onclick="fermerPublier()">Annuler</button>
+      <h2 id="publierTitre">Publier une compétence</h2>
+      <p>Décris ce que tu sais enseigner. Les autres étudiant·e·s pourront te proposer une session.</p>
+
+      <div class="cat-preview Code" id="catPreview">
+        <div class="code-lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:70%"></span><span style="width:45%"></span></div>
+      </div>
+
+      <label class="field-label">Titre de la compétence</label>
+      <input type="text" id="inputTitre" placeholder="Ex. : Python pour débutants" />
+
+      <label class="field-label">Catégorie</label>
+      <div class="cat-row" id="catRow"></div>
+
+      <label class="field-label">Description / informations utiles</label>
+      <textarea id="inputDescription" rows="3" placeholder="Niveau, déroulé d'une séance, ce que l'autre apprendra, supports fournis…"></textarea>
+
+      <label class="field-label">Coût par heure</label>
+      <div class="cost-row" id="costRow"></div>
+
+      <button class="btn-modal-p" id="btnPublier" onclick="soumettrePublication()">Publier ma compétence</button>
+      <button class="btn-modal-g" onclick="fermerModal('modalPublier')">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL MODIFIER MON PROFIL ═══ -->
+  <div class="modal-overlay" id="modalProfil" onclick="fermerSiDehors(event,'modalProfil')">
+    <div class="modal-box">
+      <h2>Modifier mon profil</h2>
+      <p>L'email ne peut pas être modifié.</p>
+
+      <div class="photo-picker">
+        <div class="photo-preview" id="photoPreview"></div>
+        <label class="btn-file">
+          Changer la photo
+          <input type="file" id="inputPhoto" accept="image/*" style="display:none" onchange="previewPhoto(this)" />
+        </label>
+      </div>
+
+      <label class="field-label">Prénom</label>
+      <input type="text" id="editPrenom" />
+      <label class="field-label">Nom</label>
+      <input type="text" id="editNom" />
+      <label class="field-label">Université</label>
+      <input type="text" id="editUniversite" placeholder="Ex. : Université de Lyon" />
+
+      <button class="btn-modal-p" id="btnEnregistrerProfil" onclick="enregistrerProfil()">Enregistrer</button>
+
+      <hr class="sep">
+
+      <h2 style="font-size:1.05rem;">Changer le mot de passe</h2>
+      <label class="field-label">Mot de passe actuel</label>
+      <input type="password" id="ancienMdp" />
+      <label class="field-label">Nouveau mot de passe</label>
+      <input type="password" id="nouveauMdp" />
+      <button class="btn-modal-p" id="btnChangerMdp" onclick="changerMotDePasse()">Changer le mot de passe</button>
+
+      <button class="btn-modal-g" onclick="fermerModal('modalProfil')">Fermer</button>
     </div>
   </div>
 
@@ -349,6 +484,8 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    const CATEGORIES = ['Code', 'Langues', 'Design', 'Musique', 'Maths', 'Marketing', 'Autre'];
+
     function afficherToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -369,46 +506,153 @@
     function getUser() {
       try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; }
     }
+    function setUser(u) { localStorage.setItem('user', JSON.stringify(u)); }
 
     function deconnexion() {
       localStorage.removeItem('user');
       window.location.href = 'index.html';
     }
 
-    const user = getUser();
+    function fermerModal(id) { document.getElementById(id).classList.remove('visible'); }
+    function fermerSiDehors(e, id) { if (e.target === document.getElementById(id)) fermerModal(id); }
+
+    let user = getUser();
     if (!user || !user.idUser) {
       window.location.href = 'explorer.html';
     }
 
+    function avatarHtml(u, size) {
+      if (u && u.photo) return `<img src="${u.photo}" alt="">`;
+      return escapeHtml(initiales(u ? u.prenomUser : '', u ? u.nomUser : ''));
+    }
+
     function afficherProfil() {
-      const init = initiales(user.prenomUser, user.nomUser);
-      document.getElementById('sidebarAvatar').textContent = init;
+      document.getElementById('sidebarAvatar').innerHTML = avatarHtml(user);
       document.getElementById('sidebarName').textContent = `${user.prenomUser} ${user.nomUser}`;
-      document.getElementById('profileAvatar').textContent = init;
+      document.getElementById('profileAvatar').innerHTML = avatarHtml(user);
       document.getElementById('profileName').textContent = `${user.prenomUser} ${user.nomUser}`;
       document.getElementById('profileSchool').textContent = user.universite ? `Étudiant·e · ${user.universite}` : 'Étudiant·e';
       document.getElementById('profileEmail').textContent = user.email || '';
     }
+
+    /* ══ Illustrations par catégorie (aperçu dans le modal Publier) ══ */
+    const CAT_PREVIEW_HTML = {
+      Code: '<div class="code-lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:70%"></span><span style="width:45%"></span></div>',
+      Langues: '<div class="lang-bubbles"><div class="bubble left">Hello</div><div class="bubble right">Bonjour</div></div>',
+      Design: '<div class="design-shapes"><div class="shape-sq"></div><div class="shape-ci"></div><div class="shape-ln"></div></div>',
+      Musique: '<span class="music-icon">🎸</span>',
+      Maths: '<div class="maths-text">a² + b² = c²<br>∫ x dx = ½x²<br>π ≈ 3.14159</div>',
+      Marketing: '<div class="chart"><div class="bar" style="height:24px"></div><div class="bar" style="height:38px"></div><div class="bar" style="height:32px"></div><div class="bar" style="height:48px"></div></div>',
+      Autre: '<span class="autre-icon">✨</span>',
+    };
+
+    let catSelectionnee = 'Code';
+    let coutSelectionne = 1;
+    let idEchangeEnEdition = null;
+
+    function initCatRow() {
+      document.getElementById('catRow').innerHTML = CATEGORIES.map(c =>
+        `<button type="button" class="cat-btn" data-cat="${c}" onclick="choisirCategorie('${c}')">${c}</button>`
+      ).join('');
+      document.getElementById('costRow').innerHTML = [1, 2, 3].map(n =>
+        `<button type="button" class="cost-btn" data-cost="${n}" onclick="choisirCout(${n})">${n} 🪙</button>`
+      ).join('');
+    }
+
+    function choisirCategorie(cat) {
+      catSelectionnee = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('selected', b.dataset.cat === cat));
+      const preview = document.getElementById('catPreview');
+      preview.className = 'cat-preview ' + cat;
+      preview.innerHTML = CAT_PREVIEW_HTML[cat] || CAT_PREVIEW_HTML.Autre;
+    }
+
+    function choisirCout(n) {
+      coutSelectionne = n;
+      document.querySelectorAll('.cost-btn').forEach(b => b.classList.toggle('selected', Number(b.dataset.cost) === n));
+    }
+
+    function ouvrirPublier() {
+      idEchangeEnEdition = null;
+      document.getElementById('publierTitre').textContent = 'Publier une compétence';
+      document.getElementById('btnPublier').textContent = 'Publier ma compétence';
+      document.getElementById('inputTitre').value = '';
+      document.getElementById('inputDescription').value = '';
+      choisirCategorie('Code');
+      choisirCout(1);
+      document.getElementById('modalPublier').classList.add('visible');
+    }
+
+    function ouvrirModifier(item) {
+      idEchangeEnEdition = item.idEchange;
+      document.getElementById('publierTitre').textContent = 'Modifier ma compétence';
+      document.getElementById('btnPublier').textContent = 'Enregistrer les modifications';
+      document.getElementById('inputTitre').value = item.competence;
+      document.getElementById('inputDescription').value = item.description || '';
+      choisirCategorie(item.categorie || 'Autre');
+      choisirCout(item.coutHeure || 1);
+      document.getElementById('modalPublier').classList.add('visible');
+    }
+
+    async function soumettrePublication() {
+      const nom = document.getElementById('inputTitre').value.trim();
+      const description = document.getElementById('inputDescription').value.trim();
+      if (!nom) { afficherToast('Indique le titre de la compétence.'); return; }
+
+      const btn = document.getElementById('btnPublier');
+      btn.disabled = true;
+
+      const action = idEchangeEnEdition ? 'modifier' : 'publier';
+      const body = { idUser: user.idUser, nom, categorie: catSelectionnee, description, coutHeure: coutSelectionne };
+      if (idEchangeEnEdition) body.idEchange = idEchangeEnEdition;
+
+      try {
+        const rep = await fetch(`api/competences.php?action=${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+
+        fermerModal('modalPublier');
+        afficherToast(idEchangeEnEdition ? 'Compétence modifiée !' : 'Compétence publiée !');
+        chargerCompetences();
+      } catch (e) {
+        afficherToast('Erreur réseau. Le serveur PHP est-il lancé ?');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    let mesCompetencesCache = [];
 
     async function chargerCompetences() {
       const conteneur = document.getElementById('listeCompetences');
       try {
         const rep = await fetch(`api/competences.php?action=mesCompetences&idUser=${user.idUser}`);
         const data = await rep.json();
-        if (!rep.ok) {
-          conteneur.innerHTML = `<div class="empty-state">${escapeHtml(data.erreur || 'Erreur de chargement.')}</div>`;
-          return;
-        }
+        if (!rep.ok) { conteneur.innerHTML = `<div class="empty-state">${escapeHtml(data.erreur || 'Erreur de chargement.')}</div>`; return; }
+
+        mesCompetencesCache = data;
+        const peutSupprimer = data.length > 1;
+
         if (data.length === 0) {
           conteneur.innerHTML = '<div class="empty-state">Tu n\'as encore publié aucune compétence.</div>';
           return;
         }
-        conteneur.innerHTML = data.map(c => `
+
+        conteneur.innerHTML = data.map((c, i) => `
           <div class="skill-row">
-            <div class="skill-dot"></div>
+            <span class="skill-cat-badge">${escapeHtml(c.categorie || 'Autre')}</span>
             <div class="skill-row-info">
-              <div class="skill-row-name">${escapeHtml(c.competence)}</div>
-              <div class="skill-row-date">Publiée le ${new Date(c.dateEchange).toLocaleDateString('fr-FR')}</div>
+              <div class="skill-row-name">${escapeHtml(c.competence)} · ${c.coutHeure} 🪙/h</div>
+              ${c.description ? `<div class="skill-row-desc">${escapeHtml(c.description)}</div>` : ''}
+              <div class="skill-row-meta">Publiée le ${new Date(c.dateEchange).toLocaleDateString('fr-FR')}</div>
+            </div>
+            <div class="skill-row-actions">
+              <button class="icon-btn" title="Modifier" onclick='ouvrirModifier(mesCompetencesCache[${i}])'>✏️</button>
+              <button class="icon-btn danger" title="Supprimer" ${peutSupprimer ? '' : 'disabled'} onclick="supprimerCompetence(${c.idEchange})">🗑️</button>
             </div>
           </div>`).join('');
       } catch (e) {
@@ -416,49 +660,151 @@
       }
     }
 
-    /* ── Publier une compétence ── */
-    function ouvrirPublier() {
-      document.getElementById('inputCompetence').value = '';
-      document.getElementById('modalPublier').classList.add('visible');
-    }
-    function fermerPublier() { document.getElementById('modalPublier').classList.remove('visible'); }
-    function fermerPublierSiDehors(e) { if (e.target === document.getElementById('modalPublier')) fermerPublier(); }
-
-    async function publierCompetence() {
-      const nom = document.getElementById('inputCompetence').value.trim();
-      if (!nom) { afficherToast('Indique le nom de la compétence.'); return; }
-
-      const btn = document.getElementById('btnPublier');
-      btn.disabled = true;
-      btn.textContent = 'Publication…';
-
+    async function supprimerCompetence(idEchange) {
+      if (!confirm('Supprimer cette compétence publiée ?')) return;
       try {
-        const rep = await fetch('api/competences.php?action=publier', {
+        const rep = await fetch('api/competences.php?action=supprimer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idUser: user.idUser, nom })
+          body: JSON.stringify({ idEchange, idUser: user.idUser })
         });
         const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        afficherToast('Compétence supprimée.');
+        chargerCompetences();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      }
+    }
 
-        if (!rep.ok) {
-          afficherToast(json.erreur || 'Erreur lors de la publication.');
+    /* ══ Ce que je reçois (sessions où je suis apprenant) ══ */
+    const STATUT_LABELS = {
+      proposee: 'Proposée',
+      en_cours: 'En cours',
+      terminee: 'Terminée · QCM à passer',
+      validee: 'Validée ✓',
+      annulee: 'Annulée',
+    };
+
+    async function chargerSessions() {
+      const conteneur = document.getElementById('listeSessions');
+      try {
+        const rep = await fetch(`api/echanges.php?action=mesSessionsApprenant&idUser=${user.idUser}`);
+        const data = await rep.json();
+        if (!rep.ok) { conteneur.innerHTML = `<div class="empty-state">${escapeHtml(data.erreur || 'Erreur de chargement.')}</div>`; return; }
+
+        if (data.length === 0) {
+          conteneur.innerHTML = '<div class="empty-state">Tu ne reçois aucun cours pour l\'instant. Trouve un binôme dans Découvrir !</div>';
           return;
         }
 
-        fermerPublier();
-        afficherToast('Compétence publiée !');
-        chargerCompetences();
+        conteneur.innerHTML = data.map(s => `
+          <div class="skill-row">
+            <span class="status-badge ${s.statut}">${STATUT_LABELS[s.statut] || s.statut}</span>
+            <div class="skill-row-info">
+              <div class="skill-row-name">${escapeHtml(s.competence)}</div>
+              <div class="skill-row-desc">Avec ${escapeHtml(s.ensPrenom)} ${escapeHtml(s.ensNom)}</div>
+              <div class="skill-row-meta">🗓 ${new Date(s.dateSession).toLocaleDateString('fr-FR')} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div>
+            </div>
+            <div class="skill-row-actions">
+              <button class="icon-btn" title="Aller à la conversation" onclick="window.location.href='messages.html?open=${s.idEnseignant}&name=${encodeURIComponent(s.ensPrenom + ' ' + s.ensNom)}'">💬</button>
+            </div>
+          </div>`).join('');
       } catch (e) {
-        afficherToast('Erreur réseau. Le serveur PHP est-il lancé ?');
+        conteneur.innerHTML = '<div class="empty-state">Impossible de contacter le serveur.</div>';
+      }
+    }
+
+    /* ══ Modifier mon profil ══ */
+    let nouvellePhotoBase64 = false; // false = inchangée
+
+    function ouvrirEditerProfil() {
+      nouvellePhotoBase64 = false;
+      document.getElementById('editPrenom').value = user.prenomUser || '';
+      document.getElementById('editNom').value = user.nomUser || '';
+      document.getElementById('editUniversite').value = user.universite || '';
+      document.getElementById('photoPreview').innerHTML = avatarHtml(user);
+      document.getElementById('ancienMdp').value = '';
+      document.getElementById('nouveauMdp').value = '';
+      document.getElementById('modalProfil').classList.add('visible');
+    }
+
+    function previewPhoto(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 2_500_000) { afficherToast('Image trop lourde (2,5 Mo max).'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        nouvellePhotoBase64 = reader.result;
+        document.getElementById('photoPreview').innerHTML = `<img src="${reader.result}" alt="">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function enregistrerProfil() {
+      const prenomUser = document.getElementById('editPrenom').value.trim();
+      const nomUser = document.getElementById('editNom').value.trim();
+      const universite = document.getElementById('editUniversite').value.trim();
+      if (!prenomUser || !nomUser) { afficherToast('Le nom et le prénom sont obligatoires.'); return; }
+
+      const btn = document.getElementById('btnEnregistrerProfil');
+      btn.disabled = true;
+
+      const body = { idUser: user.idUser, prenomUser, nomUser, universite };
+      if (nouvellePhotoBase64 !== false) body.photo = nouvellePhotoBase64;
+
+      try {
+        const rep = await fetch('api/auth.php?action=modifierProfil', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+
+        user = json.user;
+        setUser(user);
+        afficherProfil();
+        afficherToast('Profil mis à jour !');
+      } catch (e) {
+        afficherToast('Erreur réseau.');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Publier';
+      }
+    }
+
+    async function changerMotDePasse() {
+      const ancien = document.getElementById('ancienMdp').value;
+      const nouveau = document.getElementById('nouveauMdp').value;
+      if (!ancien || !nouveau) { afficherToast('Remplis les deux champs de mot de passe.'); return; }
+
+      const btn = document.getElementById('btnChangerMdp');
+      btn.disabled = true;
+
+      try {
+        const rep = await fetch('api/auth.php?action=changerMotDePasse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idUser: user.idUser, ancienMotDePasse: ancien, nouveauMotDePasse: nouveau })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+
+        document.getElementById('ancienMdp').value = '';
+        document.getElementById('nouveauMdp').value = '';
+        afficherToast('Mot de passe changé !');
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      } finally {
+        btn.disabled = false;
       }
     }
 
     if (user) {
+      initCatRow();
       afficherProfil();
       chargerCompetences();
+      chargerSessions();
     }
   </script>
 

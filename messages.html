@@ -35,356 +35,156 @@
 
     /* ── SIDEBAR ── */
     .sidebar {
-      width: 180px;
-      min-height: 100vh;
-      background: var(--sidebar);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 1.4rem 1rem;
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
+      width: 180px; min-height: 100vh; background: var(--sidebar); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 1.4rem 1rem; position: fixed; top: 0; left: 0; bottom: 0;
     }
-
-    .sidebar-logo {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 2.5rem;
-      padding: .2rem .3rem;
-    }
-
-    .logo-icon {
-      width: 30px; height: 30px;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: .8rem;
-    }
-
+    .sidebar-logo { display: flex; align-items: center; gap: .6rem; font-weight: 700; font-size: 1rem; margin-bottom: 2.5rem; padding: .2rem .3rem; }
+    .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple), var(--pink)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .8rem; }
     .sidebar-nav { display: flex; flex-direction: column; gap: .3rem; flex: 1; }
-
-    .sidebar-item {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      padding: .6rem .8rem;
-      border-radius: 8px;
-      font-size: .88rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-
+    .sidebar-item { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; border-radius: 8px; font-size: .88rem; color: var(--text-muted); cursor: pointer; transition: background .15s, color .15s; }
     .sidebar-item:hover { background: var(--bg-card); color: var(--text); }
-
-    .sidebar-item.active {
-      background: rgba(168,85,247,.15);
-      color: var(--purple-light);
-      font-weight: 600;
-    }
-
-    .badge {
-      margin-left: auto;
-      background: var(--purple);
-      color: #fff;
-      border-radius: 99px;
-      font-size: .68rem;
-      font-weight: 700;
-      padding: .1rem .4rem;
-      min-width: 18px;
-      text-align: center;
-    }
-
+    .sidebar-item.active { background: rgba(168,85,247,.15); color: var(--purple-light); font-weight: 600; }
     .sidebar-bottom { border-top: 1px solid var(--border); padding-top: 1rem; }
-
-    .token-balance {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: .8rem 1rem;
-      margin-bottom: .8rem;
-    }
-
-    .token-balance .label { font-size: .72rem; color: var(--text-muted); margin-bottom: .25rem; }
-    .token-balance .amount { font-size: 1.3rem; font-weight: 800; }
-    .token-balance .unit  { font-size: .78rem; color: var(--text-muted); margin-left: .2rem; }
-
     .user-pill { display: flex; align-items: center; gap: .6rem; padding: .5rem .6rem; border-radius: 8px; cursor: pointer; }
     .user-pill:hover { background: var(--bg-card); }
-
-    .avatar-pill {
-      width: 30px; height: 30px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #7c3aed, #a855f7);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .7rem; font-weight: 700;
-    }
-
+    .avatar-pill { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; overflow: hidden; }
+    .avatar-pill img { width: 100%; height: 100%; object-fit: cover; }
     .user-pill-name { font-size: .82rem; font-weight: 600; }
     .user-pill-status { font-size: .7rem; color: var(--text-muted); }
 
     /* ── MAIN ── */
     .main { margin-left: 180px; flex: 1; padding: 2rem 2.4rem; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-
     .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; flex-shrink: 0; }
     .page-header h1 { font-size: 1.7rem; font-weight: 800; }
 
-    .theme-pill {
-      display: flex; align-items: center; gap: .6rem;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 99px; padding: .4rem .9rem; font-size: .68rem;
-      color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase;
-    }
-    .theme-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
-    .theme-dot.d1 { background: var(--purple); }
-    .theme-dot.d2 { background: var(--pink); }
-    .theme-dot.d3 { background: var(--cyan); }
+    .messages-shell { flex: 1; display: grid; grid-template-columns: 260px 1fr 300px; gap: 1.1rem; min-height: 0; }
 
-    /* ── LAYOUT 3 COLONNES ── */
-    .messages-shell {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 260px 1fr 300px;
-      gap: 1.1rem;
-      min-height: 0;
-    }
-
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
+    .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
 
     /* Colonne conversations */
     .conv-col { padding: .6rem; overflow-y: auto; }
-
-    .conv-item {
-      display: flex; align-items: center; gap: .7rem;
-      padding: .7rem .6rem; border-radius: 10px; cursor: pointer;
-      transition: background .15s;
-    }
+    .conv-item { display: flex; align-items: center; gap: .7rem; padding: .7rem .6rem; border-radius: 10px; cursor: pointer; transition: background .15s; }
     .conv-item:hover { background: var(--bg-card2); }
     .conv-item.active { background: rgba(168,85,247,.15); }
-
     .conv-item-info { flex: 1; min-width: 0; }
     .conv-item-name { font-size: .88rem; font-weight: 600; }
-    .conv-item-preview {
-      font-size: .76rem; color: var(--text-muted);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+    .conv-item-preview { font-size: .76rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .avatar-conv { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .8rem; flex-shrink: 0; overflow: hidden; }
+    .avatar-conv img { width: 100%; height: 100%; object-fit: cover; }
 
     /* Colonne chat */
-    .chat-col { }
-
     .chat-head { display: flex; align-items: center; gap: .8rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .chat-head-name { font-size: 1rem; font-weight: 700; }
-    .chat-head-status { font-size: .78rem; color: var(--text-muted); }
-    .chat-head-status.online { color: var(--cyan); }
-
     .chat-body { flex: 1; overflow-y: auto; padding: 1.2rem; display: flex; flex-direction: column; gap: .7rem; }
 
     .bubble-row { display: flex; }
     .bubble-row.me { justify-content: flex-end; }
-    .bubble {
-      max-width: 70%;
-      padding: .7rem 1rem;
-      border-radius: 14px;
-      font-size: .88rem;
-      line-height: 1.5;
-    }
+    .bubble { max-width: 70%; padding: .7rem 1rem; border-radius: 14px; font-size: .88rem; line-height: 1.5; }
     .bubble.them { background: var(--bg-card2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
     .bubble.me { background: linear-gradient(135deg, var(--purple), var(--pink)); border-bottom-right-radius: 4px; }
 
-    .system-msg {
-      text-align: center; font-size: .78rem; color: var(--text-muted);
-      background: var(--bg-card2); border: 1px solid var(--border);
-      border-radius: 99px; padding: .4rem 1rem; align-self: center;
-    }
+    .system-msg { text-align: center; font-size: .78rem; color: var(--text-muted); background: var(--bg-card2); border: 1px solid var(--border); border-radius: 99px; padding: .4rem 1rem; align-self: center; }
 
-    .chat-foot {
-      display: flex; align-items: center; gap: .7rem;
-      padding: 1rem 1.2rem; border-top: 1px solid var(--border); flex-shrink: 0;
-    }
-
-    .btn-session {
-      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
-      padding: .65rem 1rem; border-radius: 10px; cursor: pointer; font-size: .85rem;
-      font-weight: 600; white-space: nowrap; transition: border-color .2s, opacity .2s;
-    }
+    .chat-foot { display: flex; align-items: center; gap: .7rem; padding: 1rem 1.2rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .btn-session { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text); padding: .65rem 1rem; border-radius: 10px; cursor: pointer; font-size: .85rem; font-weight: 600; white-space: nowrap; transition: border-color .2s, opacity .2s; }
     .btn-session:hover { border-color: var(--purple); }
     .btn-session:disabled { opacity: .4; cursor: not-allowed; }
-
-    .msg-input {
-      flex: 1; background: var(--bg-card2); border: 1px solid var(--border);
-      border-radius: 10px; padding: .7rem 1rem; color: var(--text); font-size: .9rem; outline: none;
-      transition: border-color .2s;
-    }
+    .msg-input { flex: 1; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: .7rem 1rem; color: var(--text); font-size: .9rem; outline: none; transition: border-color .2s; }
     .msg-input:focus { border-color: var(--purple); }
-
-    .btn-send {
-      background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
-      width: 42px; height: 42px; border-radius: 10px; cursor: pointer; font-size: 1.1rem;
-      display: flex; align-items: center; justify-content: center; transition: opacity .2s;
-    }
+    .btn-send { background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: opacity .2s; flex-shrink: 0; }
     .btn-send:hover { opacity: .88; }
+
+    .empty-chat { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: .9rem; padding: 2rem; text-align: center; }
 
     /* Session card dans le chat */
     .session-card-row { align-self: stretch; }
-    .session-card {
-      background: var(--bg-card2); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .8rem;
-    }
+    .session-card { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .8rem; }
     .session-card-head { display: flex; align-items: center; justify-content: space-between; font-size: .88rem; font-weight: 700; }
-
     .sess-badge { font-size: .72rem; font-weight: 700; border-radius: 6px; padding: .2rem .6rem; }
-    .sess-badge.pending { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
-    .sess-badge.progress { background: rgba(34,211,238,.15); color: var(--cyan); border: 1px solid rgba(34,211,238,.3); }
-    .sess-badge.done { background: rgba(52,211,153,.15); color: #34d399; border: 1px solid rgba(52,211,153,.3); }
+    .sess-badge.proposee { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
+    .sess-badge.en_cours { background: rgba(34,211,238,.15); color: var(--cyan); border: 1px solid rgba(34,211,238,.3); }
+    .sess-badge.terminee { background: rgba(168,85,247,.15); color: var(--purple-light); border: 1px solid rgba(168,85,247,.3); }
+    .sess-badge.validee { background: rgba(52,211,153,.15); color: #34d399; border: 1px solid rgba(52,211,153,.3); }
+    .sess-badge.annulee { background: rgba(244,63,94,.15); color: #f43f5e; border: 1px solid rgba(244,63,94,.3); }
 
-    .session-sides { display: flex; align-items: center; gap: .7rem; }
-    .sess-side { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: .7rem .8rem; min-height: 60px; }
-    .sess-side.empty { display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: .8rem; }
-    .sess-side-who { display: flex; align-items: center; gap: .4rem; font-size: .74rem; color: var(--text-muted); margin-bottom: .3rem; }
-    .sess-side-title { font-size: .86rem; font-weight: 700; margin-bottom: .2rem; }
-    .sess-side-meta { font-size: .74rem; color: var(--text-muted); }
-    .sess-arrow { color: var(--text-muted); font-size: 1rem; }
+    .sess-side { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: .7rem .8rem; }
+    .sess-side-title { font-size: .9rem; font-weight: 700; margin-bottom: .2rem; }
+    .sess-side-meta { font-size: .76rem; color: var(--text-muted); }
 
     .sess-note { font-size: .8rem; color: var(--text-muted); line-height: 1.5; }
     .sess-note.ok { color: var(--cyan); }
     .sess-note.success { color: #34d399; font-weight: 600; }
 
     .sess-btn-row { display: flex; gap: .6rem; flex-wrap: wrap; }
-
-    .btn-confirm, .btn-qcm {
+    .btn-confirm, .btn-qcm, .btn-accept {
       background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
-      padding: .6rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem; font-weight: 600;
-      transition: opacity .2s;
+      padding: .6rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem; font-weight: 600; transition: opacity .2s;
     }
+    .btn-refuse { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: .6rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem; }
     .btn-confirm.done { background: #0f5c4c; color: #6ee7b7; }
     .btn-qcm.pink { background: linear-gradient(135deg, #db2777, var(--pink)); }
-    .btn-confirm:hover, .btn-qcm:hover { opacity: .88; }
+    .btn-confirm:hover, .btn-qcm:hover, .btn-accept:hover { opacity: .88; }
     .btn-confirm:disabled, .btn-qcm:disabled { opacity: .6; cursor: default; }
-
-    .btn-sim {
-      background: transparent; border: 1px dashed var(--border); color: var(--text-muted);
-      padding: .5rem .8rem; border-radius: 8px; cursor: pointer; font-size: .76rem; align-self: flex-start;
-      transition: border-color .2s, color .2s;
-    }
-    .btn-sim:hover { border-color: var(--purple); color: var(--purple-light); }
 
     /* Colonne échange */
     .exchange-col { padding: 1.3rem; overflow-y: auto; }
     .exchange-col h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .3rem; }
     .exch-sub { font-size: .8rem; color: var(--text-muted); margin-bottom: 1.2rem; }
-
-    .exch-summary { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.2rem; }
-    .exch-line { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: .7rem .8rem; }
-    .exch-tag { display: block; font-size: .68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
-    .exch-line strong { display: block; font-size: .88rem; margin-bottom: .2rem; }
-    .exch-meta { font-size: .74rem; color: var(--text-muted); }
-
     .exch-steps { display: flex; flex-direction: column; gap: .8rem; margin-bottom: 1.2rem; }
     .exch-step { display: flex; align-items: center; gap: .7rem; font-size: .84rem; color: var(--text-muted); }
     .exch-step.done { color: var(--text); }
-    .exch-step-num {
-      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-      background: var(--bg-card2); border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center; font-size: .74rem; font-weight: 700;
-    }
+    .exch-step-num { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; background: var(--bg-card2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: .74rem; font-weight: 700; }
     .exch-step.done .exch-step-num { background: linear-gradient(135deg, var(--purple), var(--pink)); border-color: transparent; color: #fff; }
-
-    .exch-cta {
-      background: var(--bg-card2); border: 1px dashed var(--border); border-radius: 10px;
-      padding: .9rem 1rem; font-size: .8rem; color: var(--text-muted); line-height: 1.6;
-    }
+    .exch-cta { background: var(--bg-card2); border: 1px dashed var(--border); border-radius: 10px; padding: .9rem 1rem; font-size: .8rem; color: var(--text-muted); line-height: 1.6; }
     .exch-cta strong { color: var(--purple-light); }
 
     /* ── MODALS ── */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center; z-index: 300;
-      opacity: 0; pointer-events: none; transition: opacity .25s;
-    }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 300; opacity: 0; pointer-events: none; transition: opacity .25s; padding: 2rem; }
     .modal-overlay.visible { opacity: 1; pointer-events: all; }
-
-    .modal {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
-      padding: 2rem; width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto;
-    }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto; }
     .modal.wide { max-width: 560px; }
-
-    .modal-close {
-      float: right; background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted);
-      width: 26px; height: 26px; border-radius: 8px; cursor: pointer; font-size: .85rem;
-    }
-
+    .modal-close { float: right; background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted); width: 26px; height: 26px; border-radius: 8px; cursor: pointer; font-size: .85rem; }
     .modal h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: .4rem; }
     .modal > p { font-size: .84rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.3rem; }
-
     .field-label { font-size: .78rem; color: var(--text-muted); font-weight: 600; margin-bottom: .5rem; display: block; }
-
     .modal input[type="text"], .modal input[type="date"], .modal input[type="time"] {
       width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
       padding: .75rem 1rem; color: var(--text); font-size: .9rem; outline: none; margin-bottom: 1.1rem;
       transition: border-color .2s; color-scheme: dark;
     }
     .modal input:focus { border-color: var(--purple); }
-
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
     .chip-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.1rem; }
-    .chip {
-      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 99px;
-      padding: .5rem 1rem; font-size: .82rem; cursor: pointer; transition: all .15s; user-select: none;
-    }
+    .chip { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 99px; padding: .5rem 1rem; font-size: .82rem; cursor: pointer; transition: all .15s; user-select: none; }
     .chip small { color: var(--text-muted); }
     .chip:hover { border-color: var(--purple); }
     .chip.selected { background: rgba(168,85,247,.2); border-color: var(--purple); color: var(--purple-light); font-weight: 600; }
-
     .fmt-row { display: flex; gap: .6rem; margin-bottom: 1.3rem; }
-    .fmt-btn {
-      flex: 1; background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
-      padding: .8rem; border-radius: 10px; cursor: pointer; font-size: .88rem; transition: all .15s;
-    }
+    .fmt-btn { flex: 1; background: var(--bg-card2); border: 1px solid var(--border); color: var(--text); padding: .8rem; border-radius: 10px; cursor: pointer; font-size: .88rem; transition: all .15s; }
     .fmt-btn.selected { border-color: var(--purple); background: rgba(168,85,247,.15); color: var(--purple-light); font-weight: 600; }
-
-    .btn-modal-primary {
-      width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
-      padding: .85rem; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: opacity .2s;
-    }
+    .btn-modal-primary { width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff; padding: .85rem; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; transition: opacity .2s; }
     .btn-modal-primary:hover { opacity: .88; }
-    .btn-modal-ghost {
-      width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text);
-      padding: .8rem; border-radius: 10px; font-size: .88rem; cursor: pointer; margin-top: .6rem; transition: border-color .2s;
-    }
+    .btn-modal-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-modal-ghost { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: .8rem; border-radius: 10px; font-size: .88rem; cursor: pointer; margin-top: .6rem; transition: border-color .2s; }
     .btn-modal-ghost:hover { border-color: var(--purple); }
 
-    .qcm-question-block {
-      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px;
-      padding: 1rem; margin-bottom: 1rem;
-    }
+    .qcm-question-block { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
     .qcm-question-block input[type="text"] { margin-bottom: .6rem; }
     .qcm-option-row { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
     .qcm-option-row input[type="text"] { margin-bottom: 0; flex: 1; }
-    .qcm-remove {
-      background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: .78rem;
-      text-decoration: underline; margin-bottom: .8rem;
-    }
+    .qcm-remove { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: .78rem; text-decoration: underline; margin-bottom: .8rem; }
 
-    .toast {
-      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem;
-      border-radius: 99px; font-size: .86rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999;
-      max-width: 90vw; text-align: center;
-    }
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .86rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; max-width: 90vw; text-align: center; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .av-1 { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    .av-2 { background: linear-gradient(135deg, #dc2626, #f87171); }
+    .av-3 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .av-4 { background: linear-gradient(135deg, #0284c7, #38bdf8); }
+    .av-5 { background: linear-gradient(135deg, #059669, #34d399); }
+    .av-6 { background: linear-gradient(135deg, #b45309, #f59e0b); }
+    .av-7 { background: linear-gradient(135deg, #0891b2, #22d3ee); }
+    .av-8 { background: linear-gradient(135deg, #7c3aed, #ec4899); }
 
     @media (max-width: 1100px) {
       .messages-shell { grid-template-columns: 220px 1fr; }
@@ -406,23 +206,17 @@
       <div class="logo-icon">S</div>
       SkillSwap
     </a>
-
     <nav class="sidebar-nav">
       <a href="explorer.html" class="sidebar-item"><span>•</span> Découvrir</a>
       <a href="profil.html" class="sidebar-item"><span>•</span> Mon profil</a>
       <div class="sidebar-item active"><span>•</span> Messages</div>
-      <div class="sidebar-item" onclick="afficherToast('Mes jetons — bientôt disponible')"><span>•</span> Mes jetons</div>
+      <div class="sidebar-item" onclick="window.location.href='jetons.html'"><span>•</span> Mes jetons</div>
     </nav>
-
     <div class="sidebar-bottom">
-      <div class="token-balance">
-        <div class="label">Solde de jetons</div>
-        <div><span class="amount" id="tokenAmount">8</span><span class="unit">jetons</span></div>
-      </div>
-      <div class="user-pill">
-        <div class="avatar-pill" id="sidebarAvatar">?</div>
+      <div class="user-pill" onclick="window.location.href='profil.html'">
+        <div class="avatar-pill" id="sidebarAvatar"></div>
         <div style="flex:1">
-          <div class="user-pill-name" id="sidebarName">…</div>
+          <div class="user-pill-name" id="sidebarName"></div>
           <div class="user-pill-status">• Connecté</div>
         </div>
       </div>
@@ -431,21 +225,15 @@
 
   <!-- ═══ CONTENU PRINCIPAL ═══ -->
   <main class="main">
-    <div class="page-header">
-      <h1>Messages</h1>
-      <div class="theme-pill">
-        Theme
-        <span class="theme-dot d1"></span><span class="theme-dot d2"></span><span class="theme-dot d3"></span>
-      </div>
-    </div>
+    <div class="page-header"><h1>Messages</h1></div>
 
     <div class="messages-shell">
       <div class="panel conv-col" id="convCol"></div>
 
       <div class="panel chat-col">
-        <div class="chat-head" id="chatHead"></div>
+        <div class="chat-head" id="chatHead" style="display:none;"></div>
         <div class="chat-body" id="chatBody"></div>
-        <div class="chat-foot">
+        <div class="chat-foot" id="chatFoot" style="display:none;">
           <button class="btn-session" id="btnDefinirSession" onclick="openSessionModal()">📅 Définir une session</button>
           <input class="msg-input" id="msgInput" placeholder="Écris un message…" />
           <button class="btn-send" onclick="sendMessage()">→</button>
@@ -461,13 +249,13 @@
     <div class="modal">
       <button class="modal-close" onclick="closeModal('modalSession')">✕</button>
       <h2>Définir une session</h2>
-      <p>Choisis la compétence que <strong>toi</strong> tu enseignes. Ton interlocuteur·rice complétera son côté en acceptant.</p>
-
-      <label class="field-label">Titre de la session</label>
-      <input type="text" id="sessTitle" placeholder="Ex. : Session d'anglais conversationnel" oninput="this.dataset.userEdited='1'" />
+      <p>Choisis la compétence que <strong>toi</strong> tu enseignes. La personne en face devra accepter.</p>
 
       <label class="field-label">Ta compétence (parmi tes publications)</label>
       <div class="chip-row" id="sessSkills"></div>
+
+      <label class="field-label">Titre de la session</label>
+      <input type="text" id="sessTitle" oninput="this.dataset.userEdited='1'" />
 
       <div class="field-row">
         <div>
@@ -486,7 +274,7 @@
         <button type="button" class="fmt-btn" data-fmt="presentiel" onclick="selectFmt(this)">📍 Présentiel</button>
       </div>
 
-      <button class="btn-modal-primary" onclick="envoyerProposition()">Envoyer la proposition</button>
+      <button class="btn-modal-primary" id="btnEnvoyerSession" onclick="envoyerProposition()">Envoyer la proposition</button>
     </div>
   </div>
 
@@ -495,12 +283,10 @@
     <div class="modal wide">
       <button class="modal-close" onclick="closeModal('modalCreateQcm')">✕</button>
       <h2 id="createQcmTitle">Crée ton QCM</h2>
-      <p>Rédige les questions que tu veux poser, avec 4 réponses possibles et coche la bonne. 100% de bonnes réponses est requis pour valider l'échange.</p>
-
+      <p>Rédige les questions que tu veux poser, avec 4 réponses possibles et coche la bonne. 100% de bonnes réponses est requis pour valider la session.</p>
       <div id="qcmQuestions"></div>
-
       <button class="btn-modal-ghost" onclick="addQcmQuestion()">+ Ajouter une question</button>
-      <button class="btn-modal-primary" style="margin-top:1rem" onclick="envoyerQcm()">Envoyer le QCM</button>
+      <button class="btn-modal-primary" id="btnEnvoyerQcm" style="margin-top:1rem" onclick="envoyerQcm()">Envoyer le QCM</button>
     </div>
   </div>
 
@@ -508,130 +294,29 @@
   <div class="modal-overlay" id="modalAnswerQcm" onclick="closeModalOutside(event,'modalAnswerQcm')">
     <div class="modal wide">
       <button class="modal-close" onclick="closeModal('modalAnswerQcm')">✕</button>
-      <h2 id="answerQcmTitle">Réponds au QCM</h2>
-      <p>Sélectionne la bonne réponse pour chaque question. Il faut 100% de bonnes réponses pour valider l'échange et gagner ton jeton.</p>
-
+      <h2>Réponds au QCM</h2>
+      <p>Sélectionne la bonne réponse pour chaque question. Il faut 100% de bonnes réponses pour valider la session et déclencher le versement des jetons.</p>
       <div id="qcmAnswerQuestions"></div>
-
-      <button class="btn-modal-primary" onclick="validerReponses()">Valider mes réponses</button>
+      <button class="btn-modal-primary" id="btnValiderQcm" onclick="validerReponses()">Valider mes réponses</button>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script>
-    /* ══════════════ DONNÉES ══════════════ */
-    const STORAGE_KEY = 'skillswap_messages_v2';
-
-    const MY_SKILLS = [
-      { name: 'Anglais conversationnel', category: 'Langues' },
-      { name: 'Aide en design / Figma', category: 'Design' }
-    ];
-
-    const SEED_QCM = {
-      'lea-martin': [
-        { q: 'En Python, quel mot-clé sert à définir une fonction ?', options: ['func', 'def', 'function', 'lambda'], correct: 1 },
-        { q: 'Quelle structure de données est ordonnée et modifiable ?', options: ['tuple', 'set', 'list', 'dict'], correct: 2 },
-        { q: 'Que retourne print(2**3) ?', options: ['6', '8', '9', '23'], correct: 1 }
-      ],
-      'tom-reyes': [
-        { q: 'Comment dit-on « bonjour » en anglais ?', options: ['Goodbye', 'Hello', 'Please', 'Sorry'], correct: 1 },
-        { q: 'Quelle est la forme correcte du présent simple pour « she » ?', options: ['She go', 'She goes', 'She going', 'She gone'], correct: 1 }
-      ],
-      'ines-khalil': [
-        { q: 'Dans Figma, comment appelle-t-on un élément réutilisable ?', options: ['Frame', 'Component', 'Layer', 'Board'], correct: 1 },
-        { q: 'Quelle fonctionnalité aligne automatiquement les éléments dans un cadre ?', options: ['Auto Layout', 'Smart Guide', 'Constraints', 'Boolean'], correct: 0 }
-      ]
-    };
-
-    function genQcm(skillName) {
-      return [
-        { q: `Quelle affirmation décrit le mieux « ${skillName} » ?`, options: ['Un concept réservé aux experts', 'Une compétence qu’on peut commencer à pratiquer dès la première séance', 'Un domaine qui ne s’apprend pas', 'Aucune de ces réponses'], correct: 1 },
-        { q: `Combien de séances régulières aident en général à progresser en « ${skillName} » ?`, options: ['0', 'Plusieurs séances régulières', 'Une seule suffit toujours', 'Cela dépend uniquement de la chance'], correct: 1 }
-      ];
-    }
-
-    function defaultExchange() {
-      return {
-        status: 'none',
-        proposalMe: null,
-        proposalThem: null,
-        confirmMe: false,
-        confirmThem: false,
-        qcmMineForThem: null,
-        qcmTheirsForMe: null,
-        scoreMePass: false,
-        scoreThemPass: false
-      };
-    }
-
-    function buildSeed() {
-      return {
-        tokens: 8,
-        order: ['lea-martin', 'tom-reyes', 'ines-khalil'],
-        conversations: {
-          'lea-martin': {
-            id: 'lea-martin', name: 'Léa Martin', init: 'LM', av: 'av-lm', online: true,
-            theirSkillDefault: { name: 'Python pour débutants', category: 'Code' },
-            messages: [
-              { type: 'text', from: 'them', text: "Salut ! J'ai vu que tu cherches à apprendre Python 🐍" },
-              { type: 'text', from: 'me', text: "Oui ! Et je peux t'aider en anglais en échange 🙌" },
-              { type: 'text', from: 'them', text: "Parfait, ça me va. On dit mardi 18h pour la 1ère séance ?" }
-            ],
-            exchange: Object.assign(defaultExchange(), { qcmTheirsForMe: { questions: SEED_QCM['lea-martin'] } })
-          },
-          'tom-reyes': {
-            id: 'tom-reyes', name: 'Tom Reyes', init: 'TR', av: 'av-tr', online: false,
-            theirSkillDefault: { name: 'Anglais conversationnel', category: 'Langues' },
-            messages: [
-              { type: 'text', from: 'them', text: "Super pour la session d'anglais, merci !" }
-            ],
-            exchange: Object.assign(defaultExchange(), { qcmTheirsForMe: { questions: SEED_QCM['tom-reyes'] } })
-          },
-          'ines-khalil': {
-            id: 'ines-khalil', name: 'Inès Khalil', init: 'IK', av: 'av-ik', online: false,
-            theirSkillDefault: { name: 'UI Design & Figma', category: 'Design' },
-            messages: [
-              { type: 'text', from: 'them', text: "Je t'envoie la maquette Figma" }
-            ],
-            exchange: Object.assign(defaultExchange(), { qcmTheirsForMe: { questions: SEED_QCM['ines-khalil'] } })
-          }
-        }
-      };
-    }
-
-    let state = null;
-    let activeId = null;
-    let currentQcmConvId = null;
-    let currentAnswerConvId = null;
-
-    function loadState() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) { try { return JSON.parse(raw); } catch (e) {} }
-      return buildSeed();
-    }
-    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-
-    /* ══════════════ UTILITAIRES ══════════════ */
     function escapeHtml(str) {
       const div = document.createElement('div');
       div.textContent = str == null ? '' : String(str);
       return div.innerHTML;
     }
-
+    function initiales(prenom, nom) { return ((prenom || '?')[0] + (nom || '')[0]).toUpperCase(); }
+    function avatarClass(idUser) { const n = ((parseInt(idUser, 10) || 0) % 8 + 8) % 8 + 1; return 'av-' + n; }
     function formatDate(dateStr) {
       if (!dateStr) return '';
       const d = new Date(dateStr + 'T00:00:00');
       if (isNaN(d)) return dateStr;
       return d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short' });
     }
-
-    function addDays(dateStr, n) {
-      const d = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
-      d.setDate(d.getDate() + n);
-      return d.toISOString().slice(0, 10);
-    }
-
     function afficherToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -639,231 +324,301 @@
       clearTimeout(window.__toastTimer);
       window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
     }
-
     function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
     function closeModalOutside(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+    function getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; } }
 
-    /* ══════════════ RENDU ══════════════ */
-    function renderAll() {
+    const user = getUser();
+    if (!user || !user.idUser) { window.location.href = 'explorer.html'; }
+
+    function avatarHtml(photo, init, av) {
+      if (photo) return `<img src="${photo}" alt="">`;
+      return escapeHtml(init);
+    }
+
+    /* ══════════════ ÉTAT ══════════════ */
+    let conversations = [];      // [{idUser, nomUser, prenomUser, photo, dernierMessage, derniereDate}]
+    let pendingContact = null;   // nouvelle conversation pas encore en base (arrivée via ?open=)
+    let activeConv = null;       // {idUser, nom, init, av, photo}
+    let activeSession = null;    // session courante entre moi et activeConv (ou null)
+    let currentQcmSessionId = null;
+
+    function afficherSidebar() {
+      document.getElementById('sidebarAvatar').innerHTML = avatarHtml(user.photo, initiales(user.prenomUser, user.nomUser));
+      document.getElementById('sidebarName').textContent = `${user.prenomUser} ${user.nomUser}`;
+    }
+
+    /* ══════════════ CONVERSATIONS ══════════════ */
+    async function chargerConversations() {
+      try {
+        const rep = await fetch(`api/messages.php?action=conversations&idUser=${user.idUser}`);
+        conversations = await rep.json();
+      } catch (e) {
+        conversations = [];
+      }
       renderConvList();
-      const conv = state.conversations[activeId];
-      if (!conv) return;
-      renderChatHead(conv);
-      renderMessages(conv);
-      renderExchangePanel(conv);
-      document.getElementById('btnDefinirSession').disabled = conv.exchange.status !== 'none';
-      document.getElementById('tokenAmount').textContent = state.tokens;
     }
 
     function renderConvList() {
       const col = document.getElementById('convCol');
       col.innerHTML = '';
-      state.order.forEach(id => {
-        const c = state.conversations[id];
-        const last = c.messages[c.messages.length - 1];
-        let preview = 'Nouvelle conversation';
-        if (last) {
-          if (last.type === 'text') preview = last.text;
-          else if (last.type === 'system') preview = last.text;
-          else preview = 'Proposition de session';
-        }
+
+      let liste = conversations.slice();
+      if (pendingContact && !liste.some(c => String(c.idUser) === String(pendingContact.idUser))) {
+        liste = [{ idUser: pendingContact.idUser, nomUser: pendingContact.nom.split(' ').slice(1).join(' '), prenomUser: pendingContact.nom.split(' ')[0], photo: null, dernierMessage: null }, ...liste];
+      }
+
+      if (liste.length === 0) {
+        col.innerHTML = '<div style="padding:1rem; color:var(--text-muted); font-size:.85rem;">Aucune conversation pour l\'instant. Propose un échange depuis Découvrir !</div>';
+        return;
+      }
+
+      liste.forEach(c => {
+        const nomComplet = `${c.prenomUser} ${c.nomUser}`;
+        const init = initiales(c.prenomUser, c.nomUser);
+        const av = avatarClass(c.idUser);
         const div = document.createElement('div');
-        div.className = 'conv-item' + (id === activeId ? ' active' : '');
-        div.onclick = () => selectConv(id);
+        div.className = 'conv-item' + (activeConv && String(activeConv.idUser) === String(c.idUser) ? ' active' : '');
+        div.onclick = () => selectConversation(c.idUser, nomComplet, init, av, c.photo);
         div.innerHTML = `
-          <div class="avatar-sm ${c.av}" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;">${escapeHtml(c.init)}</div>
+          <div class="avatar-conv ${av}">${avatarHtml(c.photo, init)}</div>
           <div class="conv-item-info">
-            <div class="conv-item-name">${escapeHtml(c.name)}</div>
-            <div class="conv-item-preview">${escapeHtml(preview)}</div>
+            <div class="conv-item-name">${escapeHtml(nomComplet)}</div>
+            <div class="conv-item-preview">${escapeHtml(c.dernierMessage || 'Nouvelle conversation')}</div>
           </div>`;
         col.appendChild(div);
       });
     }
 
-    function selectConv(id) {
-      activeId = id;
-      renderAll();
-    }
-
-    function renderChatHead(conv) {
+    async function selectConversation(idUser, nom, init, av, photo) {
+      activeConv = { idUser, nom, init, av, photo };
+      document.getElementById('chatHead').style.display = 'flex';
+      document.getElementById('chatFoot').style.display = 'flex';
       document.getElementById('chatHead').innerHTML = `
-        <div class="avatar-sm ${conv.av}" style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;">${escapeHtml(conv.init)}</div>
-        <div>
-          <div class="chat-head-name">${escapeHtml(conv.name)}</div>
-          <div class="chat-head-status ${conv.online ? 'online' : ''}">${conv.online ? 'En ligne' : 'Hors ligne'}</div>
-        </div>`;
+        <div class="avatar-conv ${av}">${avatarHtml(photo, init)}</div>
+        <div class="chat-head-name">${escapeHtml(nom)}</div>`;
+      renderConvList();
+      await Promise.all([chargerMessages(), chargerSession()]);
     }
 
-    function renderMessages(conv) {
+    /* ══════════════ MESSAGES ══════════════ */
+    async function chargerMessages() {
       const body = document.getElementById('chatBody');
+      body.innerHTML = '<div class="empty-chat">Chargement…</div>';
+      try {
+        const rep = await fetch(`api/messages.php?action=historique&idUser=${user.idUser}&idAutre=${activeConv.idUser}`);
+        const data = await rep.json();
+        renderMessages(data);
+      } catch (e) {
+        body.innerHTML = '<div class="empty-chat">Impossible de charger les messages.</div>';
+      }
+    }
+
+    function renderMessages(messages) {
+      const body = document.getElementById('chatBody');
+      if (messages.length === 0) {
+        body.innerHTML = `<div class="empty-chat">Dis bonjour à ${escapeHtml(activeConv.nom)} pour démarrer la conversation !</div>`;
+        return;
+      }
       body.innerHTML = '';
-      conv.messages.forEach(m => {
-        if (m.type === 'text') {
-          const div = document.createElement('div');
-          div.className = 'bubble-row ' + (m.from === 'me' ? 'me' : 'them');
-          const bubble = document.createElement('div');
-          bubble.className = 'bubble ' + (m.from === 'me' ? 'me' : 'them');
-          bubble.textContent = m.text;
-          div.appendChild(bubble);
-          body.appendChild(div);
-        } else if (m.type === 'system') {
-          const div = document.createElement('div');
-          div.className = 'system-msg';
-          div.textContent = m.text;
-          body.appendChild(div);
-        } else if (m.type === 'session') {
-          body.appendChild(buildSessionCard(conv));
-        }
+      messages.forEach(m => {
+        const mine = String(m.idEnvoyeur) === String(user.idUser);
+        const row = document.createElement('div');
+        row.className = 'bubble-row ' + (mine ? 'me' : 'them');
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble ' + (mine ? 'me' : 'them');
+        bubble.textContent = m.contenu;
+        row.appendChild(bubble);
+        body.appendChild(row);
       });
       body.scrollTop = body.scrollHeight;
     }
 
-    function statusBadge(status) {
-      const map = {
-        proposed: ['En attente', 'pending'],
-        in_progress: ['En cours', 'progress'],
-        done: ['Terminé', 'done'],
-        qcm_done: ['Terminé', 'done']
-      };
-      const pair = map[status] || ['', ''];
-      return `<span class="sess-badge ${pair[1]}">${pair[0]}</span>`;
-    }
-
-    function sideBlock(whoLabel, prop, initials, avClass) {
-      if (!prop) return `<div class="sess-side empty">En attente…</div>`;
-      return `
-        <div class="sess-side">
-          <div class="sess-side-who"><span class="avatar-sm ${avClass || ''}" style="width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;">${escapeHtml(initials)}</span> ${escapeHtml(whoLabel)}</div>
-          <div class="sess-side-title">${escapeHtml(prop.title)}</div>
-          <div class="sess-side-meta">🗓 ${formatDate(prop.date)} · ${escapeHtml(prop.time)} · ${prop.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div>
-        </div>`;
-    }
-
-    function buildSessionCard(conv) {
-      const wrap = document.createElement('div');
-      wrap.className = 'session-card-row';
-      const ex = conv.exchange;
-
-      let inner = `<div class="session-card">
-        <div class="session-card-head"><span>📅 Proposition de session</span> ${statusBadge(ex.status)}</div>
-        <div class="session-sides">
-          ${sideBlock('Toi', ex.proposalMe, 'MD', '')}
-          <div class="sess-arrow">⇅</div>
-          ${sideBlock(conv.name, ex.proposalThem, conv.init, conv.av)}
-        </div>`;
-
-      if (ex.status === 'proposed') {
-        inner += `<div class="sess-note">${escapeHtml(conv.name)} doit choisir la compétence proposée en retour, la date et le format.</div>
-        <button class="btn-sim" onclick="simulerReponse('${conv.id}')">🎭 Simuler : ${escapeHtml(conv.name)} complète sa proposition</button>`;
-      } else if (ex.status === 'in_progress') {
-        inner += `<div class="sess-note ok">Troc confirmé <strong>en cours</strong>. Les deux valident la fin des cours.</div>
-        <div class="sess-btn-row">
-          <button class="btn-confirm ${ex.confirmMe ? 'done' : ''}" onclick="confirmerFin('${conv.id}','me')" ${ex.confirmMe ? 'disabled' : ''}>${ex.confirmMe ? '✓ Tu as confirmé' : 'Marquer la session comme terminée'}</button>
-          ${!ex.confirmThem ? `<button class="btn-sim" onclick="confirmerFin('${conv.id}','them')">🎭 Simuler : ${escapeHtml(conv.name)} confirme aussi</button>` : ''}
-        </div>`;
-      } else if (ex.status === 'done' || ex.status === 'qcm_done') {
-        inner += `<div class="sess-note ok">✓ Fin validée des deux côtés. Chacun fait passer son QCM à l'autre — 100% requis des deux.</div>
-        <div class="sess-btn-row">
-          <button class="btn-qcm" onclick="openAnswerQcm('${conv.id}')" ${ex.scoreMePass ? 'disabled' : ''}>${ex.scoreMePass ? '✓ QCM de ' + escapeHtml(conv.name) + ' réussi' : 'Répondre au QCM de ' + escapeHtml(conv.name)}</button>
-          <button class="btn-qcm pink" onclick="openCreateQcm('${conv.id}')" ${ex.qcmMineForThem ? 'disabled' : ''}>${ex.qcmMineForThem ? 'QCM envoyé ✓' : 'Faire répondre ' + escapeHtml(conv.name) + ' à ton QCM'}</button>
-        </div>`;
-        if (ex.qcmMineForThem && !ex.scoreThemPass) {
-          inner += `<button class="btn-sim" onclick="simulerReponseQcm('${conv.id}')">🎭 Simuler : ${escapeHtml(conv.name)} réussit ton QCM (100%)</button>`;
-        }
-        if (ex.status === 'qcm_done') {
-          inner += `<div class="sess-note success">🎉 Échange terminé avec succès ! Vous avez chacun gagné 1 jeton 🪙.</div>`;
-        }
-      }
-
-      inner += `</div>`;
-      wrap.innerHTML = inner;
-      return wrap;
-    }
-
-    function renderExchangePanel(conv) {
-      const ex = conv.exchange;
-      const mySkill = ex.proposalMe ? ex.proposalMe.skill : null;
-      const theirSkill = ex.proposalThem ? ex.proposalThem.skill : null;
-
-      let headline = 'Troc 1h contre 1h · 1 jeton';
-      if (mySkill && theirSkill) headline = `${mySkill} ⇌ ${theirSkill} · 1h = 1 jeton`;
-      else if (mySkill) headline = `${mySkill} ⇌ … · 1h = 1 jeton`;
-
-      const steps = [
-        { done: ex.status !== 'none', label: 'Session proposée' },
-        { done: ['in_progress', 'done', 'qcm_done'].includes(ex.status), label: 'Acceptée par les deux' },
-        { done: ['done', 'qcm_done'].includes(ex.status), label: 'Cours réalisé' },
-        { done: ex.status === 'qcm_done', label: 'QCM validé · jetons versés' }
-      ];
-
-      let html = `<h3>L'échange</h3><div class="exch-sub">${escapeHtml(headline)}</div>`;
-
-      if (ex.proposalMe || ex.proposalThem) {
-        html += `<div class="exch-summary">`;
-        if (ex.proposalMe) {
-          html += `<div class="exch-line"><span class="exch-tag">Toi → tu enseignes</span><strong>${escapeHtml(ex.proposalMe.skill)}</strong><span class="exch-meta">🗓 ${formatDate(ex.proposalMe.date)} · ${escapeHtml(ex.proposalMe.time)} · ${ex.proposalMe.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</span></div>`;
-        }
-        if (ex.proposalThem) {
-          html += `<div class="exch-line"><span class="exch-tag">${escapeHtml(conv.name)} → t'enseigne</span><strong>${escapeHtml(ex.proposalThem.skill)}</strong><span class="exch-meta">🗓 ${formatDate(ex.proposalThem.date)} · ${escapeHtml(ex.proposalThem.time)} · ${ex.proposalThem.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</span></div>`;
-        }
-        html += `</div>`;
-      }
-
-      html += `<div class="exch-steps">`;
-      steps.forEach((s, i) => {
-        html += `<div class="exch-step ${s.done ? 'done' : ''}"><span class="exch-step-num">${s.done ? '✓' : i + 1}</span> ${s.label}</div>`;
-      });
-      html += `</div>`;
-
-      if (ex.status === 'none') {
-        html += `<div class="exch-cta">Clique sur 📅 <strong>Définir une session</strong> dans le chat pour lancer l'échange.</div>`;
-      }
-
-      document.getElementById('exchangeCol').innerHTML = html;
-    }
-
-    /* ══════════════ MESSAGES TEXTE ══════════════ */
-    function sendMessage() {
+    async function sendMessage() {
       const input = document.getElementById('msgInput');
-      const text = input.value.trim();
-      if (!text || !activeId) return;
-      state.conversations[activeId].messages.push({ type: 'text', from: 'me', text });
-      input.value = '';
-      saveState();
-      renderAll();
+      const contenu = input.value.trim();
+      if (!contenu || !activeConv) return;
+
+      try {
+        const rep = await fetch('api/messages.php?action=envoyer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idEnvoyeur: user.idUser, idReceveur: activeConv.idUser, contenu })
+        });
+        if (!rep.ok) { afficherToast('Erreur lors de l\'envoi du message.'); return; }
+        input.value = '';
+        pendingContact = null;
+        await chargerMessages();
+        await chargerConversations();
+        renderConvList();
+      } catch (e) {
+        afficherToast('Erreur réseau. Le serveur PHP est-il lancé ?');
+      }
     }
 
     document.addEventListener('keydown', e => {
       if (e.target && e.target.id === 'msgInput' && e.key === 'Enter') sendMessage();
     });
 
-    /* ══════════════ DÉFINIR UNE SESSION ══════════════ */
-    function initSessSkillChips() {
-      const wrap = document.getElementById('sessSkills');
-      wrap.innerHTML = MY_SKILLS.map((s, i) =>
-        `<span class="chip" data-idx="${i}" onclick="selectSessSkill(this)">${escapeHtml(s.name)} <small>· ${escapeHtml(s.category)}</small></span>`
-      ).join('');
-    }
-
-    function selectSessSkill(el) {
-      document.querySelectorAll('#sessSkills .chip').forEach(c => c.classList.remove('selected'));
-      el.classList.add('selected');
-      const titleInput = document.getElementById('sessTitle');
-      if (!titleInput.dataset.userEdited) {
-        titleInput.value = MY_SKILLS[el.dataset.idx].name;
+    /* ══════════════ SESSION EN COURS DANS LA CONVERSATION ══════════════ */
+    async function chargerSession() {
+      try {
+        const rep = await fetch(`api/echanges.php?action=pourConversation&idUser=${user.idUser}&idAutre=${activeConv.idUser}`);
+        activeSession = await rep.json();
+      } catch (e) {
+        activeSession = null;
       }
+      renderSessionCard();
+      renderExchangePanel();
     }
 
-    function selectFmt(el) {
-      document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('selected'));
-      el.classList.add('selected');
+    function estEnseignant(session) { return session && String(session.idEnseignant) === String(user.idUser); }
+    function estApprenant(session) { return session && String(session.idApprenant) === String(user.idUser); }
+
+    const STATUT_LABEL = { proposee: 'En attente', en_cours: 'En cours', terminee: 'Terminée', validee: 'Validée', annulee: 'Annulée' };
+
+    function renderSessionCard() {
+      const s = activeSession;
+      document.getElementById('btnDefinirSession').disabled = !!(s && ['proposee', 'en_cours', 'terminee'].includes(s.statut));
+
+      const existing = document.getElementById('sessionCardRow');
+      if (existing) existing.remove();
+      if (!s) return;
+
+      const body = document.getElementById('chatBody');
+      const wrap = document.createElement('div');
+      wrap.className = 'session-card-row';
+      wrap.id = 'sessionCardRow';
+
+      const autreNom = estEnseignant(s) ? `${s.appPrenom} ${s.appNom}` : `${s.ensPrenom} ${s.ensNom}`;
+
+      let inner = `<div class="session-card">
+        <div class="session-card-head"><span>📅 ${escapeHtml(s.titre)}</span> <span class="sess-badge ${s.statut}">${STATUT_LABEL[s.statut] || s.statut}</span></div>
+        <div class="sess-side">
+          <div class="sess-side-title">${escapeHtml(s.competence)} · ${s.coutHeure} 🪙/h</div>
+          <div class="sess-side-meta">🗓 ${formatDate(s.dateSession)} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'} · avec ${escapeHtml(autreNom)}</div>
+        </div>`;
+
+      if (s.statut === 'proposee') {
+        if (estApprenant(s)) {
+          inner += `<div class="sess-note">${escapeHtml(s.ensPrenom)} te propose cette session.</div>
+          <div class="sess-btn-row">
+            <button class="btn-accept" onclick="repondreSession(${s.idSession}, 'accepter')">Accepter</button>
+            <button class="btn-refuse" onclick="repondreSession(${s.idSession}, 'refuser')">Refuser</button>
+          </div>`;
+        } else {
+          inner += `<div class="sess-note">En attente de la réponse de ${escapeHtml(s.appPrenom)}.</div>`;
+        }
+      } else if (s.statut === 'en_cours') {
+        const jaiConfirme = estEnseignant(s) ? s.confirmeEnseignant : s.confirmeApprenant;
+        inner += `<div class="sess-note ok">Session <strong>en cours</strong>. Les deux doivent valider la fin du cours.</div>
+        <div class="sess-btn-row">
+          <button class="btn-confirm ${jaiConfirme ? 'done' : ''}" onclick="confirmerFin(${s.idSession})" ${jaiConfirme ? 'disabled' : ''}>${jaiConfirme ? '✓ Tu as confirmé' : 'Marquer la session comme terminée'}</button>
+        </div>`;
+      } else if (s.statut === 'terminee' || s.statut === 'validee') {
+        inner += `<div class="sess-note ok">✓ Session terminée. ${escapeHtml(s.ensPrenom)} fait passer un QCM à ${escapeHtml(s.appPrenom)} — 100% requis pour valider.</div>
+        <div class="sess-btn-row">`;
+        if (estEnseignant(s)) {
+          inner += `<button class="btn-qcm pink" onclick="openCreateQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? 'QCM validé ✓' : 'Créer / modifier le QCM'}</button>`;
+        }
+        if (estApprenant(s)) {
+          inner += `<button class="btn-qcm" onclick="openAnswerQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? '✓ QCM réussi' : 'Répondre au QCM'}</button>`;
+        }
+        inner += `</div>`;
+        if (s.qcmValide) {
+          inner += `<div class="sess-note success">🎉 QCM validé ! ${s.coutHeure} jeton${s.coutHeure > 1 ? 's' : ''} versé${s.coutHeure > 1 ? 's' : ''}.</div>`;
+        } else if (s.qcmScore !== null && s.qcmScore !== undefined) {
+          inner += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
+        }
+      } else if (s.statut === 'annulee') {
+        inner += `<div class="sess-note">Cette session a été refusée. Tu peux en définir une nouvelle.</div>`;
+      }
+
+      inner += `</div>`;
+      wrap.innerHTML = inner;
+      body.appendChild(wrap);
+      body.scrollTop = body.scrollHeight;
     }
 
-    function openSessionModal() {
-      if (!activeId) return;
+    function renderExchangePanel() {
+      const col = document.getElementById('exchangeCol');
+      if (!activeConv) { col.innerHTML = ''; return; }
+      const s = activeSession;
+
+      let html = `<h3>L'échange</h3><div class="exch-sub">Avec ${escapeHtml(activeConv.nom)}</div>`;
+
+      if (!s) {
+        html += `<div class="exch-cta">Clique sur 📅 <strong>Définir une session</strong> dans le chat pour proposer l'une de tes compétences.</div>`;
+        col.innerHTML = html;
+        return;
+      }
+
+      const steps = [
+        { done: true, label: 'Session proposée' },
+        { done: ['en_cours', 'terminee', 'validee'].includes(s.statut), label: 'Acceptée' },
+        { done: ['terminee', 'validee'].includes(s.statut), label: 'Cours réalisé' },
+        { done: s.statut === 'validee', label: 'QCM validé · jeton versé' },
+      ];
+
+      html += `<div class="exch-steps">`;
+      steps.forEach((st, i) => {
+        html += `<div class="exch-step ${st.done ? 'done' : ''}"><span class="exch-step-num">${st.done ? '✓' : i + 1}</span> ${st.label}</div>`;
+      });
+      html += `</div>`;
+
+      col.innerHTML = html;
+    }
+
+    async function repondreSession(idSession, reponse) {
+      try {
+        const rep = await fetch('api/echanges.php?action=repondre', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idSession, idUser: user.idUser, reponse })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        afficherToast(reponse === 'accepter' ? 'Session acceptée !' : 'Session refusée.');
+        chargerSession();
+      } catch (e) { afficherToast('Erreur réseau.'); }
+    }
+
+    async function confirmerFin(idSession) {
+      try {
+        const rep = await fetch('api/echanges.php?action=confirmerFin', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idSession, idUser: user.idUser })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        afficherToast('Confirmation enregistrée.');
+        chargerSession();
+      } catch (e) { afficherToast('Erreur réseau.'); }
+    }
+
+    /* ══════════════ DÉFINIR UNE SESSION ══════════════ */
+    let mesCompetencesPourSession = [];
+
+    async function openSessionModal() {
+      if (!activeConv) return;
+      try {
+        const rep = await fetch(`api/competences.php?action=mesCompetences&idUser=${user.idUser}`);
+        mesCompetencesPourSession = await rep.json();
+      } catch (e) {
+        afficherToast('Impossible de charger tes compétences.');
+        return;
+      }
+      if (mesCompetencesPourSession.length === 0) {
+        afficherToast('Publie au moins une compétence depuis ton profil avant de définir une session.');
+        return;
+      }
+
+      document.getElementById('sessSkills').innerHTML = mesCompetencesPourSession.map((c, i) =>
+        `<span class="chip" data-idx="${i}" onclick="selectSessSkill(this)">${escapeHtml(c.competence)} <small>· ${c.coutHeure} 🪙/h</small></span>`
+      ).join('');
+      document.querySelectorAll('#sessSkills .chip').forEach(c => c.classList.remove('selected'));
+
       document.getElementById('sessTitle').value = '';
       document.getElementById('sessTitle').dataset.userEdited = '';
-      document.querySelectorAll('#sessSkills .chip').forEach(c => c.classList.remove('selected'));
       document.getElementById('sessDate').value = '';
       document.getElementById('sessDate').min = new Date().toISOString().slice(0, 10);
       document.getElementById('sessTime').value = '';
@@ -872,241 +627,194 @@
       document.getElementById('modalSession').classList.add('visible');
     }
 
-    function envoyerProposition() {
-      const title = document.getElementById('sessTitle').value.trim();
+    function selectSessSkill(el) {
+      document.querySelectorAll('#sessSkills .chip').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      const titleInput = document.getElementById('sessTitle');
+      if (!titleInput.dataset.userEdited) {
+        titleInput.value = mesCompetencesPourSession[el.dataset.idx].competence;
+      }
+    }
+
+    function selectFmt(el) {
+      document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    async function envoyerProposition() {
       const skillChip = document.querySelector('#sessSkills .chip.selected');
+      const titre = document.getElementById('sessTitle').value.trim();
       const date = document.getElementById('sessDate').value;
-      const time = document.getElementById('sessTime').value;
+      const heure = document.getElementById('sessTime').value;
       const fmtBtn = document.querySelector('.fmt-btn.selected');
 
-      if (!title || !skillChip || !date || !time || !fmtBtn) {
+      if (!skillChip || !titre || !date || !heure || !fmtBtn) {
         afficherToast('Complète tous les champs pour envoyer la proposition.');
         return;
       }
 
-      const skillName = MY_SKILLS[skillChip.dataset.idx].name;
-      const conv = state.conversations[activeId];
-      conv.exchange.proposalMe = { title, skill: skillName, date, time, format: fmtBtn.dataset.fmt };
-      conv.exchange.status = 'proposed';
-      conv.messages.push({ type: 'session' });
+      const idEchange = mesCompetencesPourSession[skillChip.dataset.idx].idEchange;
+      const btn = document.getElementById('btnEnvoyerSession');
+      btn.disabled = true;
 
-      saveState();
-      closeModal('modalSession');
-      renderAll();
-    }
-
-    function simulerReponse(id) {
-      const conv = state.conversations[id];
-      const ex = conv.exchange;
-      ex.proposalThem = {
-        title: conv.theirSkillDefault.name,
-        skill: conv.theirSkillDefault.name,
-        date: addDays(ex.proposalMe.date, 2),
-        time: '16:00',
-        format: ex.proposalMe.format
-      };
-      ex.status = 'in_progress';
-      conv.messages.push({ type: 'system', text: `${conv.name} a complété la proposition. L'échange est en cours ! 🤝` });
-      saveState();
-      renderAll();
-    }
-
-    function confirmerFin(id, who) {
-      const conv = state.conversations[id];
-      const ex = conv.exchange;
-      if (who === 'me') ex.confirmMe = true; else ex.confirmThem = true;
-      if (ex.confirmMe && ex.confirmThem) {
-        ex.status = 'done';
-        conv.messages.push({ type: 'system', text: '✅ Session terminée et confirmée par les deux !' });
+      try {
+        const rep = await fetch('api/echanges.php?action=definir', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idEchange, idUser: user.idUser, idApprenant: activeConv.idUser, titre, date, heure, format: fmtBtn.dataset.fmt })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        closeModal('modalSession');
+        afficherToast('Proposition envoyée !');
+        chargerSession();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      } finally {
+        btn.disabled = false;
       }
-      saveState();
-      renderAll();
     }
 
     /* ══════════════ QCM : CRÉATION ══════════════ */
+    let qcmBlockCounter = 0;
+
     function qcmQuestionBlockHtml(idx) {
       return `
         <div class="qcm-question-block" data-qidx="${idx}">
           <input type="text" class="qcm-q" placeholder="Ta question…" />
-          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="0" checked><input type="text" class="qcm-opt" placeholder="Réponse A"></div>
-          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="1"><input type="text" class="qcm-opt" placeholder="Réponse B"></div>
-          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="2"><input type="text" class="qcm-opt" placeholder="Réponse C"></div>
-          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="3"><input type="text" class="qcm-opt" placeholder="Réponse D"></div>
+          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="A" checked><input type="text" class="qcm-opt" placeholder="Réponse A"></div>
+          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="B"><input type="text" class="qcm-opt" placeholder="Réponse B"></div>
+          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="C"><input type="text" class="qcm-opt" placeholder="Réponse C"></div>
+          <div class="qcm-option-row"><input type="radio" name="correct-${idx}" value="D"><input type="text" class="qcm-opt" placeholder="Réponse D"></div>
           ${idx > 0 ? `<button type="button" class="qcm-remove" onclick="this.closest('.qcm-question-block').remove()">Supprimer cette question</button>` : ''}
         </div>`;
     }
 
-    let qcmBlockCounter = 0;
-
-    function openCreateQcm(convId) {
-      currentQcmConvId = convId;
-      const conv = state.conversations[convId];
-      document.getElementById('createQcmTitle').textContent = `Crée ton QCM pour ${conv.name}`;
+    function openCreateQcm(idSession) {
+      currentQcmSessionId = idSession;
+      document.getElementById('createQcmTitle').textContent = `Crée ton QCM`;
       qcmBlockCounter = 0;
-      document.getElementById('qcmQuestions').innerHTML = qcmQuestionBlockHtml(qcmBlockCounter);
+      document.getElementById('qcmQuestions').innerHTML = qcmQuestionBlockHtml(0);
       document.getElementById('modalCreateQcm').classList.add('visible');
     }
 
     function addQcmQuestion() {
-      if (document.querySelectorAll('.qcm-question-block').length >= 5) {
-        afficherToast('Maximum 5 questions par QCM.');
-        return;
-      }
+      if (document.querySelectorAll('.qcm-question-block').length >= 5) { afficherToast('Maximum 5 questions.'); return; }
       qcmBlockCounter++;
       document.getElementById('qcmQuestions').insertAdjacentHTML('beforeend', qcmQuestionBlockHtml(qcmBlockCounter));
     }
 
-    function envoyerQcm() {
+    async function envoyerQcm() {
       const blocks = document.querySelectorAll('.qcm-question-block');
       const questions = [];
       for (const block of blocks) {
-        const q = block.querySelector('.qcm-q').value.trim();
-        const opts = [...block.querySelectorAll('.qcm-opt')].map(i => i.value.trim());
+        const enonce = block.querySelector('.qcm-q').value.trim();
+        const options = [...block.querySelectorAll('.qcm-opt')].map(i => i.value.trim());
         const checked = block.querySelector('input[type="radio"]:checked');
-        if (!q || opts.some(o => !o) || !checked) {
-          afficherToast('Complète chaque question avec ses 4 réponses et la bonne réponse.');
-          return;
-        }
-        questions.push({ q, options: opts, correct: parseInt(checked.value, 10) });
+        if (!enonce || options.some(o => !o) || !checked) { afficherToast('Complète chaque question avec ses 4 réponses.'); return; }
+        questions.push({ enonce, options, bonneReponse: checked.value });
       }
-      if (!questions.length) { afficherToast('Ajoute au moins une question.'); return; }
 
-      const conv = state.conversations[currentQcmConvId];
-      conv.exchange.qcmMineForThem = { questions };
-      conv.messages.push({ type: 'system', text: `Tu as envoyé ton QCM à ${conv.name}.` });
-      saveState();
-      closeModal('modalCreateQcm');
-      renderAll();
-      afficherToast('QCM envoyé ✓');
-    }
-
-    function simulerReponseQcm(id) {
-      const conv = state.conversations[id];
-      const ex = conv.exchange;
-      ex.scoreThemPass = true;
-      conv.messages.push({ type: 'system', text: `${conv.name} a réussi ton QCM avec 100% de bonnes réponses !` });
-      checkQcmCompletion(conv);
-      saveState();
-      renderAll();
+      const btn = document.getElementById('btnEnvoyerQcm');
+      btn.disabled = true;
+      try {
+        const rep = await fetch('api/qcm.php?action=creer', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idSession: currentQcmSessionId, idUser: user.idUser, questions })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        closeModal('modalCreateQcm');
+        afficherToast('QCM envoyé !');
+        chargerSession();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     /* ══════════════ QCM : RÉPONDRE ══════════════ */
-    function openAnswerQcm(convId) {
-      currentAnswerConvId = convId;
-      const conv = state.conversations[convId];
-      document.getElementById('answerQcmTitle').textContent = `QCM de ${conv.name}`;
-      const questions = conv.exchange.qcmTheirsForMe.questions;
-      document.getElementById('qcmAnswerQuestions').innerHTML = questions.map((item, qi) => `
+    let questionsCourantes = [];
+
+    async function openAnswerQcm(idSession) {
+      currentQcmSessionId = idSession;
+      try {
+        const rep = await fetch(`api/qcm.php?action=questions&idSession=${idSession}`);
+        questionsCourantes = await rep.json();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+        return;
+      }
+      if (questionsCourantes.length === 0) {
+        afficherToast("Cette personne n'a pas encore créé le QCM.");
+        return;
+      }
+      document.getElementById('qcmAnswerQuestions').innerHTML = questionsCourantes.map((q, i) => `
         <div class="qcm-question-block">
-          <p style="font-weight:600; font-size:.9rem; margin-bottom:.7rem;">${qi + 1}. ${escapeHtml(item.q)}</p>
-          ${item.options.map((opt, oi) => `
+          <p style="font-weight:600; font-size:.9rem; margin-bottom:.7rem;">${i + 1}. ${escapeHtml(q.enonce)}</p>
+          ${['A', 'B', 'C', 'D'].map(lettre => `
             <label style="display:flex; align-items:center; gap:.5rem; font-size:.85rem; margin-bottom:.4rem; cursor:pointer;">
-              <input type="radio" name="ans-${qi}" value="${oi}"> ${escapeHtml(opt)}
+              <input type="radio" name="ans-${q.idQuestion}" value="${lettre}"> ${escapeHtml(q['option' + lettre])}
             </label>`).join('')}
         </div>`).join('');
       document.getElementById('modalAnswerQcm').classList.add('visible');
     }
 
-    function validerReponses() {
-      const conv = state.conversations[currentAnswerConvId];
-      const questions = conv.exchange.qcmTheirsForMe.questions;
-      let correctCount = 0;
-      for (let qi = 0; qi < questions.length; qi++) {
-        const checked = document.querySelector(`input[name="ans-${qi}"]:checked`);
+    async function validerReponses() {
+      const reponses = {};
+      for (const q of questionsCourantes) {
+        const checked = document.querySelector(`input[name="ans-${q.idQuestion}"]:checked`);
         if (!checked) { afficherToast('Réponds à toutes les questions.'); return; }
-        if (parseInt(checked.value, 10) === questions[qi].correct) correctCount++;
+        reponses[q.idQuestion] = checked.value;
       }
 
-      if (correctCount === questions.length) {
-        conv.exchange.scoreMePass = true;
-        conv.messages.push({ type: 'system', text: `Tu as réussi le QCM de ${conv.name} avec 100% de bonnes réponses ! 🎉` });
-        checkQcmCompletion(conv);
-        saveState();
+      const btn = document.getElementById('btnValiderQcm');
+      btn.disabled = true;
+      try {
+        const rep = await fetch('api/qcm.php?action=repondre', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idSession: currentQcmSessionId, idUser: user.idUser, reponses })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+
         closeModal('modalAnswerQcm');
-        renderAll();
-        afficherToast('Bravo, QCM réussi ! 🪙');
-      } else {
-        afficherToast(`Score : ${correctCount}/${questions.length} — il faut 100% pour valider, réessaie !`);
-      }
-    }
-
-    function checkQcmCompletion(conv) {
-      const ex = conv.exchange;
-      if (ex.scoreMePass && ex.scoreThemPass && ex.status !== 'qcm_done') {
-        ex.status = 'qcm_done';
-        state.tokens += 1;
-        conv.messages.push({ type: 'system', text: '🎉 Échange terminé avec succès ! Vous avez chacun gagné 1 jeton.' });
+        if (json.valide) {
+          afficherToast('Bravo, QCM réussi à 100% ! 🪙');
+        } else {
+          afficherToast(`Score : ${json.correct}/${json.total} — il faut 100%, réessaie !`);
+        }
+        chargerSession();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      } finally {
+        btn.disabled = false;
       }
     }
 
     /* ══════════════ INIT ══════════════ */
-    function handleUrlParams() {
+    async function init() {
+      afficherSidebar();
+      await chargerConversations();
+
       const params = new URLSearchParams(window.location.search);
       const open = params.get('open');
-      if (!open) return;
-      if (!state.conversations[open]) {
+      if (open) {
         const name = params.get('name') || 'Nouveau contact';
         const init = (params.get('init') || name.split(' ').map(w => w[0]).join('')).slice(0, 2).toUpperCase();
-        const av = params.get('av') || 'av-lm';
-        const skill = params.get('skill') || 'Compétence';
-        const cat = params.get('cat') || '';
-        state.conversations[open] = {
-          id: open, name, init, av, online: true,
-          theirSkillDefault: { name: skill, category: cat },
-          messages: [{ type: 'system', text: `Tu as démarré une conversation avec ${name} au sujet de « ${skill} ».` }],
-          exchange: Object.assign(defaultExchange(), { qcmTheirsForMe: { questions: SEED_QCM[open] || genQcm(skill) } })
-        };
-        state.order.unshift(open);
-        saveState();
+        const av = params.get('av') || avatarClass(open);
+        pendingContact = { idUser: open, nom: name };
+        history.replaceState({}, '', 'messages.html');
+        renderConvList();
+        selectConversation(open, name, init, av, null);
+      } else if (conversations.length > 0) {
+        const c = conversations[0];
+        selectConversation(c.idUser, `${c.prenomUser} ${c.nomUser}`, initiales(c.prenomUser, c.nomUser), avatarClass(c.idUser), c.photo);
       }
-      activeId = open;
-      history.replaceState({}, '', 'messages.html');
     }
 
-    function getConnectedUser() {
-      try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; }
-    }
-
-    function renderConnectedUser() {
-      const u = getConnectedUser();
-      if (!u) {
-        window.location.href = 'explorer.html';
-        return;
-      }
-      const init = ((u.prenomUser || '?')[0] + (u.nomUser || '')[0]).toUpperCase();
-      document.getElementById('sidebarAvatar').textContent = init;
-      document.getElementById('sidebarName').textContent = `${u.prenomUser} ${u.nomUser}`;
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      renderConnectedUser();
-      state = loadState();
-      initSessSkillChips();
-      handleUrlParams();
-      if (!activeId) activeId = state.order[0];
-      renderAll();
-    });
+    if (user) init();
   </script>
-
-  <!-- Couleurs d'avatars réutilisées du reste du site -->
-  <style>
-    .av-1 { background: linear-gradient(135deg, #7c3aed, #a855f7); }
-    .av-2 { background: linear-gradient(135deg, #dc2626, #f87171); }
-    .av-3 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
-    .av-4 { background: linear-gradient(135deg, #0284c7, #38bdf8); }
-    .av-5 { background: linear-gradient(135deg, #059669, #34d399); }
-    .av-6 { background: linear-gradient(135deg, #b45309, #f59e0b); }
-    .av-7 { background: linear-gradient(135deg, #0891b2, #22d3ee); }
-    .av-8 { background: linear-gradient(135deg, #7c3aed, #ec4899); }
-    .av-lm { background: linear-gradient(135deg, #7c3aed, #a855f7); }
-    .av-tr { background: linear-gradient(135deg, #dc2626, #f87171); }
-    .av-ik { background: linear-gradient(135deg, #ec4899, #f43f5e); }
-    .av-kb { background: linear-gradient(135deg, #0284c7, #38bdf8); }
-    .av-sl { background: linear-gradient(135deg, #059669, #34d399); }
-    .av-yd { background: linear-gradient(135deg, #b45309, #f59e0b); }
-    .av-cp { background: linear-gradient(135deg, #0891b2, #22d3ee); }
-    .av-nv { background: linear-gradient(135deg, #7c3aed, #ec4899); }
-  </style>
 
 </body>
 </html>

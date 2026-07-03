@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Mes jetons</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --sidebar: #120f22;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --cyan: #22d3ee;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 180px; min-height: 100vh; background: var(--sidebar); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 1.4rem 1rem; position: fixed; top: 0; left: 0; bottom: 0;
+    }
+    .sidebar-logo { display: flex; align-items: center; gap: .6rem; font-weight: 700; font-size: 1rem; margin-bottom: 2.5rem; padding: .2rem .3rem; }
+    .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple), var(--pink)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .8rem; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+    .sidebar-item { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; border-radius: 8px; font-size: .88rem; color: var(--text-muted); cursor: pointer; transition: background .15s, color .15s; }
+    .sidebar-item:hover { background: var(--bg-card); color: var(--text); }
+    .sidebar-item.active { background: rgba(168,85,247,.15); color: var(--purple-light); font-weight: 600; }
+    .sidebar-bottom { border-top: 1px solid var(--border); padding-top: 1rem; }
+    .user-pill { display: flex; align-items: center; gap: .6rem; padding: .5rem .6rem; border-radius: 8px; cursor: pointer; }
+    .user-pill:hover { background: var(--bg-card); }
+    .avatar-pill { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; overflow: hidden; }
+    .avatar-pill img { width: 100%; height: 100%; object-fit: cover; }
+    .user-pill-name { font-size: .82rem; font-weight: 600; }
+    .user-pill-status { font-size: .7rem; color: var(--text-muted); }
+
+    /* ── MAIN ── */
+    .main { margin-left: 180px; flex: 1; padding: 2.5rem 3rem; }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.8rem; }
+    .page-header h1 { font-size: 1.7rem; font-weight: 800; }
+
+    .theme-pill { display: flex; align-items: center; gap: .6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 99px; padding: .4rem .9rem; font-size: .68rem; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; }
+    .theme-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+    .theme-dot.d1 { background: var(--purple); }
+    .theme-dot.d2 { background: var(--pink); }
+    .theme-dot.d3 { background: var(--cyan); }
+
+    /* Cartes de stats */
+    .stats-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1.2rem; margin-bottom: 1.5rem; }
+
+    .stat-card {
+      border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border);
+    }
+    .stat-card.solde {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      position: relative; overflow: hidden; border: none;
+    }
+    .stat-card.solde::after {
+      content: '🏦'; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+      font-size: 4rem; opacity: .25;
+    }
+    .stat-card:not(.solde) { background: var(--bg-card); }
+
+    .stat-label { font-size: .8rem; color: rgba(255,255,255,.8); margin-bottom: .5rem; }
+    .stat-card:not(.solde) .stat-label { color: var(--text-muted); }
+
+    .stat-value { font-size: 2.4rem; font-weight: 800; color: #fff; }
+    .stat-card:not(.solde) .stat-value { color: var(--text); font-size: 2rem; }
+    .stat-value.positif { color: #34d399; }
+    .stat-value.negatif { color: #f43f5e; }
+
+    .stat-sub { font-size: .8rem; color: rgba(255,255,255,.75); margin-top: .3rem; }
+    .stat-card:not(.solde) .stat-sub { color: var(--text-muted); }
+
+    /* Bandeau "valider un cours" */
+    .cta-banner {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.3rem 1.5rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;
+    }
+    .cta-check {
+      width: 34px; height: 34px; border-radius: 50%; background: rgba(52,211,153,.15); color: #34d399;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+    }
+    .cta-text { flex: 1; min-width: 200px; }
+    .cta-text strong { display: block; font-size: .92rem; margin-bottom: .2rem; }
+    .cta-text span { font-size: .8rem; color: var(--text-muted); }
+    .cta-text b { color: var(--purple-light); }
+    .btn-cta {
+      background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .7rem 1.3rem; border-radius: 10px; cursor: pointer; font-size: .88rem; font-weight: 600;
+      transition: opacity .2s; white-space: nowrap;
+    }
+    .btn-cta:hover { opacity: .88; }
+
+    /* Historique */
+    .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; }
+
+    .hist-row {
+      display: flex; align-items: center; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: .7rem;
+    }
+    .hist-icon {
+      width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; flex-shrink: 0;
+    }
+    .hist-icon.plus  { background: rgba(52,211,153,.15); color: #34d399; }
+    .hist-icon.minus { background: rgba(244,63,94,.15); color: #f43f5e; }
+    .hist-info { flex: 1; min-width: 0; }
+    .hist-info strong { display: block; font-size: .9rem; }
+    .hist-info span { font-size: .78rem; color: var(--text-muted); }
+    .hist-amount { font-size: .95rem; font-weight: 800; flex-shrink: 0; }
+    .hist-amount.plus  { color: #34d399; }
+    .hist-amount.minus { color: #f43f5e; }
+
+    .empty-state { color: var(--text-muted); font-size: .88rem; padding: 1rem; text-align: center; }
+
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="logo-icon">S</div>
+      SkillSwap
+    </a>
+    <nav class="sidebar-nav">
+      <a href="explorer.html" class="sidebar-item"><span>•</span> Découvrir</a>
+      <a href="profil.html" class="sidebar-item"><span>•</span> Mon profil</a>
+      <div class="sidebar-item" onclick="window.location.href='messages.html'"><span>•</span> Messages</div>
+      <div class="sidebar-item active"><span>•</span> Mes jetons</div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-pill" onclick="window.location.href='profil.html'">
+        <div class="avatar-pill" id="sidebarAvatar"></div>
+        <div style="flex:1">
+          <div class="user-pill-name" id="sidebarName"></div>
+          <div class="user-pill-status">• Connecté</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ CONTENU PRINCIPAL ═══ -->
+  <main class="main">
+    <div class="page-header">
+      <h1>Mes jetons de temps</h1>
+      <div class="theme-pill">Theme <span class="theme-dot d1"></span><span class="theme-dot d2"></span><span class="theme-dot d3"></span></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card solde">
+        <div class="stat-label">Solde actuel</div>
+        <div class="stat-value" id="statSolde">–</div>
+        <div class="stat-sub" id="statSoldeHeures">jetons disponibles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Gagnés ce mois</div>
+        <div class="stat-value positif" id="statGagnes">–</div>
+        <div class="stat-sub">en donnant des cours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dépensés ce mois</div>
+        <div class="stat-value negatif" id="statDepenses">–</div>
+        <div class="stat-sub">en apprenant</div>
+      </div>
+    </div>
+
+    <div class="cta-banner">
+      <div class="cta-check">✓</div>
+      <div class="cta-text">
+        <strong>Valider un cours suivi</strong>
+        <span>La validation se fait dans la conversation : chacun fait passer son QCM à l'autre. <b>100% = 1 jeton par heure.</b></span>
+      </div>
+      <button class="btn-cta" onclick="window.location.href='messages.html'">Aller aux messages →</button>
+    </div>
+
+    <div class="section-title">Historique des échanges</div>
+    <div id="listeHistorique"><div class="empty-state">Chargement…</div></div>
+  </main>
+
+  <script>
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str == null ? '' : String(str);
+      return div.innerHTML;
+    }
+    function initiales(prenom, nom) {
+      return ((prenom || '?')[0] + (nom || '')[0]).toUpperCase();
+    }
+    function getUser() {
+      try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; }
+    }
+
+    const user = getUser();
+    if (!user || !user.idUser) {
+      window.location.href = 'explorer.html';
+    }
+
+    function afficherSidebar() {
+      document.getElementById('sidebarAvatar').innerHTML = user.photo ? `<img src="${user.photo}" alt="">` : escapeHtml(initiales(user.prenomUser, user.nomUser));
+      document.getElementById('sidebarName').textContent = `${user.prenomUser} ${user.nomUser}`;
+    }
+
+    async function chargerSolde() {
+      try {
+        const rep = await fetch(`api/jetons.php?action=solde&idUser=${user.idUser}`);
+        const data = await rep.json();
+        if (!rep.ok) return;
+        document.getElementById('statSolde').textContent = data.solde;
+        document.getElementById('statSoldeHeures').textContent = `jetons disponibles · = ${data.solde} heure${data.solde === 1 ? '' : 's'}`;
+        document.getElementById('statGagnes').textContent = '+' + data.gagnesMois;
+        document.getElementById('statDepenses').textContent = '−' + data.depensesMois;
+      } catch (e) {
+        document.getElementById('statSolde').textContent = '?';
+      }
+    }
+
+    async function chargerHistorique() {
+      const conteneur = document.getElementById('listeHistorique');
+      try {
+        const rep = await fetch(`api/jetons.php?action=historique&idUser=${user.idUser}`);
+        const data = await rep.json();
+        if (!rep.ok) { conteneur.innerHTML = `<div class="empty-state">${escapeHtml(data.erreur || 'Erreur de chargement.')}</div>`; return; }
+
+        if (data.length === 0) {
+          conteneur.innerHTML = '<div class="empty-state">Aucun échange pour l\'instant.</div>';
+          return;
+        }
+
+        conteneur.innerHTML = data.map(h => {
+          const positif = h.montant > 0;
+          return `
+            <div class="hist-row">
+              <div class="hist-icon ${positif ? 'plus' : 'minus'}">${positif ? '+' : '–'}</div>
+              <div class="hist-info">
+                <strong>${escapeHtml(h.motif)}</strong>
+                <span>${new Date(h.dateJeton).toLocaleDateString('fr-FR')}</span>
+              </div>
+              <div class="hist-amount ${positif ? 'plus' : 'minus'}">${positif ? '+' : ''}${h.montant} 🪙</div>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        conteneur.innerHTML = '<div class="empty-state">Impossible de contacter le serveur.</div>';
+      }
+    }
+
+    if (user) {
+      afficherSidebar();
+      chargerSolde();
+      chargerHistorique();
+    }
+  </script>
+
+</body>
+</html>

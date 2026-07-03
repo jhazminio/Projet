@@ -27,6 +27,12 @@ switch ($action) {
     case 'connexion':
         connexion($pdo, $data);
         break;
+    case 'modifierProfil':
+        modifierProfil($pdo, $data);
+        break;
+    case 'changerMotDePasse':
+        changerMotDePasse($pdo, $data);
+        break;
     default:
         erreur(404, 'Action inconnue.');
 }
@@ -69,7 +75,9 @@ function inscription(PDO $pdo, array $data): void
 
         $stmtFindComp   = $pdo->prepare('SELECT idCompetences FROM COMPETENCES WHERE nom = ?');
         $stmtCreateComp = $pdo->prepare('INSERT INTO COMPETENCES (nom) VALUES (?)');
-        $stmtLinkComp   = $pdo->prepare('INSERT INTO ECHANGE (idUser, idComp) VALUES (?, ?)');
+        $stmtLinkComp   = $pdo->prepare(
+            'INSERT INTO ECHANGE (idUser, idComp, categorie, coutHeure) VALUES (?, ?, ?, ?)'
+        );
 
         foreach ($competences as $nomComp) {
             $nomComp = trim((string) $nomComp);
@@ -87,8 +95,14 @@ function inscription(PDO $pdo, array $data): void
                 $idComp = $pdo->lastInsertId();
             }
 
-            $stmtLinkComp->execute([$idUser, $idComp]);
+            $stmtLinkComp->execute([$idUser, $idComp, 'Autre', 1]);
         }
+
+        // Bonus de bienvenue
+        $stmt = $pdo->prepare(
+            'INSERT INTO JETON_HISTORIQUE (idUser, montant, motif) VALUES (?, 2, ?)'
+        );
+        $stmt->execute([$idUser, 'Bonus de bienvenue']);
 
         $pdo->commit();
     } catch (Exception $e) {
@@ -103,6 +117,7 @@ function inscription(PDO $pdo, array $data): void
         'prenomUser'  => $prenomUser,
         'email'       => $email,
         'universite'  => $universite,
+        'photo'       => null,
         'competences' => array_values($competences),
     ]);
 }
@@ -126,4 +141,69 @@ function connexion(PDO $pdo, array $data): void
 
     unset($user['motDePasse']);
     echo json_encode(['user' => $user]);
+}
+
+function modifierProfil(PDO $pdo, array $data): void
+{
+    $idUser     = (int) ($data['idUser'] ?? 0);
+    $nomUser    = trim((string) ($data['nomUser'] ?? ''));
+    $prenomUser = trim((string) ($data['prenomUser'] ?? ''));
+    $universite = trim((string) ($data['universite'] ?? ''));
+    $photo      = array_key_exists('photo', $data) ? $data['photo'] : false;
+
+    if ($idUser <= 0) {
+        erreur(400, 'Utilisateur invalide.');
+    }
+    if ($nomUser === '' || $prenomUser === '') {
+        erreur(400, 'Le nom et le prénom sont obligatoires.');
+    }
+    if ($photo !== false && $photo !== null && strlen((string) $photo) > 3000000) {
+        erreur(400, 'Photo trop volumineuse (3 Mo max).');
+    }
+
+    if ($photo === false) {
+        $stmt = $pdo->prepare('UPDATE USER SET nomUser = ?, prenomUser = ?, universite = ? WHERE idUser = ?');
+        $stmt->execute([$nomUser, $prenomUser, $universite ?: null, $idUser]);
+    } else {
+        $stmt = $pdo->prepare('UPDATE USER SET nomUser = ?, prenomUser = ?, universite = ?, photo = ? WHERE idUser = ?');
+        $stmt->execute([$nomUser, $prenomUser, $universite ?: null, $photo ?: null, $idUser]);
+    }
+
+    $stmt = $pdo->prepare('SELECT idUser, nomUser, prenomUser, email, universite, photo FROM USER WHERE idUser = ?');
+    $stmt->execute([$idUser]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        erreur(404, 'Utilisateur introuvable.');
+    }
+
+    echo json_encode(['user' => $user]);
+}
+
+function changerMotDePasse(PDO $pdo, array $data): void
+{
+    $idUser         = (int) ($data['idUser'] ?? 0);
+    $ancienMdp      = (string) ($data['ancienMotDePasse'] ?? '');
+    $nouveauMdp     = (string) ($data['nouveauMotDePasse'] ?? '');
+
+    if ($idUser <= 0 || $ancienMdp === '' || $nouveauMdp === '') {
+        erreur(400, 'Tous les champs sont requis.');
+    }
+    if (strlen($nouveauMdp) < 6) {
+        erreur(400, 'Le nouveau mot de passe doit contenir au moins 6 caractères.');
+    }
+
+    $stmt = $pdo->prepare('SELECT motDePasse FROM USER WHERE idUser = ?');
+    $stmt->execute([$idUser]);
+    $user = $stmt->fetch();
+
+    if (!$user || !password_verify($ancienMdp, $user['motDePasse'])) {
+        erreur(401, 'Mot de passe actuel incorrect.');
+    }
+
+    $hash = password_hash($nouveauMdp, PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare('UPDATE USER SET motDePasse = ? WHERE idUser = ?');
+    $stmt->execute([$hash, $idUser]);
+
+    echo json_encode(['ok' => true]);
 }

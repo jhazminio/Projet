@@ -548,7 +548,7 @@
       if (!estConnecte()) { ouvrirModal(); return; }
       if (kind === 'profil') window.location.href = 'profil.html';
       else if (kind === 'messages') window.location.href = 'messages.html';
-      else afficherToast('Mes jetons — bientôt disponible');
+      else if (kind === 'jetons') window.location.href = 'jetons.html';
     }
 
     function renderSidebarBottom() {
