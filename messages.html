@@ -420,9 +420,9 @@
         <div><span class="amount" id="tokenAmount">8</span><span class="unit">jetons</span></div>
       </div>
       <div class="user-pill">
-        <div class="avatar-pill">MD</div>
+        <div class="avatar-pill" id="sidebarAvatar">?</div>
         <div style="flex:1">
-          <div class="user-pill-name">Maxime Dubois</div>
+          <div class="user-pill-name" id="sidebarName">…</div>
           <div class="user-pill-status">• Connecté</div>
         </div>
       </div>
@@ -1063,8 +1063,23 @@
       history.replaceState({}, '', 'messages.html');
     }
 
+    function getConnectedUser() {
+      try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; }
+    }
+
+    function renderConnectedUser() {
+      const u = getConnectedUser();
+      if (!u) {
+        window.location.href = 'explorer.html';
+        return;
+      }
+      const init = ((u.prenomUser || '?')[0] + (u.nomUser || '')[0]).toUpperCase();
+      document.getElementById('sidebarAvatar').textContent = init;
+      document.getElementById('sidebarName').textContent = `${u.prenomUser} ${u.nomUser}`;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      localStorage.setItem('ss_connected', '1');
+      renderConnectedUser();
       state = loadState();
       initSessSkillChips();
       handleUrlParams();
@@ -1075,6 +1090,14 @@
 
   <!-- Couleurs d'avatars réutilisées du reste du site -->
   <style>
+    .av-1 { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    .av-2 { background: linear-gradient(135deg, #dc2626, #f87171); }
+    .av-3 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .av-4 { background: linear-gradient(135deg, #0284c7, #38bdf8); }
+    .av-5 { background: linear-gradient(135deg, #059669, #34d399); }
+    .av-6 { background: linear-gradient(135deg, #b45309, #f59e0b); }
+    .av-7 { background: linear-gradient(135deg, #0891b2, #22d3ee); }
+    .av-8 { background: linear-gradient(135deg, #7c3aed, #ec4899); }
     .av-lm { background: linear-gradient(135deg, #7c3aed, #a855f7); }
     .av-tr { background: linear-gradient(135deg, #dc2626, #f87171); }
     .av-ik { background: linear-gradient(135deg, #ec4899, #f43f5e); }

@@ -31,6 +31,7 @@
     }
 
     a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
 
     /* ── SIDEBAR (identique à explorer.html) ── */
     .sidebar {
@@ -85,34 +86,10 @@
       font-weight: 600;
     }
 
-    .badge {
-      margin-left: auto;
-      background: var(--purple);
-      color: #fff;
-      border-radius: 99px;
-      font-size: .68rem;
-      font-weight: 700;
-      padding: .1rem .4rem;
-      min-width: 18px;
-      text-align: center;
-    }
-
     .sidebar-bottom {
       border-top: 1px solid var(--border);
       padding-top: 1rem;
     }
-
-    .token-balance {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: .8rem 1rem;
-      margin-bottom: .8rem;
-    }
-
-    .token-balance .label { font-size: .72rem; color: var(--text-muted); margin-bottom: .25rem; }
-    .token-balance .amount { font-size: 1.3rem; font-weight: 800; }
-    .token-balance .unit  { font-size: .78rem; color: var(--text-muted); margin-left: .2rem; }
 
     .user-pill {
       display: flex;
@@ -136,7 +113,7 @@
     .user-pill-name   { font-size: .82rem; font-weight: 600; }
     .user-pill-status { font-size: .7rem; color: var(--text-muted); }
 
-    .settings-btn {
+    .logout-btn {
       background: var(--bg-card2);
       border: 1px solid var(--border);
       color: var(--text-muted);
@@ -147,6 +124,7 @@
       display: flex; align-items: center; justify-content: center;
       margin-left: auto;
     }
+    .logout-btn:hover { border-color: var(--purple); color: var(--text); }
 
     /* ── CONTENU PRINCIPAL ── */
     .main {
@@ -168,7 +146,6 @@
       position: relative;
     }
 
-    /* Halo derrière l'avatar */
     .profile-header::before {
       content: '';
       position: absolute;
@@ -190,47 +167,8 @@
     .profile-info { flex: 1; }
 
     .profile-info h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: .3rem; }
-    .profile-info .school { font-size: .88rem; color: var(--text-muted); margin-bottom: .6rem; }
-
-    .profile-meta {
-      display: flex;
-      align-items: center;
-      gap: .8rem;
-      flex-wrap: wrap;
-    }
-
-    .meta-rating { font-size: .85rem; color: #fbbf24; font-weight: 600; }
-    .meta-rating span { color: var(--text-muted); font-weight: 400; }
-
-    .verified-badge {
-      background: rgba(34,211,238,.15);
-      color: var(--cyan);
-      border: 1px solid rgba(34,211,238,.3);
-      border-radius: 6px;
-      padding: .2rem .65rem;
-      font-size: .75rem;
-      font-weight: 600;
-    }
-
-    /* Solde affiché en haut à droite */
-    .profile-balance {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: .3rem;
-    }
-
-    .profile-balance .bal-label { font-size: .75rem; color: var(--text-muted); }
-
-    .bal-amount {
-      display: flex;
-      align-items: center;
-      gap: .4rem;
-      font-size: 1.8rem;
-      font-weight: 800;
-    }
-
-    .coin-icon { font-size: 1.5rem; }
+    .profile-info .school { font-size: .88rem; color: var(--text-muted); }
+    .profile-info .email { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
 
     /* ── SECTION COMPÉTENCES ── */
     .section-title {
@@ -243,21 +181,6 @@
     }
 
     .section-title h3 { font-size: 1.2rem; font-weight: 700; }
-
-    .section-actions { display: flex; gap: .6rem; }
-
-    .btn-edit {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: .4rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: .85rem;
-      transition: border-color .2s;
-    }
-
-    .btn-edit:hover { border-color: var(--purple); }
 
     .btn-publish {
       background: linear-gradient(135deg, var(--purple), var(--pink));
@@ -273,33 +196,18 @@
 
     .btn-publish:hover { opacity: .88; }
 
-    /* Grille propose / apprend */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
-    }
-
     .skills-panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.5rem;
-    }
-
-    .panel-title {
-      font-size: .78rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 1.2rem;
+      max-width: 560px;
     }
 
     /* Une ligne de compétence */
     .skill-row {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: .8rem;
       padding: .85rem 0;
       border-bottom: 1px solid var(--border);
@@ -307,47 +215,56 @@
 
     .skill-row:last-child { border-bottom: none; }
 
-    /* Pastille de statut */
     .skill-dot {
       width: 8px; height: 8px;
       border-radius: 50%;
-      margin-top: 5px;
+      background: #34d399;
       flex-shrink: 0;
     }
-
-    .skill-dot.active   { background: #34d399; }
-    .skill-dot.inactive { background: var(--pink); }
-    .skill-dot.learning { background: var(--purple); }
-    .skill-dot.wanted   { background: var(--text-muted); }
 
     .skill-row-info { flex: 1; }
-    .skill-row-name { font-size: .95rem; font-weight: 600; margin-bottom: .15rem; }
-    .skill-row-cat  { font-size: .76rem; color: var(--text-muted); margin-bottom: .3rem; }
-    .skill-row-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.5; }
+    .skill-row-name { font-size: .95rem; font-weight: 600; }
+    .skill-row-date { font-size: .76rem; color: var(--text-muted); margin-top: .15rem; }
 
-    .skill-row-tokens {
-      display: flex;
-      align-items: center;
-      gap: .2rem;
-      font-size: .85rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
+    .empty-state { color: var(--text-muted); font-size: .88rem; padding: .5rem 0; }
 
-    .skill-row-status {
-      font-size: .76rem;
-      color: var(--text-muted);
-      flex-shrink: 0;
+    /* ── MODAL PUBLIER ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; z-index: 300;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
     }
-
-    @media (max-width: 900px) {
-      .skills-grid { grid-template-columns: 1fr; }
+    .modal-overlay.visible { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 2.2rem; width: 100%; max-width: 400px;
     }
+    .modal-box h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: .5rem; }
+    .modal-box p { font-size: .85rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    .modal-box input {
+      width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
+      padding: .75rem 1rem; color: var(--text); font-size: .9rem; outline: none; margin-bottom: 1rem;
+      transition: border-color .2s;
+    }
+    .modal-box input:focus { border-color: var(--purple); }
+    .btn-modal-p {
+      width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .8rem; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; margin-bottom: .6rem;
+      transition: opacity .2s;
+    }
+    .btn-modal-p:hover { opacity: .88; }
+    .btn-modal-p:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-modal-g {
+      width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text);
+      padding: .8rem; border-radius: 10px; font-size: .9rem; cursor: pointer;
+    }
+    .btn-modal-g:hover { border-color: var(--purple); }
 
     @media (max-width: 600px) {
       .sidebar { display: none; }
       .main { margin-left: 0; padding: 1.5rem; }
       .profile-header { flex-direction: column; align-items: flex-start; }
+      .skills-panel { max-width: 100%; }
     }
   </style>
 </head>
@@ -369,32 +286,20 @@
       </div>
       <div class="sidebar-item" onclick="window.location.href='messages.html'">
         <span>•</span> Messages
-        <span class="badge">2</span>
       </div>
       <div class="sidebar-item" onclick="afficherToast('Mes jetons — bientôt disponible')">
         <span>•</span> Mes jetons
       </div>
-      <div class="sidebar-item" onclick="afficherToast('Admin — bientôt disponible')">
-        <span>•</span> Admin
-        <span class="badge">3</span>
-      </div>
     </nav>
 
     <div class="sidebar-bottom">
-      <div class="token-balance">
-        <div class="label">Solde de jetons</div>
-        <div>
-          <span class="amount">8</span>
-          <span class="unit">jetons</span>
-        </div>
-      </div>
       <div class="user-pill">
-        <div class="avatar-pill">MD</div>
+        <div class="avatar-pill" id="sidebarAvatar"></div>
         <div style="flex:1">
-          <div class="user-pill-name">Maxime<br>Dubois</div>
+          <div class="user-pill-name" id="sidebarName"></div>
           <div class="user-pill-status">• Connecté</div>
         </div>
-        <button class="settings-btn" onclick="afficherToast('Paramètres — bientôt disponible')">⚙</button>
+        <button class="logout-btn" onclick="deconnexion()" title="Se déconnecter">⎋</button>
       </div>
     </div>
   </aside>
@@ -404,96 +309,41 @@
 
     <!-- En-tête du profil -->
     <div class="profile-header">
-      <div class="profile-avatar">MD</div>
-
+      <div class="profile-avatar" id="profileAvatar"></div>
       <div class="profile-info">
-        <h2>Maxime Dubois</h2>
-        <div class="school">Étudiant·e · Université de Lyon</div>
-        <div class="profile-meta">
-          <span class="meta-rating">⭐ 4.9 <span>· 24 échanges</span></span>
-          <span class="verified-badge">Membre vérifié</span>
-        </div>
-      </div>
-
-      <div class="profile-balance">
-        <span class="bal-label">Solde</span>
-        <div class="bal-amount">
-          8 <span class="coin-icon">🪙</span>
-        </div>
+        <h2 id="profileName"></h2>
+        <div class="school" id="profileSchool"></div>
+        <div class="email" id="profileEmail"></div>
       </div>
     </div>
 
     <!-- Section Mes compétences -->
     <div class="section-title">
       <h3>Mes compétences</h3>
-      <div class="section-actions">
-        <button class="btn-edit" onclick="afficherToast('Modification — bientôt disponible')">Modifier</button>
-        <button class="btn-publish" onclick="afficherToast('Publication — bientôt disponible')">+ Publier une compétence</button>
-      </div>
+      <button class="btn-publish" onclick="ouvrirPublier()">+ Publier une compétence</button>
     </div>
 
-    <div class="skills-grid">
-
-      <!-- Ce que je propose -->
-      <div class="skills-panel">
-        <div class="panel-title">Ce que je propose</div>
-
-        <div class="skill-row">
-          <div class="skill-dot active"></div>
-          <div class="skill-row-info">
-            <div class="skill-row-name">Anglais conversationnel</div>
-            <div class="skill-row-cat">Langues</div>
-            <div class="skill-row-desc">
-              Sessions 100% parlées pour gagner en aisance. On travaille la prononciation et
-              le vocabulaire du quotidien.
-            </div>
-          </div>
-          <div class="skill-row-tokens">1 🪙</div>
-        </div>
-
-        <div class="skill-row">
-          <div class="skill-dot inactive"></div>
-          <div class="skill-row-info">
-            <div class="skill-row-name">Aide en design / Figma</div>
-            <div class="skill-row-cat">Design</div>
-            <div class="skill-row-desc">
-              De la grille aux composants : auto-layout, variantes et bonnes pratiques d'un
-              design system.
-            </div>
-          </div>
-          <div class="skill-row-tokens">2 🪙</div>
-        </div>
+    <div class="skills-panel">
+      <div id="listeCompetences">
+        <div class="empty-state">Chargement…</div>
       </div>
-
-      <!-- Ce que j'apprends -->
-      <div class="skills-panel">
-        <div class="panel-title">Ce que j'apprends</div>
-
-        <div class="skill-row">
-          <div class="skill-dot learning"></div>
-          <div class="skill-row-info">
-            <div class="skill-row-name">Python pour débutants</div>
-            <div class="skill-row-cat">Code</div>
-          </div>
-          <div class="skill-row-status">En cours</div>
-        </div>
-
-        <div class="skill-row">
-          <div class="skill-dot wanted"></div>
-          <div class="skill-row-info">
-            <div class="skill-row-name">Guitare acoustique</div>
-            <div class="skill-row-cat">Musique</div>
-          </div>
-          <div class="skill-row-status">Souhaité</div>
-        </div>
-      </div>
-
     </div>
   </main>
 
+  <!-- ═══ MODAL PUBLIER UNE COMPÉTENCE ═══ -->
+  <div class="modal-overlay" id="modalPublier" onclick="fermerPublierSiDehors(event)">
+    <div class="modal-box">
+      <h2>Publier une compétence</h2>
+      <p>Indique la compétence que tu proposes d'enseigner aux autres étudiant·e·s.</p>
+      <input type="text" id="inputCompetence" placeholder="Ex. : Python, Anglais, Guitare…" />
+      <button class="btn-modal-p" id="btnPublier" onclick="publierCompetence()">Publier</button>
+      <button class="btn-modal-g" onclick="fermerPublier()">Annuler</button>
+    </div>
+  </div>
+
   <!-- Toast de notification -->
   <style>
-    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .88rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; }
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .88rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; max-width: 90vw; text-align: center; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
   <div class="toast" id="toast"></div>
@@ -503,10 +353,113 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
+      setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    localStorage.setItem('ss_connected', '1');
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str == null ? '' : String(str);
+      return div.innerHTML;
+    }
+
+    function initiales(prenom, nom) {
+      return ((prenom || '?')[0] + (nom || '')[0]).toUpperCase();
+    }
+
+    function getUser() {
+      try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; }
+    }
+
+    function deconnexion() {
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    }
+
+    const user = getUser();
+    if (!user || !user.idUser) {
+      window.location.href = 'explorer.html';
+    }
+
+    function afficherProfil() {
+      const init = initiales(user.prenomUser, user.nomUser);
+      document.getElementById('sidebarAvatar').textContent = init;
+      document.getElementById('sidebarName').textContent = `${user.prenomUser} ${user.nomUser}`;
+      document.getElementById('profileAvatar').textContent = init;
+      document.getElementById('profileName').textContent = `${user.prenomUser} ${user.nomUser}`;
+      document.getElementById('profileSchool').textContent = user.universite ? `Étudiant·e · ${user.universite}` : 'Étudiant·e';
+      document.getElementById('profileEmail').textContent = user.email || '';
+    }
+
+    async function chargerCompetences() {
+      const conteneur = document.getElementById('listeCompetences');
+      try {
+        const rep = await fetch(`api/competences.php?action=mesCompetences&idUser=${user.idUser}`);
+        const data = await rep.json();
+        if (!rep.ok) {
+          conteneur.innerHTML = `<div class="empty-state">${escapeHtml(data.erreur || 'Erreur de chargement.')}</div>`;
+          return;
+        }
+        if (data.length === 0) {
+          conteneur.innerHTML = '<div class="empty-state">Tu n\'as encore publié aucune compétence.</div>';
+          return;
+        }
+        conteneur.innerHTML = data.map(c => `
+          <div class="skill-row">
+            <div class="skill-dot"></div>
+            <div class="skill-row-info">
+              <div class="skill-row-name">${escapeHtml(c.competence)}</div>
+              <div class="skill-row-date">Publiée le ${new Date(c.dateEchange).toLocaleDateString('fr-FR')}</div>
+            </div>
+          </div>`).join('');
+      } catch (e) {
+        conteneur.innerHTML = '<div class="empty-state">Impossible de contacter le serveur. Vérifie que PHP et MySQL sont lancés.</div>';
+      }
+    }
+
+    /* ── Publier une compétence ── */
+    function ouvrirPublier() {
+      document.getElementById('inputCompetence').value = '';
+      document.getElementById('modalPublier').classList.add('visible');
+    }
+    function fermerPublier() { document.getElementById('modalPublier').classList.remove('visible'); }
+    function fermerPublierSiDehors(e) { if (e.target === document.getElementById('modalPublier')) fermerPublier(); }
+
+    async function publierCompetence() {
+      const nom = document.getElementById('inputCompetence').value.trim();
+      if (!nom) { afficherToast('Indique le nom de la compétence.'); return; }
+
+      const btn = document.getElementById('btnPublier');
+      btn.disabled = true;
+      btn.textContent = 'Publication…';
+
+      try {
+        const rep = await fetch('api/competences.php?action=publier', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idUser: user.idUser, nom })
+        });
+        const json = await rep.json();
+
+        if (!rep.ok) {
+          afficherToast(json.erreur || 'Erreur lors de la publication.');
+          return;
+        }
+
+        fermerPublier();
+        afficherToast('Compétence publiée !');
+        chargerCompetences();
+      } catch (e) {
+        afficherToast('Erreur réseau. Le serveur PHP est-il lancé ?');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Publier';
+      }
+    }
+
+    if (user) {
+      afficherProfil();
+      chargerCompetences();
+    }
   </script>
 
 </body>
