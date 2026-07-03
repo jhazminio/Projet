@@ -26,11 +26,43 @@
       background: var(--bg-dark);
       color: var(--text);
       min-height: 100vh;
-      padding: 2rem 3rem;
+      display: flex;
     }
 
     a { color: inherit; text-decoration: none; }
     button { font-family: inherit; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 180px; min-height: 100vh; background: #120f22; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 1.4rem 1rem; position: fixed; top: 0; left: 0; bottom: 0;
+    }
+    .sidebar-logo { display: flex; align-items: center; gap: .6rem; font-weight: 700; font-size: 1rem; margin-bottom: 2.5rem; padding: .2rem .3rem; }
+    .logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--purple), var(--pink)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .8rem; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+    .sidebar-item { display: flex; align-items: center; gap: .6rem; padding: .6rem .8rem; border-radius: 8px; font-size: .88rem; color: var(--text-muted); cursor: pointer; transition: background .15s, color .15s; }
+    .sidebar-item:hover { background: var(--bg-card); color: var(--text); }
+    .sidebar-item.active { background: rgba(168,85,247,.15); color: var(--purple-light); font-weight: 600; }
+    .sidebar-bottom { border-top: 1px solid var(--border); padding-top: 1rem; }
+    .user-pill { display: flex; align-items: center; gap: .6rem; padding: .5rem .6rem; border-radius: 8px; cursor: pointer; }
+    .user-pill:hover { background: var(--bg-card); }
+    .avatar-pill { width: 30px; height: 30px; border-radius: 8px; background: var(--bg-card2); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--text-muted); overflow: hidden; }
+    .avatar-pill img { width: 100%; height: 100%; object-fit: cover; }
+    .user-pill-info { flex: 1; }
+    .user-pill-name { font-size: .82rem; font-weight: 600; color: var(--text-muted); }
+    .user-pill-status { font-size: .7rem; color: var(--text-muted); }
+    .logout-btn { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted); width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: .8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logout-btn:hover { border-color: var(--purple); color: var(--text); }
+    .btn-connect-sm { width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff; padding: .55rem; border-radius: 8px; cursor: pointer; font-size: .85rem; font-weight: 600; margin-top: .5rem; transition: opacity .2s; }
+    .btn-connect-sm:hover { opacity: .88; }
+
+    .main { margin-left: 180px; flex: 1; padding: 2rem 3rem; }
+
+    .theme-pill { display: flex; align-items: center; gap: .6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 99px; padding: .4rem .9rem; font-size: .68rem; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; }
+    .theme-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+    .theme-dot.d1 { background: var(--purple); }
+    .theme-dot.d2 { background: var(--pink); }
+    .theme-dot.d3 { background: var(--cyan); }
 
     .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.6rem; }
 
@@ -122,21 +154,45 @@
     .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
 
     @media (max-width: 900px) {
-      body { padding: 1.5rem; }
+      .main { padding: 1.5rem; }
       .layout { grid-template-columns: 1fr; }
       .info-chips { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
     }
   </style>
 </head>
 <body>
 
-  <div class="top-bar">
-    <button class="btn-back" onclick="window.location.href='explorer.html'">← Retour</button>
-  </div>
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="logo-icon">S</div>
+      SkillSwap
+    </a>
+    <nav class="sidebar-nav">
+      <a href="explorer.html" class="sidebar-item active"><span>•</span> Découvrir</a>
+      <div class="sidebar-item" onclick="navItem('profil')"><span>•</span> Mon profil</div>
+      <div class="sidebar-item" onclick="navItem('messages')"><span>•</span> Messages</div>
+      <div class="sidebar-item" onclick="navItem('jetons')"><span>•</span> Mes jetons</div>
+    </nav>
+    <div class="sidebar-bottom" id="sidebarBottom"></div>
+  </aside>
 
-  <div id="contenu" class="layout">
-    <div class="empty-state">Chargement…</div>
-  </div>
+  <!-- ═══ CONTENU PRINCIPAL ═══ -->
+  <main class="main">
+    <div class="top-bar">
+      <button class="btn-back" onclick="window.location.href='explorer.html'">← Retour</button>
+      <div class="theme-pill">Theme <span class="theme-dot d1"></span><span class="theme-dot d2"></span><span class="theme-dot d3"></span></div>
+    </div>
+
+    <div id="contenu" class="layout">
+      <div class="empty-state">Chargement…</div>
+    </div>
+  </main>
 
   <style>
     .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .88rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; max-width: 90vw; text-align: center; }
@@ -169,6 +225,44 @@
     function initiales(prenom, nom) { return ((prenom || '?')[0] + (nom || '')[0]).toUpperCase(); }
     function getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch (e) { return null; } }
     function avatarHtml(photo, init) { return photo ? `<img src="${photo}" alt="">` : escapeHtml(init); }
+
+    function deconnexion() { localStorage.removeItem('user'); window.location.href = 'index.html'; }
+
+    function navItem(kind) {
+      const user = getUser();
+      if (!user) { window.location.href = 'explorer.html'; return; }
+      if (kind === 'profil') window.location.href = 'profil.html';
+      else if (kind === 'messages') window.location.href = 'messages.html';
+      else if (kind === 'jetons') window.location.href = 'jetons.html';
+    }
+
+    function renderSidebarBottom() {
+      const user = getUser();
+      const el = document.getElementById('sidebarBottom');
+      if (user) {
+        el.innerHTML = `
+          <div class="user-pill">
+            <div class="avatar-pill" style="cursor:pointer;" onclick="window.location.href='profil.html'">${avatarHtml(user.photo, initiales(user.prenomUser, user.nomUser))}</div>
+            <div class="user-pill-info" style="cursor:pointer;" onclick="window.location.href='profil.html'">
+              <div class="user-pill-name" style="color:var(--text)">${escapeHtml((user.prenomUser || '') + ' ' + (user.nomUser || ''))}</div>
+              <div class="user-pill-status">• Connecté</div>
+            </div>
+            <button class="logout-btn" onclick="deconnexion()" title="Se déconnecter">⎋</button>
+          </div>`;
+      } else {
+        el.innerHTML = `
+          <div class="user-pill">
+            <div class="avatar-pill">👤</div>
+            <div class="user-pill-info">
+              <div class="user-pill-name">Invité</div>
+              <div class="user-pill-status">Mode exploration</div>
+            </div>
+          </div>
+          <button class="btn-connect-sm" onclick="window.location.href='explorer.html'">Se connecter</button>`;
+      }
+    }
+
+    renderSidebarBottom();
 
     function afficherToast(msg) {
       const t = document.getElementById('toast');
