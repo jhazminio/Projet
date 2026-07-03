@@ -129,6 +129,13 @@
     /* ── CONTENU PRINCIPAL ── */
     .main { margin-left: 180px; flex: 1; padding: 2.5rem 3rem; }
 
+    .page-header-top { display: flex; justify-content: flex-end; margin-bottom: 1.2rem; }
+    .theme-pill { display: flex; align-items: center; gap: .6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 99px; padding: .4rem .9rem; font-size: .68rem; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; }
+    .theme-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+    .theme-dot.d1 { background: var(--purple); }
+    .theme-dot.d2 { background: var(--pink); }
+    .theme-dot.d3 { background: var(--cyan); }
+
     /* ── CARTE EN-TÊTE DU PROFIL ── */
     .profile-header {
       background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
@@ -165,8 +172,25 @@
 
     .profile-info { flex: 1; min-width: 200px; }
     .profile-info h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: .3rem; }
-    .profile-info .school { font-size: .88rem; color: var(--text-muted); }
-    .profile-info .email { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
+    .profile-info .school { font-size: .88rem; color: var(--text-muted); margin-bottom: .6rem; }
+
+    .profile-meta { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+    .meta-rating {
+      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 99px;
+      padding: .3rem .8rem; font-size: .82rem; color: #fbbf24; font-weight: 600;
+    }
+    .meta-rating span { color: var(--text-muted); font-weight: 400; }
+    .verified-badge {
+      background: rgba(34,211,238,.15); color: var(--cyan); border: 1px solid rgba(34,211,238,.3);
+      border-radius: 99px; padding: .3rem .8rem; font-size: .78rem; font-weight: 600;
+    }
+
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: .8rem; }
+
+    .profile-balance { display: flex; flex-direction: column; align-items: flex-end; gap: .2rem; }
+    .profile-balance .bal-label { font-size: .72rem; color: var(--text-muted); }
+    .bal-amount { display: flex; align-items: center; gap: .35rem; font-size: 1.5rem; font-weight: 800; }
+    .coin-icon { font-size: 1.25rem; }
 
     .btn-edit {
       background: transparent;
@@ -204,46 +228,60 @@
     }
     .btn-publish:hover { opacity: .88; }
 
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 2.2rem; }
+
     .panel {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.5rem;
-      margin-bottom: 2.2rem;
+    }
+    .panel-title {
+      font-size: .78rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1.1rem;
     }
 
     .skill-row {
       display: flex;
       align-items: flex-start;
-      gap: .9rem;
-      padding: .9rem 0;
+      gap: .8rem;
+      padding: .85rem 0;
       border-bottom: 1px solid var(--border);
     }
     .skill-row:last-child { border-bottom: none; }
 
+    .skill-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .skill-dot.active   { background: #34d399; }
+    .skill-dot.proposee { background: var(--text-muted); }
+    .skill-dot.en_cours { background: var(--purple); }
+    .skill-dot.terminee { background: #f59e0b; }
+    .skill-dot.validee  { background: #34d399; }
+    .skill-dot.annulee  { background: var(--pink); }
+
     .skill-cat-badge {
-      font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
-      background: rgba(168,85,247,.15); color: var(--purple-light);
-      border-radius: 6px; padding: .2rem .5rem; flex-shrink: 0; margin-top: 2px;
+      font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+      color: var(--purple-light); margin-bottom: .15rem; display: block;
     }
 
     .skill-row-info { flex: 1; min-width: 0; }
-    .skill-row-name { font-size: .95rem; font-weight: 600; margin-bottom: .2rem; }
-    .skill-row-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: .3rem; }
-    .skill-row-meta { font-size: .74rem; color: var(--text-muted); }
+    .skill-row-name { font-size: .92rem; font-weight: 600; margin-bottom: .15rem; }
+    .skill-row-desc { font-size: .78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: .25rem; }
+    .skill-row-meta { font-size: .72rem; color: var(--text-muted); }
 
-    .skill-row-actions { display: flex; gap: .4rem; flex-shrink: 0; }
+    .skill-row-side { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+    .skill-row-tokens { font-size: .85rem; font-weight: 700; color: var(--purple-light); white-space: nowrap; }
+
     .icon-btn {
       background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-muted);
-      width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: .85rem;
-      display: flex; align-items: center; justify-content: center; transition: all .15s;
+      width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: .75rem;
+      display: flex; align-items: center; justify-content: center; transition: all .15s; line-height: 1;
     }
     .icon-btn:hover { border-color: var(--purple); color: var(--text); }
     .icon-btn:disabled { opacity: .35; cursor: not-allowed; }
     .icon-btn.danger:hover { border-color: var(--pink); color: var(--pink); }
 
     .status-badge {
-      font-size: .72rem; font-weight: 700; border-radius: 6px; padding: .25rem .6rem; flex-shrink: 0;
+      font-size: .7rem; font-weight: 700; border-radius: 6px; padding: .2rem .55rem; flex-shrink: 0; white-space: nowrap;
     }
     .status-badge.proposee   { background: rgba(245,158,11,.15); color: #f59e0b; }
     .status-badge.en_cours   { background: rgba(34,211,238,.15); color: var(--cyan); }
@@ -252,6 +290,8 @@
     .status-badge.annulee    { background: rgba(244,63,94,.15); color: #f43f5e; }
 
     .empty-state { color: var(--text-muted); font-size: .88rem; padding: .5rem 0; }
+
+    .lock-hint { font-size: .78rem; color: var(--text-muted); margin-top: .6rem; display: flex; align-items: center; gap: .4rem; }
 
     /* ── MODALS ── */
     .modal-overlay {
@@ -353,10 +393,15 @@
 
     hr.sep { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
 
+    @media (max-width: 900px) {
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+
     @media (max-width: 600px) {
       .sidebar { display: none; }
       .main { margin-left: 0; padding: 1.5rem; }
       .profile-header { flex-direction: column; align-items: flex-start; }
+      .header-right { align-items: flex-start; width: 100%; }
     }
   </style>
 </head>
@@ -391,15 +436,24 @@
   <!-- ═══ CONTENU PRINCIPAL ═══ -->
   <main class="main">
 
+    <div class="page-header-top">
+      <div class="theme-pill">Theme <span class="theme-dot d1"></span><span class="theme-dot d2"></span><span class="theme-dot d3"></span></div>
+    </div>
+
     <div class="profile-header">
       <div class="profile-avatar" id="profileAvatar"></div>
       <div class="profile-info">
         <h2 id="profileName"></h2>
         <div class="school" id="profileSchool"></div>
-        <div class="email" id="profileEmail"></div>
-        <div class="rating-line" id="profileRating" style="font-size:.85rem;color:#fbbf24;font-weight:600;margin-top:.5rem;"></div>
+        <div class="profile-meta" id="profileMeta"></div>
       </div>
-      <button class="btn-edit" onclick="ouvrirEditerProfil()">Modifier mon profil</button>
+      <div class="header-right">
+        <div class="profile-balance">
+          <span class="bal-label">Solde</span>
+          <div class="bal-amount" id="profileBalance">– <span class="coin-icon">🪙</span></div>
+        </div>
+        <button class="btn-edit" onclick="ouvrirEditerProfil()">Modifier mon profil</button>
+      </div>
     </div>
 
     <!-- Mes compétences -->
@@ -407,16 +461,18 @@
       <h3>Mes compétences</h3>
       <button class="btn-publish" onclick="ouvrirPublier()">+ Publier une compétence</button>
     </div>
-    <div class="panel">
-      <div id="listeCompetences"><div class="empty-state">Chargement…</div></div>
-    </div>
 
-    <!-- Ce que je reçois -->
-    <div class="section-title">
-      <h3>Ce que je reçois</h3>
-    </div>
-    <div class="panel">
-      <div id="listeSessions"><div class="empty-state">Chargement…</div></div>
+    <div class="skills-grid">
+      <div class="panel">
+        <div class="panel-title">Ce que je propose</div>
+        <div id="listeCompetences"><div class="empty-state">Chargement…</div></div>
+        <div class="lock-hint" id="lockHint" style="display:none;">🔒 Tu dois garder au moins une compétence proposée.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Ce que je reçois</div>
+        <div id="listeSessions"><div class="empty-state">Chargement…</div></div>
+      </div>
     </div>
   </main>
 
@@ -542,20 +598,32 @@
       document.getElementById('profileAvatar').innerHTML = avatarHtml(user);
       document.getElementById('profileName').textContent = `${user.prenomUser} ${user.nomUser}`;
       document.getElementById('profileSchool').textContent = user.universite ? `Étudiant·e · ${user.universite}` : 'Étudiant·e';
-      document.getElementById('profileEmail').textContent = user.email || '';
     }
 
     async function chargerNote() {
-      const el = document.getElementById('profileRating');
+      const el = document.getElementById('profileMeta');
       try {
         const rep = await fetch(`api/avis.php?action=statsUtilisateur&idUser=${user.idUser}`);
         const stats = await rep.json();
-        if (!rep.ok) { el.textContent = ''; return; }
-        el.innerHTML = stats.totalAvis > 0
-          ? `⭐ ${stats.moyenne} <span style="color:var(--text-muted);font-weight:400">· ${stats.totalAvis} avis · ${stats.totalEchanges} échanges</span>`
-          : `<span style="color:var(--text-muted);font-weight:400">Pas encore d'avis · ${stats.totalEchanges} échanges</span>`;
+        if (!rep.ok) { el.innerHTML = '<span class="verified-badge">Membre</span>'; return; }
+        const ratingHtml = stats.totalAvis > 0
+          ? `⭐ ${stats.moyenne} <span>· ${stats.totalEchanges} échanges</span>`
+          : `<span>Pas encore d'avis</span>`;
+        el.innerHTML = `<span class="meta-rating">${ratingHtml}</span><span class="verified-badge">Membre</span>`;
       } catch (e) {
-        el.textContent = '';
+        el.innerHTML = '<span class="verified-badge">Membre</span>';
+      }
+    }
+
+    async function chargerBalance() {
+      const el = document.getElementById('profileBalance');
+      try {
+        const rep = await fetch(`api/jetons.php?action=solde&idUser=${user.idUser}`);
+        const data = await rep.json();
+        if (!rep.ok) { el.innerHTML = '? <span class="coin-icon">🪙</span>'; return; }
+        el.innerHTML = `${data.solde} <span class="coin-icon">🪙</span>`;
+      } catch (e) {
+        el.innerHTML = '? <span class="coin-icon">🪙</span>';
       }
     }
 
@@ -666,6 +734,7 @@
 
         mesCompetencesCache = data;
         const peutSupprimer = data.length > 1;
+        document.getElementById('lockHint').style.display = peutSupprimer ? 'none' : 'flex';
 
         if (data.length === 0) {
           conteneur.innerHTML = '<div class="empty-state">Tu n\'as encore publié aucune compétence.</div>';
@@ -674,15 +743,16 @@
 
         conteneur.innerHTML = data.map((c, i) => `
           <div class="skill-row">
-            <span class="skill-cat-badge">${escapeHtml(c.categorie || 'Autre')}</span>
+            <div class="skill-dot active"></div>
             <div class="skill-row-info">
-              <div class="skill-row-name">${escapeHtml(c.competence)} · ${c.coutHeure} 🪙/h</div>
+              <span class="skill-cat-badge">${escapeHtml(c.categorie || 'Autre')}</span>
+              <div class="skill-row-name">${escapeHtml(c.competence)}</div>
               ${c.description ? `<div class="skill-row-desc">${escapeHtml(c.description)}</div>` : ''}
-              <div class="skill-row-meta">Publiée le ${new Date(c.dateEchange).toLocaleDateString('fr-FR')}</div>
             </div>
-            <div class="skill-row-actions">
-              <button class="icon-btn" title="Modifier" onclick='ouvrirModifier(mesCompetencesCache[${i}])'>✏️</button>
-              <button class="icon-btn danger" title="Supprimer" ${peutSupprimer ? '' : 'disabled'} onclick="supprimerCompetence(${c.idEchange})">🗑️</button>
+            <div class="skill-row-side">
+              <span class="skill-row-tokens">${c.coutHeure} 🪙</span>
+              <button class="icon-btn" title="Modifier" onclick='ouvrirModifier(mesCompetencesCache[${i}])'>✎</button>
+              <button class="icon-btn danger" title="Supprimer" ${peutSupprimer ? '' : 'disabled'} onclick="supprimerCompetence(${c.idEchange})">✕</button>
             </div>
           </div>`).join('');
       } catch (e) {
@@ -730,13 +800,14 @@
 
         conteneur.innerHTML = data.map(s => `
           <div class="skill-row">
-            <span class="status-badge ${s.statut}">${STATUT_LABELS[s.statut] || s.statut}</span>
+            <div class="skill-dot ${s.statut}"></div>
             <div class="skill-row-info">
+              <span class="skill-cat-badge">Avec ${escapeHtml(s.ensPrenom)} ${escapeHtml(s.ensNom)}</span>
               <div class="skill-row-name">${escapeHtml(s.competence)}</div>
-              <div class="skill-row-desc">Avec ${escapeHtml(s.ensPrenom)} ${escapeHtml(s.ensNom)}</div>
               <div class="skill-row-meta">🗓 ${new Date(s.dateSession).toLocaleDateString('fr-FR')} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div>
             </div>
-            <div class="skill-row-actions">
+            <div class="skill-row-side">
+              <span class="status-badge ${s.statut}">${STATUT_LABELS[s.statut] || s.statut}</span>
               <button class="icon-btn" title="Aller à la conversation" onclick="window.location.href='messages.html?open=${s.idEnseignant}&name=${encodeURIComponent(s.ensPrenom + ' ' + s.ensNom)}'">💬</button>
             </div>
           </div>`).join('');
@@ -834,6 +905,7 @@
       initCatRow();
       afficherProfil();
       chargerNote();
+      chargerBalance();
       chargerCompetences();
       chargerSessions();
     }
