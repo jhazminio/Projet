@@ -281,13 +281,19 @@
       height: 100px; border-radius: 12px; margin-bottom: 1.1rem;
       display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
     }
-    .cat-preview.Code      { background: linear-gradient(135deg, #0f0c29, #302b63); }
-    .cat-preview.Langues   { background: linear-gradient(135deg, #0a6473, #135e72); }
-    .cat-preview.Design    { background: linear-gradient(135deg, #3b0764, #7e22ce); }
-    .cat-preview.Musique   { background: linear-gradient(135deg, #3a1c71, #6a0572); }
-    .cat-preview.Maths     { background: linear-gradient(135deg, #134e5e, #1a6b4a); }
-    .cat-preview.Marketing { background: linear-gradient(135deg, #831843, #be185d); }
-    .cat-preview.Autre     { background: linear-gradient(135deg, #27272a, #3f3f46); }
+    .cat-preview.Musique       { background: linear-gradient(135deg, #3a1c71, #6a0572); }
+    .cat-preview.Programmation { background: linear-gradient(135deg, #0f0c29, #302b63); }
+    .cat-preview.Sport         { background: linear-gradient(135deg, #b91c1c, #f97316); }
+    .cat-preview.Mathématiques { background: linear-gradient(135deg, #134e5e, #1a6b4a); }
+    .cat-preview.Langues       { background: linear-gradient(135deg, #0a6473, #135e72); }
+    .cat-preview.Danse         { background: linear-gradient(135deg, #9d174d, #db2777); }
+    .cat-preview.Informatique  { background: linear-gradient(135deg, #1e3a8a, #2563eb); }
+    .cat-preview.Sciences      { background: linear-gradient(135deg, #065f46, #10b981); }
+    .cat-preview.Arts          { background: linear-gradient(135deg, #3b0764, #7e22ce); }
+    .cat-preview.Théâtre       { background: linear-gradient(135deg, #7c2d12, #c2410c); }
+    .cat-preview.Photographie  { background: linear-gradient(135deg, #1e1b4b, #4338ca); }
+    .cat-preview.Dessin        { background: linear-gradient(135deg, #831843, #be185d); }
+    .cat-preview.Autre         { background: linear-gradient(135deg, #27272a, #3f3f46); }
 
     .code-lines { display: flex; flex-direction: column; gap: 5px; padding: 1rem; width: 70%; }
     .code-lines span { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #a855f7, #22d3ee); }
@@ -419,8 +425,8 @@
       <h2 id="publierTitre">Publier une compétence</h2>
       <p>Décris ce que tu sais enseigner. Les autres étudiant·e·s pourront te proposer une session.</p>
 
-      <div class="cat-preview Code" id="catPreview">
-        <div class="code-lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:70%"></span><span style="width:45%"></span></div>
+      <div class="cat-preview Musique" id="catPreview">
+        <span class="music-icon">🎸</span>
       </div>
 
       <label class="field-label">Titre de la compétence</label>
@@ -484,7 +490,10 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const CATEGORIES = ['Code', 'Langues', 'Design', 'Musique', 'Maths', 'Marketing', 'Autre'];
+    const CATEGORIES = [
+      'Musique', 'Programmation', 'Sport', 'Mathématiques', 'Langues', 'Danse',
+      'Informatique', 'Sciences', 'Arts', 'Théâtre', 'Photographie', 'Dessin',
+    ];
 
     function afficherToast(msg) {
       const t = document.getElementById('toast');
@@ -537,16 +546,22 @@
 
     /* ══ Illustrations par catégorie (aperçu dans le modal Publier) ══ */
     const CAT_PREVIEW_HTML = {
-      Code: '<div class="code-lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:70%"></span><span style="width:45%"></span></div>',
-      Langues: '<div class="lang-bubbles"><div class="bubble left">Hello</div><div class="bubble right">Bonjour</div></div>',
-      Design: '<div class="design-shapes"><div class="shape-sq"></div><div class="shape-ci"></div><div class="shape-ln"></div></div>',
       Musique: '<span class="music-icon">🎸</span>',
-      Maths: '<div class="maths-text">a² + b² = c²<br>∫ x dx = ½x²<br>π ≈ 3.14159</div>',
-      Marketing: '<div class="chart"><div class="bar" style="height:24px"></div><div class="bar" style="height:38px"></div><div class="bar" style="height:32px"></div><div class="bar" style="height:48px"></div></div>',
+      Programmation: '<div class="code-lines"><span style="width:80%"></span><span style="width:55%"></span><span style="width:70%"></span><span style="width:45%"></span></div>',
+      Sport: '<span class="music-icon">🏀</span>',
+      Mathématiques: '<div class="maths-text">a² + b² = c²<br>∫ x dx = ½x²<br>π ≈ 3.14159</div>',
+      Langues: '<div class="lang-bubbles"><div class="bubble left">Hello</div><div class="bubble right">Bonjour</div></div>',
+      Danse: '<span class="music-icon">💃</span>',
+      Informatique: '<span class="music-icon">💻</span>',
+      Sciences: '<span class="music-icon">🔬</span>',
+      Arts: '<div class="design-shapes"><div class="shape-sq"></div><div class="shape-ci"></div><div class="shape-ln"></div></div>',
+      Théâtre: '<span class="music-icon">🎭</span>',
+      Photographie: '<span class="music-icon">📷</span>',
+      Dessin: '<span class="music-icon">✏️</span>',
       Autre: '<span class="autre-icon">✨</span>',
     };
 
-    let catSelectionnee = 'Code';
+    let catSelectionnee = 'Musique';
     let coutSelectionne = 1;
     let idEchangeEnEdition = null;
 
@@ -578,7 +593,7 @@
       document.getElementById('btnPublier').textContent = 'Publier ma compétence';
       document.getElementById('inputTitre').value = '';
       document.getElementById('inputDescription').value = '';
-      choisirCategorie('Code');
+      choisirCategorie('Musique');
       choisirCout(1);
       document.getElementById('modalPublier').classList.add('visible');
     }

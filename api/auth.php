@@ -11,12 +11,15 @@ function erreur(int $code, string $message): void
 }
 
 // Fait correspondre une compétence choisie à l'inscription (chip du formulaire,
-// qui utilise les mêmes catégories que "Publier une compétence") à l'une des
-// catégories utilisées dans le reste de l'app.
+// qui utilise exactement les mêmes catégories que "Publier une compétence")
+// à l'une des catégories utilisées dans le reste de l'app.
 function categorieDepuisChip(string $nomComp): string
 {
-    $categories = ['Code', 'Langues', 'Design', 'Musique', 'Maths', 'Marketing', 'Autre'];
-    $nomComp    = trim($nomComp);
+    $categories = [
+        'Musique', 'Programmation', 'Sport', 'Mathématiques', 'Langues', 'Danse',
+        'Informatique', 'Sciences', 'Arts', 'Théâtre', 'Photographie', 'Dessin',
+    ];
+    $nomComp = trim($nomComp);
 
     foreach ($categories as $categorie) {
         if (mb_strtolower($categorie) === mb_strtolower($nomComp)) {
@@ -24,18 +27,7 @@ function categorieDepuisChip(string $nomComp): string
         }
     }
 
-    // Anciens intitulés (comptes déjà créés avant l'unification des catégories)
-    $correspondances = [
-        'programmation'  => 'Code',
-        'informatique'   => 'Code',
-        'mathématiques'  => 'Maths',
-        'mathematiques'  => 'Maths',
-        'arts'           => 'Design',
-        'dessin'         => 'Design',
-        'photographie'   => 'Design',
-    ];
-
-    return $correspondances[mb_strtolower($nomComp)] ?? 'Autre';
+    return 'Autre';
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

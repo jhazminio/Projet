@@ -3,7 +3,10 @@ header('Content-Type: application/json; charset=utf-8');
 
 require __DIR__ . '/config.php';
 
-const CATEGORIES = ['Code', 'Langues', 'Design', 'Musique', 'Maths', 'Marketing', 'Autre'];
+const CATEGORIES = [
+    'Musique', 'Programmation', 'Sport', 'Mathématiques', 'Langues', 'Danse',
+    'Informatique', 'Sciences', 'Arts', 'Théâtre', 'Photographie', 'Dessin',
+];
 
 function erreur(int $code, string $message): void
 {
