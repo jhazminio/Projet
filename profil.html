@@ -367,7 +367,7 @@
       <div class="sidebar-item active">
         <span>•</span> Mon profil
       </div>
-      <div class="sidebar-item" onclick="afficherToast('Messages — bientôt disponible')">
+      <div class="sidebar-item" onclick="window.location.href='messages.html'">
         <span>•</span> Messages
         <span class="badge">2</span>
       </div>
@@ -505,6 +505,8 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2500);
     }
+
+    localStorage.setItem('ss_connected', '1');
   </script>
 
 </body>

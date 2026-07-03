@@ -498,20 +498,20 @@
       <div class="sidebar-item active">
         <span>•</span> Découvrir
       </div>
-      <div class="sidebar-item" onclick="ouvrirModal()">
+      <div class="sidebar-item" onclick="navItem('profil')">
         <span>•</span> Mon profil
       </div>
-      <div class="sidebar-item" onclick="ouvrirModal()">
+      <div class="sidebar-item" onclick="navItem('messages')">
         <span>•</span> Messages
         <span class="badge">2</span>
       </div>
-      <div class="sidebar-item" onclick="ouvrirModal()">
+      <div class="sidebar-item" onclick="navItem('jetons')">
         <span>•</span> Mes jetons
       </div>
     </nav>
 
-    <!-- Solde jetons + profil invité -->
-    <div class="sidebar-bottom">
+    <!-- Solde jetons + profil (invité ou connecté) -->
+    <div class="sidebar-bottom" id="sidebarBottom">
       <div class="token-balance">
         <div class="label">Solde de jetons</div>
         <div>
@@ -560,7 +560,7 @@
     <div class="grid" id="grid">
 
       <!-- Python -->
-      <div class="skill-card" data-cat="code" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="code" data-author-id="lea-martin" onclick="clicCarte(this)">
         <div class="thumb code">
           <span class="cat-tag code">Code</span>
           <span class="rating">⭐ 4.9</span>
@@ -585,7 +585,7 @@
       </div>
 
       <!-- Anglais -->
-      <div class="skill-card" data-cat="langues" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="langues" data-author-id="tom-reyes" onclick="clicCarte(this)">
         <div class="thumb langues">
           <span class="cat-tag langues">Langues</span>
           <span class="rating">⭐ 4.8</span>
@@ -610,7 +610,7 @@
       </div>
 
       <!-- UI Design -->
-      <div class="skill-card" data-cat="design" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="design" data-author-id="ines-khalil" onclick="clicCarte(this)">
         <div class="thumb design">
           <span class="cat-tag design">Design</span>
           <span class="rating">⭐ 5</span>
@@ -634,7 +634,7 @@
       </div>
 
       <!-- Java -->
-      <div class="skill-card" data-cat="code" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="code" data-author-id="karim-benali" onclick="clicCarte(this)">
         <div class="thumb code">
           <span class="cat-tag code">Code</span>
           <span class="rating">⭐ 4.7</span>
@@ -659,7 +659,7 @@
       </div>
 
       <!-- Guitare -->
-      <div class="skill-card" data-cat="music" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="music" data-author-id="sofia-lopez" onclick="clicCarte(this)">
         <div class="thumb music">
           <span class="cat-tag music">Musique</span>
           <span class="rating">⭐ 4.9</span>
@@ -679,7 +679,7 @@
       </div>
 
       <!-- Algèbre -->
-      <div class="skill-card" data-cat="maths" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="maths" data-author-id="yanis-dubois" onclick="clicCarte(this)">
         <div class="thumb maths">
           <span class="cat-tag maths">Maths</span>
           <span class="rating">⭐ 4.6</span>
@@ -704,7 +704,7 @@
       </div>
 
       <!-- Espagnol -->
-      <div class="skill-card" data-cat="langues" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="langues" data-author-id="clara-perez" onclick="clicCarte(this)">
         <div class="thumb langues">
           <span class="cat-tag langues">Langues</span>
           <span class="rating">⭐ 4.8</span>
@@ -729,7 +729,7 @@
       </div>
 
       <!-- Marketing -->
-      <div class="skill-card" data-cat="mkt" onclick="ouvrirModal()">
+      <div class="skill-card" data-cat="mkt" data-author-id="noah-vidal" onclick="clicCarte(this)">
         <div class="thumb mkt">
           <span class="cat-tag mkt" style="background:rgba(245,158,11,.5);">Marketing</span>
           <span class="rating">⭐ 4.7</span>
@@ -769,10 +769,38 @@
       </p>
       <input type="email" placeholder="Email universitaire" />
       <input type="password" placeholder="Mot de passe" />
-      <button class="btn-modal-primary" onclick="window.location.href='profil.html'">Se connecter</button>
+      <button class="btn-modal-primary" onclick="connexionExplorer()">Se connecter</button>
       <button class="btn-modal-ghost" onclick="fermerModal()">Continuer à explorer</button>
     </div>
   </div>
+
+  <!-- ═══ MODAL DÉTAIL COMPÉTENCE ═══ -->
+  <div class="modal-overlay" id="modalDetail" onclick="fermerDetailSiDehors(event)">
+    <div class="modal" style="max-width:420px; text-align:left;">
+      <span id="detailCatBadge" class="cat-tag code" style="position:static; display:inline-block; margin-bottom:.9rem;"></span>
+      <h2 id="detailSkill" style="font-size:1.3rem; margin-bottom:1.1rem;"></h2>
+      <div style="display:flex; align-items:center; gap:.7rem; margin-bottom:1.3rem;">
+        <div id="detailAvatar" class="avatar-sm" style="width:34px;height:34px;font-size:.78rem;"></div>
+        <div>
+          <div id="detailAuthorName" style="font-weight:600; font-size:.92rem;"></div>
+          <div id="detailAuthorLevel" style="font-size:.78rem; color:var(--text-muted);"></div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; font-size:.9rem;">
+        <span id="detailRating" style="color:#fbbf24; font-weight:700;"></span>
+        <span id="detailTokens" style="font-weight:700; display:flex; align-items:center; gap:.2rem;"></span>
+      </div>
+      <button class="btn-modal-primary" onclick="proposerEchange()">🤝 Proposer un échange</button>
+      <button class="btn-modal-ghost" onclick="fermerDetail()">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Toast de notification -->
+  <style>
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .88rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+  <div class="toast" id="toast"></div>
 
   <script>
     /* Ouvrir / fermer le modal de connexion */
@@ -835,6 +863,97 @@
       }
       noRes.style.display = visible === 0 ? '' : 'none';
     }
+
+    /* ── Connexion (simulée côté client) ── */
+    function estConnecte() {
+      return localStorage.getItem('ss_connected') === '1';
+    }
+
+    function connexionExplorer() {
+      localStorage.setItem('ss_connected', '1');
+      window.location.href = 'profil.html';
+    }
+
+    function navItem(kind) {
+      if (!estConnecte()) { ouvrirModal(); return; }
+      if (kind === 'profil') window.location.href = 'profil.html';
+      else if (kind === 'messages') window.location.href = 'messages.html';
+      else afficherToast('Mes jetons — bientôt disponible');
+    }
+
+    function renderSidebarBottom() {
+      if (!estConnecte()) return;
+      document.getElementById('sidebarBottom').innerHTML = `
+        <div class="token-balance">
+          <div class="label">Solde de jetons</div>
+          <div><span class="amount">8</span><span class="unit">jetons</span></div>
+        </div>
+        <div class="user-pill" onclick="window.location.href='profil.html'">
+          <div class="avatar-pill" style="background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff;">MD</div>
+          <div class="user-pill-info">
+            <div class="user-pill-name" style="color:var(--text)">Maxime Dubois</div>
+            <div class="user-pill-status">• Connecté</div>
+          </div>
+        </div>`;
+    }
+
+    /* ── Détail d'une compétence / proposer un échange ── */
+    const CAT_LABELS = { code: 'Code', langues: 'Langues', design: 'Design', music: 'Musique', maths: 'Maths', mkt: 'Marketing' };
+    let currentDetailCard = null;
+
+    function clicCarte(el) {
+      if (!estConnecte()) { ouvrirModal(); return; }
+      currentDetailCard = el;
+      const avatarEl = el.querySelector('.avatar-sm');
+      document.getElementById('detailSkill').textContent = el.querySelector('h3').textContent;
+      const badge = document.getElementById('detailCatBadge');
+      badge.className = 'cat-tag ' + el.dataset.cat;
+      badge.style.position = 'static';
+      badge.style.display = 'inline-block';
+      badge.textContent = CAT_LABELS[el.dataset.cat] || el.dataset.cat;
+      document.getElementById('detailAvatar').textContent = avatarEl.textContent;
+      document.getElementById('detailAvatar').className = 'avatar-sm ' + avatarEl.classList[1];
+      document.getElementById('detailAvatar').style.width = '34px';
+      document.getElementById('detailAvatar').style.height = '34px';
+      document.getElementById('detailAvatar').style.fontSize = '.78rem';
+      document.getElementById('detailAuthorName').textContent = el.querySelector('.author-name').textContent;
+      document.getElementById('detailAuthorLevel').textContent = el.querySelector('.author-level').textContent;
+      document.getElementById('detailRating').textContent = el.querySelector('.rating').textContent;
+      document.getElementById('detailTokens').innerHTML = el.querySelector('.token-info').innerHTML;
+      document.getElementById('modalDetail').classList.add('visible');
+    }
+
+    function fermerDetail() {
+      document.getElementById('modalDetail').classList.remove('visible');
+    }
+
+    function fermerDetailSiDehors(e) {
+      if (e.target === document.getElementById('modalDetail')) fermerDetail();
+    }
+
+    function proposerEchange() {
+      const el = currentDetailCard;
+      if (!el) return;
+      const avatarEl = el.querySelector('.avatar-sm');
+      const params = new URLSearchParams({
+        open: el.dataset.authorId,
+        name: el.querySelector('.author-name').textContent,
+        init: avatarEl.textContent,
+        av: avatarEl.classList[1],
+        skill: el.querySelector('h3').textContent,
+        cat: CAT_LABELS[el.dataset.cat] || el.dataset.cat
+      });
+      window.location.href = 'messages.html?' + params.toString();
+    }
+
+    function afficherToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    document.addEventListener('DOMContentLoaded', renderSidebarBottom);
   </script>
 
 </body>

@@ -411,6 +411,7 @@
         alert('Sélectionne au moins une compétence.');
         return;
       }
+      localStorage.setItem('ss_connected', '1');
       window.location.href = 'explorer.html';
     }
 
@@ -452,7 +453,7 @@
       <p>Tu as déjà un compte ? Entre tes identifiants pour accéder à ton profil.</p>
       <input type="email" placeholder="Email universitaire" />
       <input type="password" placeholder="Mot de passe" />
-      <button class="btn-modal-p" onclick="window.location.href='profil.html'">Se connecter</button>
+      <button class="btn-modal-p" onclick="localStorage.setItem('ss_connected','1'); window.location.href='profil.html'">Se connecter</button>
       <button class="btn-modal-g" onclick="fermerConnexion()">Annuler</button>
     </div>
   </div>
