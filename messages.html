@@ -454,6 +454,18 @@
     </div>
   </div>
 
+  <!-- ═══ MODAL : COMBIEN D'HEURES A DURÉ LA SESSION ═══ -->
+  <div class="modal-overlay" id="modalHeures" onclick="closeModalOutside(event,'modalHeures')">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('modalHeures')">✕</button>
+      <h2>Combien d'heures ?</h2>
+      <p>Indique combien d'heures a duré la session, pour en valider la fin.</p>
+      <label class="field-label">Nombre d'heures</label>
+      <input type="number" id="heuresConfirmInput" min="1" max="12" value="1" />
+      <button class="btn-modal-primary" onclick="validerHeuresConfirmation()">Valider</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -1031,16 +1043,41 @@
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
+    let sessionAConfirmer = null;  // idSession en attente du nombre d'heures dans modalHeures
+    let modalAReouvrir = null;     // popup à rouvrir une fois modalHeures validée
+
     async function confirmerFin(idSession) {
       const s = trouverSessionConnue(idSession);
-      const payload = { idSession, idUser: user.idUser };
 
       if (s && estEnseignant(s)) {
-        const reponse = prompt('Combien d\'heures a duré la session ?', s.nbHeures);
-        if (reponse === null) return; // annulé
-        const heuresReelles = Math.min(12, Math.max(1, parseInt(reponse, 10) || s.nbHeures));
-        payload.heuresReelles = heuresReelles;
+        sessionAConfirmer = idSession;
+        modalAReouvrir = document.getElementById('modalMesSessions').classList.contains('visible') ? 'modalMesSessions'
+          : document.getElementById('modalExchange').classList.contains('visible') ? 'modalExchange' : null;
+        closeModal('modalExchange');
+        closeModal('modalMesSessions');
+        document.getElementById('heuresConfirmInput').value = s.nbHeures;
+        document.getElementById('modalHeures').classList.add('visible');
+        return;
       }
+
+      await envoyerConfirmationFin(idSession, null);
+    }
+
+    async function validerHeuresConfirmation() {
+      const heures = Math.min(12, Math.max(1, parseInt(document.getElementById('heuresConfirmInput').value, 10) || 1));
+      const idSession = sessionAConfirmer;
+      const modal = modalAReouvrir;
+      sessionAConfirmer = null;
+      modalAReouvrir = null;
+      closeModal('modalHeures');
+      await envoyerConfirmationFin(idSession, heures);
+      if (modal === 'modalMesSessions') openMesSessionsModal();
+      else if (modal === 'modalExchange') openExchangeModal();
+    }
+
+    async function envoyerConfirmationFin(idSession, heuresReelles) {
+      const payload = { idSession, idUser: user.idUser };
+      if (heuresReelles !== null) payload.heuresReelles = heuresReelles;
 
       try {
         const rep = await fetch('api/echanges.php?action=confirmerFin', {
