@@ -244,6 +244,12 @@ function repondre(PDO $pdo): void
     $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = ? WHERE idSession = ?');
     $stmt->execute([$nouveauStatut, $idSession]);
 
+    if ($nouveauStatut === 'en_cours' && !empty($session['idSessionMiroir'])) {
+        // Session déjà jumelée (troc) : accepter cette moitié démarre les deux d'un coup.
+        $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = \'en_cours\' WHERE idSession = ? AND statut = \'proposee\'')
+            ->execute([(int) $session['idSessionMiroir']]);
+    }
+
     if ($nouveauStatut === 'annulee') {
         annulerMiroirSiPresent($pdo, $session);
     }
