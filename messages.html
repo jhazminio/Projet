@@ -784,26 +784,63 @@
           </div>`;
         }
       } else if (s.statut === 'en_cours') {
-        const jaiConfirme = cestMoiQuiEnseigne ? s.confirmeEnseignant : s.confirmeApprenant;
-        html += `<div class="sess-btn-row">
-          <button class="btn-confirm ${jaiConfirme ? 'done' : ''}" onclick="confirmerFin(${s.idSession})" ${jaiConfirme ? 'disabled' : ''}>${jaiConfirme ? '✓ Tu as confirmé' : 'Marquer comme terminé'}</button>
-          <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
-        </div>`;
+        html += confirmationHtml(s, cestMoiQuiEnseigne);
       } else if (s.statut === 'terminee' || s.statut === 'validee') {
-        html += `<div class="sess-btn-row">`;
-        if (cestMoiQuiEnseigne) {
-          html += `<button class="btn-qcm pink" onclick="openCreateQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? 'QCM validé ✓' : 'Créer / modifier le QCM'}</button>`;
-        } else {
-          html += `<button class="btn-qcm" onclick="openAnswerQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? '✓ QCM réussi' : 'Répondre au QCM'}</button>`;
-        }
-        html += `</div>`;
-        if (s.qcmValide && s.statut !== 'validee') {
-          html += `<div class="sess-note ok">✓ Ton QCM est validé, en attente de l'autre moitié du troc.</div>`;
-        } else if (!s.qcmValide && s.qcmScore !== null && s.qcmScore !== undefined) {
-          html += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
-        }
+        html += qcmBoutonHtml(s, cestMoiQuiEnseigne);
       } else if (s.statut === 'annulee') {
         html += `<div class="sess-note">Annulée.</div>`;
+      }
+      return html;
+    }
+
+    // Validation séquentielle de la fin de session : l'enseignant·e confirme et déclare les
+    // heures en premier, puis l'apprenant·e valide que c'est correct.
+    function confirmationHtml(s, cestMoiQuiEnseigne) {
+      let html = '';
+      if (cestMoiQuiEnseigne) {
+        const jaiConfirme = !!s.confirmeEnseignant;
+        html = `<div class="sess-btn-row">
+          <button class="btn-confirm ${jaiConfirme ? 'done' : ''}" onclick="confirmerFin(${s.idSession})" ${jaiConfirme ? 'disabled' : ''}>${jaiConfirme ? `✓ Tu as confirmé (${s.heuresReelles ?? s.nbHeures} h)` : 'Marquer comme terminé'}</button>
+          <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
+        </div>`;
+        if (!jaiConfirme) {
+          html += `<div class="sess-note">Indique combien d'heures a duré la session pour la valider.</div>`;
+        }
+      } else if (!s.confirmeEnseignant) {
+        html = `<div class="sess-note">En attente que ${escapeHtml(s.ensPrenom)} confirme la fin du cours et indique le nombre d'heures.</div>
+        <div class="sess-btn-row">
+          <button class="btn-confirm" disabled>En attente…</button>
+          <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
+        </div>`;
+      } else {
+        const jaiConfirme = !!s.confirmeApprenant;
+        const heures = s.heuresReelles ?? s.nbHeures;
+        html = `<div class="sess-note ok">${escapeHtml(s.ensPrenom)} indique que la session a duré <strong>${heures} h</strong>. Est-ce correct ?</div>
+        <div class="sess-btn-row">
+          <button class="btn-confirm ${jaiConfirme ? 'done' : ''}" onclick="confirmerFin(${s.idSession})" ${jaiConfirme ? 'disabled' : ''}>${jaiConfirme ? '✓ Tu as confirmé' : `Confirmer (${heures} h)`}</button>
+          <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
+        </div>`;
+      }
+      return html;
+    }
+
+    // Bouton QCM : n'active "Répondre au QCM" que si l'enseignant·e a bien créé les questions.
+    function qcmBoutonHtml(s, cestMoiQuiEnseigne) {
+      let html = `<div class="sess-btn-row">`;
+      if (cestMoiQuiEnseigne) {
+        html += `<button class="btn-qcm pink" onclick="openCreateQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? 'QCM validé ✓' : (s.nbQuestionsQcm > 0 ? 'Modifier le QCM' : 'Créer le QCM')}</button>`;
+      } else if (s.nbQuestionsQcm > 0) {
+        html += `<button class="btn-qcm" onclick="openAnswerQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? '✓ QCM réussi' : 'Répondre au QCM'}</button>`;
+      } else {
+        html += `<button class="btn-qcm" disabled>QCM pas encore créé</button>`;
+      }
+      html += `</div>`;
+      if (!cestMoiQuiEnseigne && s.nbQuestionsQcm === 0) {
+        html += `<div class="sess-note">En attente que ${escapeHtml(s.ensPrenom)} crée le QCM.</div>`;
+      } else if (s.qcmValide && s.statut !== 'validee') {
+        html += `<div class="sess-note ok">✓ Ton QCM est validé, en attente de l'autre moitié du troc.</div>`;
+      } else if (!s.qcmValide && s.qcmScore !== null && s.qcmScore !== undefined) {
+        html += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
       }
       return html;
     }
@@ -835,29 +872,14 @@
           </div>`;
         }
       } else if (s.statut === 'en_cours') {
-        const jaiConfirme = estEnseignant(s) ? s.confirmeEnseignant : s.confirmeApprenant;
-        inner += `<div class="sess-note ok">Session <strong>en cours</strong>. Les deux doivent valider la fin du cours.</div>
-        <div class="sess-btn-row">
-          <button class="btn-confirm ${jaiConfirme ? 'done' : ''}" onclick="confirmerFin(${s.idSession})" ${jaiConfirme ? 'disabled' : ''}>${jaiConfirme ? '✓ Tu as confirmé' : 'Marquer la session comme terminée'}</button>
-          <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
-        </div>`;
+        inner += confirmationHtml(s, estEnseignant(s));
       } else if (s.statut === 'terminee' || s.statut === 'validee') {
         const heuresFinales = s.heuresReelles ?? s.nbHeures;
-        inner += `<div class="sess-note ok">✓ Session terminée (${heuresFinales} h). ${escapeHtml(s.ensPrenom)} fait passer un QCM à ${escapeHtml(s.appPrenom)} — 100% requis pour valider.</div>
-        <div class="sess-btn-row">`;
-        if (estEnseignant(s)) {
-          inner += `<button class="btn-qcm pink" onclick="openCreateQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? 'QCM validé ✓' : 'Créer / modifier le QCM'}</button>`;
-        }
-        if (estApprenant(s)) {
-          inner += `<button class="btn-qcm" onclick="openAnswerQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? '✓ QCM réussi' : 'Répondre au QCM'}</button>`;
-        }
-        inner += `</div>`;
+        inner += qcmBoutonHtml(s, estEnseignant(s));
         if (s.qcmValide) {
           const jetonsVerses = s.coutHeure * heuresFinales;
           inner += `<div class="sess-note success">🎉 QCM validé ! ${jetonsVerses} jeton${jetonsVerses > 1 ? 's' : ''} versé${jetonsVerses > 1 ? 's' : ''}.</div>
           <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${autreIdUser}'">⭐ Laisser un avis</button>`;
-        } else if (s.qcmScore !== null && s.qcmScore !== undefined) {
-          inner += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
         }
       } else if (s.statut === 'annulee') {
         inner += `<div class="sess-note">Cette session a été refusée.</div>`;

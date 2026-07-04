@@ -17,7 +17,8 @@ const SELECT_SESSION = '
            e.idUser AS idEnseignant, e.categorie, e.coutHeure,
            c.nom AS competence,
            ens.nomUser AS ensNom, ens.prenomUser AS ensPrenom,
-           app.nomUser AS appNom, app.prenomUser AS appPrenom
+           app.nomUser AS appNom, app.prenomUser AS appPrenom,
+           (SELECT COUNT(*) FROM QCM_QUESTION q WHERE q.idSession = s.idSession) AS nbQuestionsQcm
     FROM SESSION_ECHANGE s
     JOIN ECHANGE e ON e.idEchange = s.idEchange
     JOIN COMPETENCES c ON c.idCompetences = e.idComp
@@ -38,7 +39,7 @@ function nbHeuresValide($v): int
 function normaliserSession(array $s): array
 {
     foreach (['idSession', 'idEchange', 'idApprenant', 'confirmeEnseignant', 'confirmeApprenant',
-              'qcmValide', 'nbHeures', 'idEnseignant', 'coutHeure'] as $champ) {
+              'qcmValide', 'nbHeures', 'idEnseignant', 'coutHeure', 'nbQuestionsQcm'] as $champ) {
         if (isset($s[$champ])) {
             $s[$champ] = (int) $s[$champ];
         }
@@ -303,6 +304,10 @@ function confirmerFin(PDO $pdo): void
         $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET confirmeEnseignant = 1, heuresReelles = ? WHERE idSession = ?');
         $stmt->execute([$heuresReelles, $idSession]);
     } elseif ((int) $session['idApprenant'] === $idUser) {
+        // L'enseignant·e doit d'abord confirmer et déclarer les heures avant que l'apprenant·e valide.
+        if (!$session['confirmeEnseignant']) {
+            erreur(409, "En attente de la confirmation de l'enseignant·e (avec le nombre d'heures).");
+        }
         $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET confirmeApprenant = 1 WHERE idSession = ?');
         $stmt->execute([$idSession]);
     } else {
