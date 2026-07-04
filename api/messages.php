@@ -34,27 +34,31 @@ function conversations(PDO $pdo): void
         erreur(400, 'idUser requis.');
     }
 
-    $stmt = $pdo->prepare(
-        'SELECT u.idUser, u.nomUser, u.prenomUser, u.photo,
-                (SELECT contenu FROM MESSAGE m
-                   WHERE (m.idEnvoyeur = :me AND m.idReceveur = u.idUser)
-                      OR (m.idEnvoyeur = u.idUser AND m.idReceveur = :me)
-                   ORDER BY m.dateMessage DESC LIMIT 1) AS dernierMessage,
-                (SELECT dateMessage FROM MESSAGE m
-                   WHERE (m.idEnvoyeur = :me AND m.idReceveur = u.idUser)
-                      OR (m.idEnvoyeur = u.idUser AND m.idReceveur = :me)
-                   ORDER BY m.dateMessage DESC LIMIT 1) AS derniereDate
-         FROM USER u
-         WHERE u.idUser != :me
-           AND EXISTS (
-                SELECT 1 FROM MESSAGE m
-                WHERE (m.idEnvoyeur = :me AND m.idReceveur = u.idUser)
-                   OR (m.idEnvoyeur = u.idUser AND m.idReceveur = :me)
-           )
-         ORDER BY derniereDate DESC'
-    );
-    $stmt->execute(['me' => $idUser]);
-    echo json_encode($stmt->fetchAll());
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT u.idUser, u.nomUser, u.prenomUser, u.photo,
+                    (SELECT contenu FROM MESSAGE m
+                       WHERE (m.idEnvoyeur = :me AND m.idReceveur = u.idUser)
+                          OR (m.idEnvoyeur = u.idUser AND m.idReceveur = :me)
+                       ORDER BY m.dateMessage DESC LIMIT 1) AS dernierMessage,
+                    (SELECT dateMessage FROM MESSAGE m
+                       WHERE (m.idEnvoyeur = :me AND m.idReceveur = u.idUser)
+                          OR (m.idEnvoyeur = u.idUser AND m.idReceveur = :me)
+                       ORDER BY m.dateMessage DESC LIMIT 1) AS derniereDate
+             FROM USER u
+             WHERE u.idUser != :me
+               AND EXISTS (
+                    SELECT 1 FROM MESSAGE m
+                    WHERE (m.idEnvoyeur = :me AND m.idReceveur = u.idUser)
+                       OR (m.idEnvoyeur = u.idUser AND m.idReceveur = :me)
+               )
+             ORDER BY derniereDate DESC'
+        );
+        $stmt->execute(['me' => $idUser]);
+        echo json_encode($stmt->fetchAll());
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (conversations) : ' . $e->getMessage());
+    }
 }
 
 // Historique des messages entre l'utilisateur connecté et un autre utilisateur
@@ -67,14 +71,18 @@ function historique(PDO $pdo): void
         erreur(400, 'Paramètres invalides.');
     }
 
-    $stmt = $pdo->prepare(
-        'SELECT idMessage, idEnvoyeur, idReceveur, contenu, dateMessage
-         FROM MESSAGE
-         WHERE (idEnvoyeur = ? AND idReceveur = ?) OR (idEnvoyeur = ? AND idReceveur = ?)
-         ORDER BY dateMessage ASC'
-    );
-    $stmt->execute([$idUser, $idAutre, $idAutre, $idUser]);
-    echo json_encode($stmt->fetchAll());
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT idMessage, idEnvoyeur, idReceveur, contenu, dateMessage
+             FROM MESSAGE
+             WHERE (idEnvoyeur = ? AND idReceveur = ?) OR (idEnvoyeur = ? AND idReceveur = ?)
+             ORDER BY dateMessage ASC'
+        );
+        $stmt->execute([$idUser, $idAutre, $idAutre, $idUser]);
+        echo json_encode($stmt->fetchAll());
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (historique) : ' . $e->getMessage());
+    }
 }
 
 // Envoie un nouveau message
@@ -96,13 +104,17 @@ function envoyer(PDO $pdo): void
         erreur(400, 'Tu ne peux pas t\'envoyer un message à toi-même.');
     }
 
-    $stmt = $pdo->prepare('INSERT INTO MESSAGE (idEnvoyeur, idReceveur, contenu) VALUES (?, ?, ?)');
-    $stmt->execute([$idEnvoyeur, $idReceveur, $contenu]);
+    try {
+        $stmt = $pdo->prepare('INSERT INTO MESSAGE (idEnvoyeur, idReceveur, contenu) VALUES (?, ?, ?)');
+        $stmt->execute([$idEnvoyeur, $idReceveur, $contenu]);
 
-    $idMessage = (int) $pdo->lastInsertId();
-    $stmt = $pdo->prepare('SELECT idMessage, idEnvoyeur, idReceveur, contenu, dateMessage FROM MESSAGE WHERE idMessage = ?');
-    $stmt->execute([$idMessage]);
+        $idMessage = (int) $pdo->lastInsertId();
+        $stmt = $pdo->prepare('SELECT idMessage, idEnvoyeur, idReceveur, contenu, dateMessage FROM MESSAGE WHERE idMessage = ?');
+        $stmt->execute([$idMessage]);
 
-    http_response_code(201);
-    echo json_encode($stmt->fetch());
+        http_response_code(201);
+        echo json_encode($stmt->fetch());
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (envoyer) : ' . $e->getMessage());
+    }
 }

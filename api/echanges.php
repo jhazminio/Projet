@@ -80,11 +80,15 @@ function definir(PDO $pdo): void
         erreur(403, 'Seul·e la personne qui propose cette compétence peut définir une session.');
     }
 
-    $stmt = $pdo->prepare(
-        'INSERT INTO SESSION_ECHANGE (idEchange, idApprenant, titre, dateSession, heureSession, format, statut)
-         VALUES (?, ?, ?, ?, ?, ?, \'proposee\')'
-    );
-    $stmt->execute([$idEchange, $idApprenant, $titre, $date, $heure, $format]);
+    try {
+        $stmt = $pdo->prepare(
+            'INSERT INTO SESSION_ECHANGE (idEchange, idApprenant, titre, dateSession, heureSession, format, statut)
+             VALUES (?, ?, ?, ?, ?, ?, \'proposee\')'
+        );
+        $stmt->execute([$idEchange, $idApprenant, $titre, $date, $heure, $format]);
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (definir) : ' . $e->getMessage());
+    }
 
     http_response_code(201);
     echo json_encode(['idSession' => (int) $pdo->lastInsertId()]);
@@ -162,17 +166,21 @@ function pourConversation(PDO $pdo): void
         erreur(400, 'Paramètres invalides.');
     }
 
-    $stmt = $pdo->prepare(
-        SELECT_SESSION . '
-        WHERE ((e.idUser = ? AND s.idApprenant = ?) OR (e.idUser = ? AND s.idApprenant = ?))
-          AND s.statut != \'annulee\'
-        ORDER BY s.dateCreation DESC
-        LIMIT 1'
-    );
-    $stmt->execute([$idUser, $idAutre, $idAutre, $idUser]);
-    $session = $stmt->fetch();
+    try {
+        $stmt = $pdo->prepare(
+            SELECT_SESSION . '
+            WHERE ((e.idUser = ? AND s.idApprenant = ?) OR (e.idUser = ? AND s.idApprenant = ?))
+              AND s.statut != \'annulee\'
+            ORDER BY s.dateCreation DESC
+            LIMIT 1'
+        );
+        $stmt->execute([$idUser, $idAutre, $idAutre, $idUser]);
+        $session = $stmt->fetch();
 
-    echo json_encode($session ?: null);
+        echo json_encode($session ?: null);
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (pourConversation) : ' . $e->getMessage());
+    }
 }
 
 // Les sessions où l'utilisateur connecté est l'apprenant ("Ce que je reçois")
@@ -183,9 +191,13 @@ function mesSessionsApprenant(PDO $pdo): void
         erreur(400, 'idUser requis.');
     }
 
-    $stmt = $pdo->prepare(SELECT_SESSION . ' WHERE s.idApprenant = ? ORDER BY s.dateCreation DESC');
-    $stmt->execute([$idUser]);
-    echo json_encode($stmt->fetchAll());
+    try {
+        $stmt = $pdo->prepare(SELECT_SESSION . ' WHERE s.idApprenant = ? ORDER BY s.dateCreation DESC');
+        $stmt->execute([$idUser]);
+        echo json_encode($stmt->fetchAll());
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (mesSessionsApprenant) : ' . $e->getMessage());
+    }
 }
 
 function chargerSession(PDO $pdo, int $idSession): array
@@ -193,8 +205,12 @@ function chargerSession(PDO $pdo, int $idSession): array
     if ($idSession <= 0) {
         erreur(400, 'idSession requis.');
     }
-    $stmt = $pdo->prepare(SELECT_SESSION . ' WHERE s.idSession = ?');
-    $stmt->execute([$idSession]);
+    try {
+        $stmt = $pdo->prepare(SELECT_SESSION . ' WHERE s.idSession = ?');
+        $stmt->execute([$idSession]);
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (session) : ' . $e->getMessage());
+    }
     $session = $stmt->fetch();
 
     if (!$session) {
