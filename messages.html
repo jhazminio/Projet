@@ -765,8 +765,8 @@
         </div>`;
 
       if (mien.statut === 'validee' && autre.statut === 'validee') {
-        const mesJetons = mien.heuresReelles ?? mien.nbHeures;
-        const sesJetons = autre.heuresReelles ?? autre.nbHeures;
+        const mesJetons = mien.coutHeure * (mien.heuresReelles ?? mien.nbHeures);
+        const sesJetons = autre.coutHeure * (autre.heuresReelles ?? autre.nbHeures);
         inner += `<div class="sess-note success">🎉 Troc complété ! Tu as gagné ${mesJetons} jeton${mesJetons > 1 ? 's' : ''}, ${escapeHtml(autre.ensPrenom)} a gagné ${sesJetons} jeton${sesJetons > 1 ? 's' : ''}.</div>
         <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${mien.idApprenant}'">⭐ Laisser un avis</button>`;
       }
@@ -778,7 +778,7 @@
     function subSessionHtml(s, cestMoiQuiEnseigne) {
       const heuresTxt = `${s.nbHeures} h${s.nbHeures > 1 ? 'eures' : 'eure'}`;
       let html = `<div class="sess-side">
-        <div class="sess-side-title">${escapeHtml(s.titre)} · ${heuresTxt}</div>
+        <div class="sess-side-title">${escapeHtml(s.titre)} · ${heuresTxt} · ${s.coutHeure} 🪙/h</div>
         <div class="sess-side-meta">🗓 ${formatDate(s.dateSession)} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div>
       </div>`;
 
