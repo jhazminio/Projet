@@ -218,6 +218,15 @@
     .exch-cta { background: var(--bg-card2); border: 1px dashed var(--border); border-radius: 10px; padding: .9rem 1rem; font-size: .8rem; color: var(--text-muted); line-height: 1.6; }
     .exch-cta strong { color: var(--purple-light); }
 
+    .exch-group { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; transition: border-color .2s; }
+    .exch-group:hover { border-color: var(--purple); }
+    .exch-group:last-child { margin-bottom: 0; }
+    .exch-headline { font-size: .84rem; font-weight: 700; margin-bottom: .8rem; }
+    .exch-mini-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: .6rem .7rem; margin-bottom: .9rem; }
+    .exch-mini-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--purple-light); margin-bottom: .2rem; }
+    .exch-mini-title { font-size: .82rem; font-weight: 600; }
+    .exch-mini-meta { font-size: .74rem; color: var(--text-muted); margin-top: .1rem; }
+
     /* ── MODALS ── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 300; opacity: 0; pointer-events: none; transition: opacity .25s; padding: 2rem; }
     .modal-overlay.visible { opacity: 1; pointer-events: all; }
@@ -749,14 +758,13 @@
         <div class="sess-side">
           <div class="sess-side-title">${escapeHtml(s.competence)} · ${heuresTxt}</div>
           <div class="sess-side-meta">🗓 ${formatDate(s.dateSession)} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'} · avec ${escapeHtml(autreNom)}</div>
-        </div>
-        <div class="sess-note">Session hors troc : proposée sans échange en retour, payée en jetons (${s.coutHeure * s.nbHeures} 🪙).</div>`;
+        </div>${s.statut !== 'proposee' ? `<div class="sess-note">Session hors troc : proposée sans échange en retour, payée en jetons (${s.coutHeure * s.nbHeures} 🪙).</div>` : ''}`;
 
       if (s.statut === 'proposee') {
         if (estApprenant(s)) {
-          inner += `<div class="sess-note">${escapeHtml(s.ensPrenom)} te propose cette session.</div>
+          inner += `<div class="sess-note">${escapeHtml(s.ensPrenom)} te propose cette session. Pour former un troc, propose-lui quelque chose en retour.</div>
           <div class="sess-btn-row">
-            <button class="btn-accept" onclick="repondreSession(${s.idSession}, 'accepter')">Accepter</button>
+            <button class="btn-accept" onclick="openSessionModal(${s.idSession})">⇅ Proposer en retour</button>
             <button class="btn-refuse" onclick="repondreSession(${s.idSession}, 'refuser')">Refuser</button>
           </div>`;
         } else {
@@ -799,32 +807,62 @@
       return inner;
     }
 
+    // Les 4 étapes classiques d'un échange, quel que soit son type (troc ou session isolée)
+    function etapesEchange(g) {
+      let acceptee, coursRealise, qcmValide;
+      if (g.type === 'troc') {
+        acceptee = true; // former le troc = les deux ont déjà accepté (proposer en retour = accepter)
+        coursRealise = ['terminee', 'validee'].includes(g.mien.statut) && ['terminee', 'validee'].includes(g.autre.statut);
+        qcmValide = g.mien.statut === 'validee' && g.autre.statut === 'validee';
+      } else {
+        acceptee = g.s.statut !== 'proposee';
+        coursRealise = ['terminee', 'validee'].includes(g.s.statut);
+        qcmValide = g.s.statut === 'validee';
+      }
+      return [
+        { done: true, label: 'Session proposée' },
+        { done: acceptee, label: 'Acceptée par les deux' },
+        { done: coursRealise, label: 'Cours réalisé' },
+        { done: qcmValide, label: 'QCM validé · jetons versés' },
+      ];
+    }
+
     function renderExchangePanel() {
       const col = document.getElementById('exchangeCol');
       if (!activeConv) { col.innerHTML = ''; return; }
 
       let html = `<h3>L'échange</h3><div class="exch-sub">Avec ${escapeHtml(activeConv.nom)}</div>`;
 
-      if (activeSessions.length === 0) {
+      const groupes = grouperSessions();
+      if (groupes.length === 0) {
         html += `<div class="exch-cta">Clique sur 📅 <strong>Définir une session</strong> dans le chat pour proposer l'une de tes compétences.</div>`;
         col.innerHTML = html;
         return;
       }
 
-      html += `<div class="exch-steps">`;
-      grouperSessions().forEach(g => {
+      groupes.forEach(g => {
+        const idAncre = g.type === 'troc' ? g.mien.idSession : g.s.idSession;
+        let headline, miniBox = '';
+
         if (g.type === 'troc') {
-          const badge = badgeTroc(g.mien, g.autre);
-          html += `<div class="exch-step done" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${g.mien.idSession}')?.scrollIntoView({behavior:'smooth', block:'center'})">
-            <span class="exch-step-num">${badge.classe === 'validee' ? '✓' : '🔄'}</span> ${escapeHtml(g.mien.competence)} ⇌ ${escapeHtml(g.autre.competence)} <span class="sess-badge ${badge.classe}" style="margin-left:auto;">${badge.label}</span>
-          </div>`;
+          headline = `${escapeHtml(g.mien.competence)} ⇌ ${escapeHtml(g.autre.competence)} · ${g.mien.nbHeures}h ⇌ ${g.autre.nbHeures}h`;
+        } else if (estEnseignant(g.s)) {
+          headline = `${escapeHtml(g.s.competence)} ⇌ … · en attente`;
+          miniBox = `<div class="exch-mini-box"><div class="exch-mini-label">Toi → tu enseignes</div><div class="exch-mini-title">${escapeHtml(g.s.competence)}</div><div class="exch-mini-meta">🗓 ${formatDate(g.s.dateSession)} · ${g.s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div></div>`;
         } else {
-          html += `<div class="exch-step done" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${g.s.idSession}')?.scrollIntoView({behavior:'smooth', block:'center'})">
-            <span class="exch-step-num">${g.s.statut === 'validee' ? '✓' : '📅'}</span> ${escapeHtml(g.s.titre)} <span class="sess-badge ${g.s.statut}" style="margin-left:auto;">${STATUT_LABEL[g.s.statut] || g.s.statut}</span>
-          </div>`;
+          headline = `… ⇌ ${escapeHtml(g.s.competence)} · en attente de ta réponse`;
+          miniBox = `<div class="exch-mini-box"><div class="exch-mini-label">${escapeHtml(g.s.ensPrenom)} enseigne</div><div class="exch-mini-title">${escapeHtml(g.s.competence)}</div><div class="exch-mini-meta">🗓 ${formatDate(g.s.dateSession)} · ${g.s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div></div>`;
         }
+
+        html += `<div class="exch-group" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${idAncre}')?.scrollIntoView({behavior:'smooth', block:'center'})">
+          <div class="exch-headline">${headline}</div>
+          ${miniBox}
+          <div class="exch-steps">`;
+        etapesEchange(g).forEach((st, i) => {
+          html += `<div class="exch-step ${st.done ? 'done' : ''}"><span class="exch-step-num">${st.done ? '✓' : i + 1}</span> ${st.label}</div>`;
+        });
+        html += `</div></div>`;
       });
-      html += `</div>`;
 
       col.innerHTML = html;
     }
@@ -926,9 +964,12 @@
     /* ══════════════ DÉFINIR UNE SESSION ══════════════ */
     let mesCompetencesPourSession = [];
     let sessionEnModification = null; // idSession en cours d'édition, ou null pour une nouvelle proposition
+    let contrePropositionPour = null; // session à laquelle on répond en proposant en retour, ou null
 
-    async function openSessionModal() {
+    async function openSessionModal(idSessionReponsePour) {
       if (!activeConv) return;
+      const propOriginale = idSessionReponsePour ? activeSessions.find(x => x.idSession === idSessionReponsePour) : null;
+
       try {
         const rep = await fetch(`api/competences.php?action=mesCompetences&idUser=${user.idUser}`);
         const data = await rep.json();
@@ -947,10 +988,17 @@
       }
 
       sessionEnModification = null;
-      document.getElementById('sessModalTitle').textContent = 'Définir une session';
-      document.getElementById('sessModalIntro').textContent = 'Choisis la compétence que toi tu enseignes. La personne en face devra accepter.';
+      contrePropositionPour = propOriginale ? propOriginale.idSession : null;
+
+      if (propOriginale) {
+        document.getElementById('sessModalTitle').textContent = 'Proposer en retour';
+        document.getElementById('sessModalIntro').textContent = `${propOriginale.ensPrenom} te propose « ${propOriginale.competence} ». Choisis ce que TOI tu offres en échange, pour former le troc.`;
+      } else {
+        document.getElementById('sessModalTitle').textContent = 'Définir une session';
+        document.getElementById('sessModalIntro').textContent = "Choisis la compétence que toi tu enseignes. Pour que ce soit un vrai troc, l'autre personne devra te proposer quelque chose en retour.";
+      }
       document.getElementById('sessSkillField').style.display = '';
-      document.getElementById('btnEnvoyerSession').textContent = 'Envoyer la proposition';
+      document.getElementById('btnEnvoyerSession').textContent = propOriginale ? 'Envoyer ma proposition en retour' : 'Envoyer la proposition';
 
       document.getElementById('sessSkills').innerHTML = mesCompetencesPourSession.map((c, i) =>
         `<span class="chip" data-idx="${i}" onclick="selectSessSkill(this)">${escapeHtml(c.competence)} <small>· ${c.coutHeure} 🪙/h</small></span>`
@@ -959,12 +1007,11 @@
 
       document.getElementById('sessTitle').value = '';
       document.getElementById('sessTitle').dataset.userEdited = '';
-      document.getElementById('sessDate').value = '';
+      document.getElementById('sessDate').value = propOriginale ? propOriginale.dateSession : '';
       document.getElementById('sessDate').min = new Date().toISOString().slice(0, 10);
-      document.getElementById('sessTime').value = '';
-      document.getElementById('sessHeures').value = 1;
-      document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('selected'));
-      document.querySelector('.fmt-btn[data-fmt="virtuel"]').classList.add('selected');
+      document.getElementById('sessTime').value = propOriginale ? propOriginale.heureSession.slice(0, 5) : '';
+      document.getElementById('sessHeures').value = propOriginale ? propOriginale.nbHeures : 1;
+      document.querySelectorAll('.fmt-btn').forEach(b => b.classList.toggle('selected', b.dataset.fmt === (propOriginale ? propOriginale.format : 'virtuel')));
       document.getElementById('modalSession').classList.add('visible');
     }
 
@@ -973,6 +1020,7 @@
       if (!s || s.statut !== 'proposee' || !estEnseignant(s)) return;
 
       sessionEnModification = s.idSession;
+      contrePropositionPour = null;
       document.getElementById('sessModalTitle').textContent = 'Modifier la session';
       document.getElementById('sessModalIntro').textContent = `Ajuste les détails de la session « ${s.competence} ».`;
       document.getElementById('sessSkillField').style.display = 'none';
@@ -1036,7 +1084,7 @@
           });
           json = await rep.json();
           if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
-          afficherToast('Proposition envoyée !');
+          afficherToast(contrePropositionPour ? 'Troc conclu !' : 'Proposition envoyée !');
         }
         closeModal('modalSession');
         chargerSessions();

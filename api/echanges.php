@@ -131,9 +131,10 @@ function jumelerSiPossible(PDO $pdo, int $idSession, int $idEnseignant, int $idA
     $miroir = $stmt->fetch();
 
     if ($miroir) {
+        // Proposer en retour = accepter : les deux sessions démarrent directement.
         $idMiroir = (int) $miroir['idSession'];
-        $pdo->prepare('UPDATE SESSION_ECHANGE SET idSessionMiroir = ? WHERE idSession = ?')->execute([$idMiroir, $idSession]);
-        $pdo->prepare('UPDATE SESSION_ECHANGE SET idSessionMiroir = ? WHERE idSession = ?')->execute([$idSession, $idMiroir]);
+        $pdo->prepare('UPDATE SESSION_ECHANGE SET idSessionMiroir = ?, statut = \'en_cours\' WHERE idSession = ?')->execute([$idMiroir, $idSession]);
+        $pdo->prepare('UPDATE SESSION_ECHANGE SET idSessionMiroir = ?, statut = \'en_cours\' WHERE idSession = ?')->execute([$idSession, $idMiroir]);
     }
 }
 
