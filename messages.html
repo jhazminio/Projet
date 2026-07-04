@@ -283,19 +283,16 @@
     .qcm-option-row input[type="text"] { margin-bottom: 0; flex: 1; }
     .qcm-remove { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: .78rem; text-decoration: underline; margin-bottom: .8rem; }
 
-    .mes-sessions-row {
-      display: flex; align-items: center; gap: .8rem; padding: .8rem .6rem; border-radius: 10px;
-      cursor: pointer; transition: background .15s; border-bottom: 1px solid var(--border);
-    }
-    .mes-sessions-row:hover { background: var(--bg-card2); }
-    .mes-sessions-row:last-child { border-bottom: none; }
-    .mes-sessions-role { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .2rem .55rem; border-radius: 6px; flex-shrink: 0; }
-    .mes-sessions-role.enseignant { background: rgba(168,85,247,.15); color: var(--purple-light); }
-    .mes-sessions-role.apprenant { background: rgba(34,211,238,.15); color: var(--cyan); }
-    .mes-sessions-info { flex: 1; min-width: 0; }
-    .mes-sessions-title { font-size: .88rem; font-weight: 600; }
-    .mes-sessions-meta { font-size: .76rem; color: var(--text-muted); }
     .mes-sessions-empty { color: var(--text-muted); font-size: .85rem; padding: 1rem 0; text-align: center; }
+    .mes-sessions-group { margin-bottom: 1.2rem; }
+    .mes-sessions-group:last-child { margin-bottom: 0; }
+    .mes-sessions-with {
+      display: flex; align-items: center; gap: .6rem; font-size: .82rem; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; margin-bottom: .5rem; padding: .3rem .1rem; transition: color .15s;
+    }
+    .mes-sessions-with:hover { color: var(--text); }
+    .mes-sessions-with:hover .mes-sessions-goto { color: var(--purple-light); }
+    .mes-sessions-goto { margin-left: auto; font-size: .74rem; font-weight: 600; color: var(--text-muted); transition: color .15s; }
 
     .pair-card .session-card-head span:first-child { background: linear-gradient(135deg, var(--purple-light), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
     .pair-sub { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: .8rem .9rem; display: flex; flex-direction: column; gap: .6rem; }
@@ -663,14 +660,15 @@
     const STATUT_LABEL = { proposee: 'En attente', en_cours: 'En cours', terminee: 'Terminée', validee: 'Validée', annulee: 'Annulée' };
 
     // Regroupe les sessions actives en trocs (paire enseigner ⇌ apprendre) et sessions isolées
-    function grouperSessions() {
+    function grouperSessions(liste) {
+      liste = liste || activeSessions;
       const groupes = [];
       const traitees = new Set();
-      activeSessions.forEach(s => {
+      liste.forEach(s => {
         if (traitees.has(s.idSession)) return;
         traitees.add(s.idSession);
         if (s.idSessionMiroir) {
-          const miroir = activeSessions.find(x => x.idSession === s.idSessionMiroir);
+          const miroir = liste.find(x => x.idSession === s.idSessionMiroir);
           if (miroir) {
             traitees.add(miroir.idSession);
             const mien = estEnseignant(s) ? s : miroir;
@@ -758,7 +756,7 @@
         const mesJetons = mien.heuresReelles ?? mien.nbHeures;
         const sesJetons = autre.heuresReelles ?? autre.nbHeures;
         inner += `<div class="sess-note success">🎉 Troc complété ! Tu as gagné ${mesJetons} jeton${mesJetons > 1 ? 's' : ''}, ${escapeHtml(autre.ensPrenom)} a gagné ${sesJetons} jeton${sesJetons > 1 ? 's' : ''}.</div>
-        <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${activeConv.idUser}'">⭐ Laisser un avis</button>`;
+        <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${mien.idApprenant}'">⭐ Laisser un avis</button>`;
       }
 
       inner += `</div>`;
@@ -812,6 +810,7 @@
 
     function sessionCardHtml(s) {
       const autreNom = estEnseignant(s) ? `${s.appPrenom} ${s.appNom}` : `${s.ensPrenom} ${s.ensNom}`;
+      const autreIdUser = estEnseignant(s) ? s.idApprenant : s.idEnseignant;
       const heuresTxt = `${s.nbHeures} h${s.nbHeures > 1 ? 'eures' : 'eure'}`;
 
       let inner = `<div class="session-card">
@@ -856,7 +855,7 @@
         if (s.qcmValide) {
           const jetonsVerses = s.coutHeure * heuresFinales;
           inner += `<div class="sess-note success">🎉 QCM validé ! ${jetonsVerses} jeton${jetonsVerses > 1 ? 's' : ''} versé${jetonsVerses > 1 ? 's' : ''}.</div>
-          <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${activeConv.idUser}'">⭐ Laisser un avis</button>`;
+          <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${autreIdUser}'">⭐ Laisser un avis</button>`;
         } else if (s.qcmScore !== null && s.qcmScore !== undefined) {
           inner += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
         }
@@ -928,6 +927,36 @@
     }
 
     /* ══════════════ TOUTES MES SESSIONS (enseignant·e ou apprenant·e) ══════════════ */
+    let dernieresMesSessions = []; // pour pouvoir re-grouper après une action dans cette modale
+
+    function autrePersonneDuGroupe(g) {
+      const s = g.type === 'troc' ? g.mien : g.s;
+      const autreEstEnseignant = !estEnseignant(s);
+      const prenom = autreEstEnseignant ? s.ensPrenom : s.appPrenom;
+      const nomFam = autreEstEnseignant ? s.ensNom : s.appNom;
+      const idUser = autreEstEnseignant ? s.idEnseignant : s.idApprenant;
+      return { idUser, nom: `${prenom} ${nomFam}`, init: initiales(prenom, nomFam), av: avatarClass(idUser) };
+    }
+
+    function renderMesSessionsListe() {
+      const zone = document.getElementById('mesSessionsListe');
+      const groupes = grouperSessions(dernieresMesSessions);
+      if (groupes.length === 0) {
+        zone.innerHTML = '<div class="mes-sessions-empty">Aucune session pour l’instant.</div>';
+        return;
+      }
+      zone.innerHTML = groupes.map(g => {
+        const autre = autrePersonneDuGroupe(g);
+        return `<div class="mes-sessions-group">
+          <div class="mes-sessions-with" onclick="ouvrirSessionDepuisListe(${autre.idUser}, '${escapeHtml(autre.nom).replace(/'/g, "\\'")}', '${autre.init}', '${autre.av}')">
+            <span class="avatar-conv ${autre.av}" style="width:26px;height:26px;font-size:.68rem;">${avatarHtml(null, autre.init)}</span>
+            Avec ${escapeHtml(autre.nom)} <span class="mes-sessions-goto">Ouvrir la conversation →</span>
+          </div>
+          ${g.type === 'troc' ? pairedCardHtml(g.mien, g.autre) : sessionCardHtml(g.s)}
+        </div>`;
+      }).join('');
+    }
+
     async function openMesSessionsModal() {
       const zone = document.getElementById('mesSessionsListe');
       zone.innerHTML = '<div class="mes-sessions-empty">Chargement…</div>';
@@ -940,27 +969,8 @@
           zone.innerHTML = `<div class="mes-sessions-empty">${escapeHtml(data.erreur || 'Impossible de charger tes sessions.')}</div>`;
           return;
         }
-        if (data.length === 0) {
-          zone.innerHTML = '<div class="mes-sessions-empty">Aucune session pour l’instant.</div>';
-          return;
-        }
-        zone.innerHTML = data.map(s => {
-          const autreEstEnseignant = s.monRole === 'apprenant';
-          const autrePrenom = autreEstEnseignant ? s.ensPrenom : s.appPrenom;
-          const autreNomFam = autreEstEnseignant ? s.ensNom : s.appNom;
-          const autreNom = `${autrePrenom} ${autreNomFam}`;
-          const autreIdUser = autreEstEnseignant ? s.idEnseignant : s.idApprenant;
-          const init = initiales(autrePrenom, autreNomFam);
-          const av = avatarClass(autreIdUser);
-          return `<div class="mes-sessions-row" onclick="ouvrirSessionDepuisListe(${autreIdUser}, '${escapeHtml(autreNom).replace(/'/g, "\\'")}', '${init}', '${av}')">
-            <span class="mes-sessions-role ${s.monRole}">${s.monRole === 'enseignant' ? 'Enseigne' : 'Apprend'}</span>
-            <div class="mes-sessions-info">
-              <div class="mes-sessions-title">${escapeHtml(s.titre)}</div>
-              <div class="mes-sessions-meta">${escapeHtml(s.competence)} · avec ${escapeHtml(autreNom)} · 🗓 ${formatDate(s.dateSession)} · ${s.nbHeures} h</div>
-            </div>
-            <span class="sess-badge ${s.statut}">${STATUT_LABEL[s.statut] || s.statut}</span>
-          </div>`;
-        }).join('');
+        dernieresMesSessions = data;
+        renderMesSessionsListe();
       } catch (e) {
         zone.innerHTML = '<div class="mes-sessions-empty">Erreur réseau.</div>';
       }
@@ -969,6 +979,21 @@
     function ouvrirSessionDepuisListe(idUser, nom, init, av) {
       closeModal('modalMesSessions');
       selectConversation(idUser, nom, init, av, null);
+    }
+
+    // Trouve une session en mémoire, que ce soit dans la conversation active ou dans "Toutes mes sessions"
+    function trouverSessionConnue(idSession) {
+      return activeSessions.find(x => x.idSession === idSession) || dernieresMesSessions.find(x => x.idSession === idSession);
+    }
+
+    // Recharge la conversation active et/ou "Toutes mes sessions" selon ce qui est ouvert
+    async function rafraichirApresAction() {
+      if (activeConv) await chargerSessions();
+      if (document.getElementById('modalMesSessions').classList.contains('visible')) {
+        const rep = await fetch(`api/echanges.php?action=mesSessions&idUser=${user.idUser}`);
+        const data = await rep.json();
+        if (rep.ok) { dernieresMesSessions = data; renderMesSessionsListe(); }
+      }
     }
 
     async function repondreSession(idSession, reponse) {
@@ -980,12 +1005,12 @@
         const json = await rep.json();
         if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
         afficherToast(reponse === 'accepter' ? 'Session acceptée !' : 'Session refusée.');
-        chargerSessions();
+        rafraichirApresAction();
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
     async function confirmerFin(idSession) {
-      const s = activeSessions.find(x => x.idSession === idSession);
+      const s = trouverSessionConnue(idSession);
       const payload = { idSession, idUser: user.idUser };
 
       if (s && estEnseignant(s)) {
@@ -1003,7 +1028,7 @@
         const json = await rep.json();
         if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
         afficherToast('Confirmation enregistrée.');
-        chargerSessions();
+        rafraichirApresAction();
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
@@ -1017,7 +1042,7 @@
         const json = await rep.json();
         if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
         afficherToast('Session annulée. Tu peux en définir une nouvelle.');
-        chargerSessions();
+        rafraichirApresAction();
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
@@ -1028,7 +1053,7 @@
 
     async function openSessionModal(idSessionReponsePour) {
       if (!activeConv) return;
-      closeModal('modalExchange');
+      closeModal('modalExchange'); closeModal('modalMesSessions');
       const propOriginale = idSessionReponsePour ? activeSessions.find(x => x.idSession === idSessionReponsePour) : null;
 
       try {
@@ -1079,7 +1104,7 @@
     function openEditSessionModal(idSession) {
       const s = activeSessions.find(x => x.idSession === idSession);
       if (!s || s.statut !== 'proposee' || !estEnseignant(s)) return;
-      closeModal('modalExchange');
+      closeModal('modalExchange'); closeModal('modalMesSessions');
 
       sessionEnModification = s.idSession;
       contrePropositionPour = null;
@@ -1173,7 +1198,7 @@
     }
 
     function openCreateQcm(idSession) {
-      closeModal('modalExchange');
+      closeModal('modalExchange'); closeModal('modalMesSessions');
       currentQcmSessionId = idSession;
       document.getElementById('createQcmTitle').textContent = `Crée ton QCM`;
       qcmBlockCounter = 0;
@@ -1221,7 +1246,7 @@
     let questionsCourantes = [];
 
     async function openAnswerQcm(idSession) {
-      closeModal('modalExchange');
+      closeModal('modalExchange'); closeModal('modalMesSessions');
       currentQcmSessionId = idSession;
       try {
         const rep = await fetch(`api/qcm.php?action=questions&idSession=${idSession}`);
