@@ -227,7 +227,7 @@
     .modal h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: .4rem; }
     .modal > p { font-size: .84rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.3rem; }
     .field-label { font-size: .78rem; color: var(--text-muted); font-weight: 600; margin-bottom: .5rem; display: block; }
-    .modal input[type="text"], .modal input[type="date"], .modal input[type="time"] {
+    .modal input[type="text"], .modal input[type="date"], .modal input[type="time"], .modal input[type="number"] {
       width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
       padding: .75rem 1rem; color: var(--text); font-size: .9rem; outline: none; margin-bottom: 1.1rem;
       transition: border-color .2s; color-scheme: dark;
@@ -253,6 +253,20 @@
     .qcm-option-row { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
     .qcm-option-row input[type="text"] { margin-bottom: 0; flex: 1; }
     .qcm-remove { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: .78rem; text-decoration: underline; margin-bottom: .8rem; }
+
+    .mes-sessions-row {
+      display: flex; align-items: center; gap: .8rem; padding: .8rem .6rem; border-radius: 10px;
+      cursor: pointer; transition: background .15s; border-bottom: 1px solid var(--border);
+    }
+    .mes-sessions-row:hover { background: var(--bg-card2); }
+    .mes-sessions-row:last-child { border-bottom: none; }
+    .mes-sessions-role { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .2rem .55rem; border-radius: 6px; flex-shrink: 0; }
+    .mes-sessions-role.enseignant { background: rgba(168,85,247,.15); color: var(--purple-light); }
+    .mes-sessions-role.apprenant { background: rgba(34,211,238,.15); color: var(--cyan); }
+    .mes-sessions-info { flex: 1; min-width: 0; }
+    .mes-sessions-title { font-size: .88rem; font-weight: 600; }
+    .mes-sessions-meta { font-size: .76rem; color: var(--text-muted); }
+    .mes-sessions-empty { color: var(--text-muted); font-size: .85rem; padding: 1rem 0; text-align: center; }
 
     .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .86rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; max-width: 90vw; text-align: center; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -308,6 +322,7 @@
   <main class="main">
     <div class="page-header">
       <h1>Messages</h1>
+      <button class="btn-session" onclick="openMesSessionsModal()">📋 Toutes mes sessions</button>
     </div>
 
     <div class="messages-shell">
@@ -353,6 +368,9 @@
         </div>
       </div>
 
+      <label class="field-label">Nombre d'heures</label>
+      <input type="number" id="sessHeures" min="1" max="12" value="1" />
+
       <label class="field-label">Format</label>
       <div class="fmt-row">
         <button type="button" class="fmt-btn selected" data-fmt="virtuel" onclick="selectFmt(this)">💻 Virtuel</button>
@@ -383,6 +401,16 @@
       <p>Sélectionne la bonne réponse pour chaque question. Il faut 100% de bonnes réponses pour valider la session et déclencher le versement des jetons.</p>
       <div id="qcmAnswerQuestions"></div>
       <button class="btn-modal-primary" id="btnValiderQcm" onclick="validerReponses()">Valider mes réponses</button>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL : TOUTES MES SESSIONS ═══ -->
+  <div class="modal-overlay" id="modalMesSessions" onclick="closeModalOutside(event,'modalMesSessions')">
+    <div class="modal wide">
+      <button class="modal-close" onclick="closeModal('modalMesSessions')">✕</button>
+      <h2>Toutes mes sessions</h2>
+      <p>Toutes les sessions où tu enseignes ou apprends, tous statuts confondus.</p>
+      <div id="mesSessionsListe"></div>
     </div>
   </div>
 
@@ -426,7 +454,7 @@
     let conversations = [];      // [{idUser, nomUser, prenomUser, photo, dernierMessage, derniereDate}]
     let pendingContact = null;   // nouvelle conversation pas encore en base (arrivée via ?open=)
     let activeConv = null;       // {idUser, nom, init, av, photo}
-    let activeSession = null;    // session courante entre moi et activeConv (ou null)
+    let activeSessions = [];     // toutes les sessions non annulées entre moi et activeConv (plusieurs à la fois possibles)
     let currentQcmSessionId = null;
 
     function afficherSidebar() {
@@ -491,7 +519,8 @@
         <div class="avatar-conv ${av}" style="cursor:pointer;" onclick="window.location.href='utilisateur.html?id=${idUser}'">${avatarHtml(photo, init)}</div>
         <div class="chat-head-name" style="cursor:pointer;" onclick="window.location.href='utilisateur.html?id=${idUser}'">${escapeHtml(nom)}</div>`;
       renderConvList();
-      await Promise.all([chargerMessages(), chargerSession()]);
+      await chargerMessages();
+      await chargerSessions();
     }
 
     /* ══════════════ MESSAGES ══════════════ */
@@ -550,6 +579,7 @@
         input.value = '';
         pendingContact = null;
         await chargerMessages();
+        await chargerSessions();
         await chargerConversations();
         renderConvList();
       } catch (e) {
@@ -561,22 +591,22 @@
       if (e.target && e.target.id === 'msgInput' && e.key === 'Enter') sendMessage();
     });
 
-    /* ══════════════ SESSION EN COURS DANS LA CONVERSATION ══════════════ */
-    async function chargerSession() {
+    /* ══════════════ SESSIONS DE LA CONVERSATION (plusieurs à la fois possibles) ══════════════ */
+    async function chargerSessions() {
       try {
         const rep = await fetch(`api/echanges.php?action=pourConversation&idUser=${user.idUser}&idAutre=${activeConv.idUser}`);
         const data = await rep.json();
         if (!rep.ok) {
           afficherToast(data.erreur || "Impossible de charger l'état de l'échange.");
-          activeSession = null;
+          activeSessions = [];
         } else {
-          activeSession = data;
+          activeSessions = data;
         }
       } catch (e) {
         afficherToast('Erreur réseau. Le serveur PHP est-il lancé ?');
-        activeSession = null;
+        activeSessions = [];
       }
-      renderSessionCard();
+      renderSessionCards();
       renderExchangePanel();
     }
 
@@ -585,25 +615,32 @@
 
     const STATUT_LABEL = { proposee: 'En attente', en_cours: 'En cours', terminee: 'Terminée', validee: 'Validée', annulee: 'Annulée' };
 
-    function renderSessionCard() {
-      const s = activeSession;
-      document.getElementById('btnDefinirSession').disabled = !!(s && ['proposee', 'en_cours', 'terminee'].includes(s.statut));
+    function renderSessionCards() {
+      // "Définir une session" reste toujours actif : on peut en proposer plusieurs à la fois.
+      document.getElementById('btnDefinirSession').disabled = false;
 
-      const existing = document.getElementById('sessionCardRow');
-      if (existing) existing.remove();
-      if (!s) return;
+      document.querySelectorAll('.session-card-row').forEach(el => el.remove());
+      if (activeSessions.length === 0) return;
 
       const body = document.getElementById('chatBody');
-      const wrap = document.createElement('div');
-      wrap.className = 'session-card-row';
-      wrap.id = 'sessionCardRow';
+      activeSessions.forEach(s => {
+        const wrap = document.createElement('div');
+        wrap.className = 'session-card-row';
+        wrap.id = 'sessionCardRow-' + s.idSession;
+        wrap.innerHTML = sessionCardHtml(s);
+        body.appendChild(wrap);
+      });
+      body.scrollTop = body.scrollHeight;
+    }
 
+    function sessionCardHtml(s) {
       const autreNom = estEnseignant(s) ? `${s.appPrenom} ${s.appNom}` : `${s.ensPrenom} ${s.ensNom}`;
+      const heuresTxt = `${s.nbHeures} h${s.nbHeures > 1 ? 'eures' : 'eure'}`;
 
       let inner = `<div class="session-card">
         <div class="session-card-head"><span>📅 ${escapeHtml(s.titre)}</span> <span class="sess-badge ${s.statut}">${STATUT_LABEL[s.statut] || s.statut}</span></div>
         <div class="sess-side">
-          <div class="sess-side-title">${escapeHtml(s.competence)} · ${s.coutHeure} 🪙/h</div>
+          <div class="sess-side-title">${escapeHtml(s.competence)} · ${heuresTxt} · ${s.coutHeure * s.nbHeures} 🪙</div>
           <div class="sess-side-meta">🗓 ${formatDate(s.dateSession)} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'} · avec ${escapeHtml(autreNom)}</div>
         </div>`;
 
@@ -617,7 +654,7 @@
         } else {
           inner += `<div class="sess-note">En attente de la réponse de ${escapeHtml(s.appPrenom)}.</div>
           <div class="sess-btn-row">
-            <button class="btn-session-edit" onclick="openEditSessionModal()">✏️ Modifier</button>
+            <button class="btn-session-edit" onclick="openEditSessionModal(${s.idSession})">✏️ Modifier</button>
             <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Supprimer</button>
           </div>`;
         }
@@ -629,7 +666,8 @@
           <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
         </div>`;
       } else if (s.statut === 'terminee' || s.statut === 'validee') {
-        inner += `<div class="sess-note ok">✓ Session terminée. ${escapeHtml(s.ensPrenom)} fait passer un QCM à ${escapeHtml(s.appPrenom)} — 100% requis pour valider.</div>
+        const heuresFinales = s.heuresReelles ?? s.nbHeures;
+        inner += `<div class="sess-note ok">✓ Session terminée (${heuresFinales} h). ${escapeHtml(s.ensPrenom)} fait passer un QCM à ${escapeHtml(s.appPrenom)} — 100% requis pour valider.</div>
         <div class="sess-btn-row">`;
         if (estEnseignant(s)) {
           inner += `<button class="btn-qcm pink" onclick="openCreateQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? 'QCM validé ✓' : 'Créer / modifier le QCM'}</button>`;
@@ -639,48 +677,85 @@
         }
         inner += `</div>`;
         if (s.qcmValide) {
-          inner += `<div class="sess-note success">🎉 QCM validé ! ${s.coutHeure} jeton${s.coutHeure > 1 ? 's' : ''} versé${s.coutHeure > 1 ? 's' : ''}.</div>
+          const jetonsVerses = s.coutHeure * heuresFinales;
+          inner += `<div class="sess-note success">🎉 QCM validé ! ${jetonsVerses} jeton${jetonsVerses > 1 ? 's' : ''} versé${jetonsVerses > 1 ? 's' : ''}.</div>
           <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${activeConv.idUser}'">⭐ Laisser un avis</button>`;
         } else if (s.qcmScore !== null && s.qcmScore !== undefined) {
           inner += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
         }
       } else if (s.statut === 'annulee') {
-        inner += `<div class="sess-note">Cette session a été refusée. Tu peux en définir une nouvelle.</div>`;
+        inner += `<div class="sess-note">Cette session a été refusée.</div>`;
       }
 
       inner += `</div>`;
-      wrap.innerHTML = inner;
-      body.appendChild(wrap);
-      body.scrollTop = body.scrollHeight;
+      return inner;
     }
 
     function renderExchangePanel() {
       const col = document.getElementById('exchangeCol');
       if (!activeConv) { col.innerHTML = ''; return; }
-      const s = activeSession;
 
       let html = `<h3>L'échange</h3><div class="exch-sub">Avec ${escapeHtml(activeConv.nom)}</div>`;
 
-      if (!s) {
+      if (activeSessions.length === 0) {
         html += `<div class="exch-cta">Clique sur 📅 <strong>Définir une session</strong> dans le chat pour proposer l'une de tes compétences.</div>`;
         col.innerHTML = html;
         return;
       }
 
-      const steps = [
-        { done: true, label: 'Session proposée' },
-        { done: ['en_cours', 'terminee', 'validee'].includes(s.statut), label: 'Acceptée' },
-        { done: ['terminee', 'validee'].includes(s.statut), label: 'Cours réalisé' },
-        { done: s.statut === 'validee', label: 'QCM validé · jeton versé' },
-      ];
-
       html += `<div class="exch-steps">`;
-      steps.forEach((st, i) => {
-        html += `<div class="exch-step ${st.done ? 'done' : ''}"><span class="exch-step-num">${st.done ? '✓' : i + 1}</span> ${st.label}</div>`;
+      activeSessions.forEach(s => {
+        html += `<div class="exch-step done" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${s.idSession}')?.scrollIntoView({behavior:'smooth', block:'center'})">
+          <span class="exch-step-num">${s.statut === 'validee' ? '✓' : '📅'}</span> ${escapeHtml(s.titre)} <span class="sess-badge ${s.statut}" style="margin-left:auto;">${STATUT_LABEL[s.statut] || s.statut}</span>
+        </div>`;
       });
       html += `</div>`;
 
       col.innerHTML = html;
+    }
+
+    /* ══════════════ TOUTES MES SESSIONS (enseignant·e ou apprenant·e) ══════════════ */
+    async function openMesSessionsModal() {
+      const zone = document.getElementById('mesSessionsListe');
+      zone.innerHTML = '<div class="mes-sessions-empty">Chargement…</div>';
+      document.getElementById('modalMesSessions').classList.add('visible');
+
+      try {
+        const rep = await fetch(`api/echanges.php?action=mesSessions&idUser=${user.idUser}`);
+        const data = await rep.json();
+        if (!rep.ok) {
+          zone.innerHTML = `<div class="mes-sessions-empty">${escapeHtml(data.erreur || 'Impossible de charger tes sessions.')}</div>`;
+          return;
+        }
+        if (data.length === 0) {
+          zone.innerHTML = '<div class="mes-sessions-empty">Aucune session pour l’instant.</div>';
+          return;
+        }
+        zone.innerHTML = data.map(s => {
+          const autreEstEnseignant = s.monRole === 'apprenant';
+          const autrePrenom = autreEstEnseignant ? s.ensPrenom : s.appPrenom;
+          const autreNomFam = autreEstEnseignant ? s.ensNom : s.appNom;
+          const autreNom = `${autrePrenom} ${autreNomFam}`;
+          const autreIdUser = autreEstEnseignant ? s.idEnseignant : s.idApprenant;
+          const init = initiales(autrePrenom, autreNomFam);
+          const av = avatarClass(autreIdUser);
+          return `<div class="mes-sessions-row" onclick="ouvrirSessionDepuisListe(${autreIdUser}, '${escapeHtml(autreNom).replace(/'/g, "\\'")}', '${init}', '${av}')">
+            <span class="mes-sessions-role ${s.monRole}">${s.monRole === 'enseignant' ? 'Enseigne' : 'Apprend'}</span>
+            <div class="mes-sessions-info">
+              <div class="mes-sessions-title">${escapeHtml(s.titre)}</div>
+              <div class="mes-sessions-meta">${escapeHtml(s.competence)} · avec ${escapeHtml(autreNom)} · 🗓 ${formatDate(s.dateSession)} · ${s.nbHeures} h</div>
+            </div>
+            <span class="sess-badge ${s.statut}">${STATUT_LABEL[s.statut] || s.statut}</span>
+          </div>`;
+        }).join('');
+      } catch (e) {
+        zone.innerHTML = '<div class="mes-sessions-empty">Erreur réseau.</div>';
+      }
+    }
+
+    function ouvrirSessionDepuisListe(idUser, nom, init, av) {
+      closeModal('modalMesSessions');
+      selectConversation(idUser, nom, init, av, null);
     }
 
     async function repondreSession(idSession, reponse) {
@@ -692,20 +767,30 @@
         const json = await rep.json();
         if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
         afficherToast(reponse === 'accepter' ? 'Session acceptée !' : 'Session refusée.');
-        chargerSession();
+        chargerSessions();
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
     async function confirmerFin(idSession) {
+      const s = activeSessions.find(x => x.idSession === idSession);
+      const payload = { idSession, idUser: user.idUser };
+
+      if (s && estEnseignant(s)) {
+        const reponse = prompt('Combien d\'heures a duré la session ?', s.nbHeures);
+        if (reponse === null) return; // annulé
+        const heuresReelles = Math.min(12, Math.max(1, parseInt(reponse, 10) || s.nbHeures));
+        payload.heuresReelles = heuresReelles;
+      }
+
       try {
         const rep = await fetch('api/echanges.php?action=confirmerFin', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idSession, idUser: user.idUser })
+          body: JSON.stringify(payload)
         });
         const json = await rep.json();
         if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
         afficherToast('Confirmation enregistrée.');
-        chargerSession();
+        chargerSessions();
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
@@ -719,7 +804,7 @@
         const json = await rep.json();
         if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
         afficherToast('Session annulée. Tu peux en définir une nouvelle.');
-        chargerSession();
+        chargerSessions();
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
@@ -762,13 +847,14 @@
       document.getElementById('sessDate').value = '';
       document.getElementById('sessDate').min = new Date().toISOString().slice(0, 10);
       document.getElementById('sessTime').value = '';
+      document.getElementById('sessHeures').value = 1;
       document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('selected'));
       document.querySelector('.fmt-btn[data-fmt="virtuel"]').classList.add('selected');
       document.getElementById('modalSession').classList.add('visible');
     }
 
-    function openEditSessionModal() {
-      const s = activeSession;
+    function openEditSessionModal(idSession) {
+      const s = activeSessions.find(x => x.idSession === idSession);
       if (!s || s.statut !== 'proposee' || !estEnseignant(s)) return;
 
       sessionEnModification = s.idSession;
@@ -782,6 +868,7 @@
       document.getElementById('sessDate').value = s.dateSession;
       document.getElementById('sessDate').min = new Date().toISOString().slice(0, 10);
       document.getElementById('sessTime').value = s.heureSession.slice(0, 5);
+      document.getElementById('sessHeures').value = s.nbHeures;
       document.querySelectorAll('.fmt-btn').forEach(b => b.classList.toggle('selected', b.dataset.fmt === s.format));
       document.getElementById('modalSession').classList.add('visible');
     }
@@ -804,6 +891,7 @@
       const titre = document.getElementById('sessTitle').value.trim();
       const date = document.getElementById('sessDate').value;
       const heure = document.getElementById('sessTime').value;
+      const nbHeures = Math.min(12, Math.max(1, parseInt(document.getElementById('sessHeures').value, 10) || 1));
       const fmtBtn = document.querySelector('.fmt-btn.selected');
       const skillChip = document.querySelector('#sessSkills .chip.selected');
 
@@ -820,7 +908,7 @@
         if (sessionEnModification) {
           rep = await fetch('api/echanges.php?action=modifier', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idSession: sessionEnModification, idUser: user.idUser, titre, date, heure, format: fmtBtn.dataset.fmt })
+            body: JSON.stringify({ idSession: sessionEnModification, idUser: user.idUser, titre, date, heure, nbHeures, format: fmtBtn.dataset.fmt })
           });
           json = await rep.json();
           if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
@@ -829,14 +917,14 @@
           const idEchange = mesCompetencesPourSession[skillChip.dataset.idx].idEchange;
           rep = await fetch('api/echanges.php?action=definir', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idEchange, idUser: user.idUser, idApprenant: activeConv.idUser, titre, date, heure, format: fmtBtn.dataset.fmt })
+            body: JSON.stringify({ idEchange, idUser: user.idUser, idApprenant: activeConv.idUser, titre, date, heure, nbHeures, format: fmtBtn.dataset.fmt })
           });
           json = await rep.json();
           if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
           afficherToast('Proposition envoyée !');
         }
         closeModal('modalSession');
-        chargerSession();
+        chargerSessions();
       } catch (e) {
         afficherToast('Erreur réseau.');
       } finally {
@@ -895,7 +983,7 @@
         if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
         closeModal('modalCreateQcm');
         afficherToast('QCM envoyé !');
-        chargerSession();
+        chargerSessions();
       } catch (e) {
         afficherToast('Erreur réseau.');
       } finally {
@@ -959,7 +1047,7 @@
         } else {
           afficherToast(`Score : ${json.correct}/${json.total} — il faut 100%, réessaie !`);
         }
-        chargerSession();
+        chargerSessions();
       } catch (e) {
         afficherToast('Erreur réseau.');
       } finally {

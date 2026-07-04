@@ -13,6 +13,7 @@ function erreur(int $code, string $message): void
 const SELECT_SESSION = '
     SELECT s.idSession, s.idEchange, s.idApprenant, s.titre, s.dateSession, s.heureSession,
            s.format, s.statut, s.confirmeEnseignant, s.confirmeApprenant, s.qcmValide, s.qcmScore,
+           s.nbHeures, s.heuresReelles,
            e.idUser AS idEnseignant, e.categorie, e.coutHeure,
            c.nom AS competence,
            ens.nomUser AS ensNom, ens.prenomUser AS ensPrenom,
@@ -23,6 +24,12 @@ const SELECT_SESSION = '
     JOIN USER ens ON ens.idUser = e.idUser
     JOIN USER app ON app.idUser = s.idApprenant
 ';
+
+function nbHeuresValide($v): int
+{
+    $n = (int) $v;
+    return $n >= 1 && $n <= 12 ? $n : 1;
+}
 
 $action = $_GET['action'] ?? '';
 
@@ -48,6 +55,9 @@ switch ($action) {
     case 'mesSessionsApprenant':
         mesSessionsApprenant($pdo);
         break;
+    case 'mesSessions':
+        mesSessions($pdo);
+        break;
     default:
         erreur(404, 'Action inconnue.');
 }
@@ -67,6 +77,7 @@ function definir(PDO $pdo): void
     $date        = trim((string) ($data['date'] ?? ''));
     $heure       = trim((string) ($data['heure'] ?? ''));
     $format      = ($data['format'] ?? 'virtuel') === 'presentiel' ? 'presentiel' : 'virtuel';
+    $nbHeures    = nbHeuresValide($data['nbHeures'] ?? 1);
 
     if ($idEchange <= 0 || $idEnseignant <= 0 || $idApprenant <= 0 || $titre === '' || $date === '' || $heure === '') {
         erreur(400, 'Tous les champs sont requis.');
@@ -88,10 +99,10 @@ function definir(PDO $pdo): void
 
     try {
         $stmt = $pdo->prepare(
-            'INSERT INTO SESSION_ECHANGE (idEchange, idApprenant, titre, dateSession, heureSession, format, statut)
-             VALUES (?, ?, ?, ?, ?, ?, \'proposee\')'
+            'INSERT INTO SESSION_ECHANGE (idEchange, idApprenant, titre, dateSession, heureSession, format, nbHeures, statut)
+             VALUES (?, ?, ?, ?, ?, ?, ?, \'proposee\')'
         );
-        $stmt->execute([$idEchange, $idApprenant, $titre, $date, $heure, $format]);
+        $stmt->execute([$idEchange, $idApprenant, $titre, $date, $heure, $format, $nbHeures]);
     } catch (PDOException $e) {
         erreur(500, 'Erreur base de données (definir) : ' . $e->getMessage());
     }
@@ -114,6 +125,7 @@ function modifier(PDO $pdo): void
     $date      = trim((string) ($data['date'] ?? ''));
     $heure     = trim((string) ($data['heure'] ?? ''));
     $format    = ($data['format'] ?? 'virtuel') === 'presentiel' ? 'presentiel' : 'virtuel';
+    $nbHeures  = nbHeuresValide($data['nbHeures'] ?? 1);
 
     if ($titre === '' || $date === '' || $heure === '') {
         erreur(400, 'Tous les champs sont requis.');
@@ -129,9 +141,9 @@ function modifier(PDO $pdo): void
 
     try {
         $stmt = $pdo->prepare(
-            'UPDATE SESSION_ECHANGE SET titre = ?, dateSession = ?, heureSession = ?, format = ? WHERE idSession = ?'
+            'UPDATE SESSION_ECHANGE SET titre = ?, dateSession = ?, heureSession = ?, format = ?, nbHeures = ? WHERE idSession = ?'
         );
-        $stmt->execute([$titre, $date, $heure, $format, $idSession]);
+        $stmt->execute([$titre, $date, $heure, $format, $nbHeures, $idSession]);
     } catch (PDOException $e) {
         erreur(500, 'Erreur base de données (modifier) : ' . $e->getMessage());
     }
@@ -215,8 +227,9 @@ function confirmerFin(PDO $pdo): void
     }
 
     if ((int) $session['idEnseignant'] === $idUser) {
-        $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET confirmeEnseignant = 1 WHERE idSession = ?');
-        $stmt->execute([$idSession]);
+        $heuresReelles = isset($data['heuresReelles']) ? nbHeuresValide($data['heuresReelles']) : (int) $session['nbHeures'];
+        $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET confirmeEnseignant = 1, heuresReelles = ? WHERE idSession = ?');
+        $stmt->execute([$heuresReelles, $idSession]);
     } elseif ((int) $session['idApprenant'] === $idUser) {
         $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET confirmeApprenant = 1 WHERE idSession = ?');
         $stmt->execute([$idSession]);
@@ -233,7 +246,8 @@ function confirmerFin(PDO $pdo): void
     echo json_encode(chargerSession($pdo, $idSession));
 }
 
-// La session la plus récente (non annulée) entre l'utilisateur connecté et un autre utilisateur
+// Toutes les sessions non annulées entre l'utilisateur connecté et un autre utilisateur
+// (plusieurs sessions actives à la fois sont permises)
 function pourConversation(PDO $pdo): void
 {
     $idUser  = (int) ($_GET['idUser'] ?? 0);
@@ -248,15 +262,33 @@ function pourConversation(PDO $pdo): void
             SELECT_SESSION . '
             WHERE ((e.idUser = ? AND s.idApprenant = ?) OR (e.idUser = ? AND s.idApprenant = ?))
               AND s.statut != \'annulee\'
-            ORDER BY s.dateCreation DESC
-            LIMIT 1'
+            ORDER BY s.dateCreation ASC'
         );
         $stmt->execute([$idUser, $idAutre, $idAutre, $idUser]);
-        $session = $stmt->fetch();
-
-        echo json_encode($session ?: null);
+        echo json_encode($stmt->fetchAll());
     } catch (PDOException $e) {
         erreur(500, 'Erreur base de données (pourConversation) : ' . $e->getMessage());
+    }
+}
+
+// Toutes les sessions de l'utilisateur connecté, comme enseignant·e ou comme apprenant·e
+function mesSessions(PDO $pdo): void
+{
+    $idUser = (int) ($_GET['idUser'] ?? 0);
+    if ($idUser <= 0) {
+        erreur(400, 'idUser requis.');
+    }
+
+    try {
+        $stmt = $pdo->prepare(SELECT_SESSION . ' WHERE e.idUser = ? OR s.idApprenant = ? ORDER BY s.dateCreation DESC');
+        $stmt->execute([$idUser, $idUser]);
+        $sessions = $stmt->fetchAll();
+        foreach ($sessions as &$s) {
+            $s['monRole'] = (int) $s['idEnseignant'] === $idUser ? 'enseignant' : 'apprenant';
+        }
+        echo json_encode($sessions);
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (mesSessions) : ' . $e->getMessage());
     }
 }
 

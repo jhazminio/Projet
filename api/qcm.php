@@ -163,22 +163,24 @@ function repondre(PDO $pdo): void
         $stmt->execute([$score, $idSession]);
 
         if ($score === 100) {
-            $cout = (int) $session['coutHeure'];
+            $heures = (int) ($session['heuresReelles'] ?? $session['nbHeures'] ?? 1);
+            $cout   = (int) $session['coutHeure'] * $heures;
 
             $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET qcmValide = 1, statut = \'validee\' WHERE idSession = ?');
             $stmt->execute([$idSession]);
 
+            $motifSuffixe = $heures > 1 ? " ({$heures}h)" : '';
             $stmt = $pdo->prepare('INSERT INTO JETON_HISTORIQUE (idUser, montant, motif, idSession) VALUES (?, ?, ?, ?)');
             $stmt->execute([
                 (int) $session['idEnseignant'],
                 $cout,
-                'Cours de ' . $session['competence'] . ' donné',
+                'Cours de ' . $session['competence'] . ' donné' . $motifSuffixe,
                 $idSession,
             ]);
             $stmt->execute([
                 (int) $session['idApprenant'],
                 -$cout,
-                'Cours de ' . $session['competence'] . ' reçu',
+                'Cours de ' . $session['competence'] . ' reçu' . $motifSuffixe,
                 $idSession,
             ]);
         }
