@@ -137,8 +137,28 @@
     /* Colonne chat */
     .chat-head { display: flex; align-items: center; gap: .8rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
     .chat-head .avatar-conv { box-shadow: 0 0 0 2px rgba(168,85,247,.35), 0 0 16px rgba(168,85,247,.3); }
-    .chat-head-name { font-size: 1rem; font-weight: 700; }
+    .chat-head-name { font-size: 1rem; font-weight: 700; flex: 1; }
     .chat-body { flex: 1; overflow-y: auto; padding: 1.2rem; display: flex; flex-direction: column; gap: .7rem; }
+
+    /* Cloche de notification des propositions / trocs */
+    @keyframes bellRing { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-14deg); } 30% { transform: rotate(11deg); } 45% { transform: rotate(-8deg); } 60% { transform: rotate(5deg); } 75% { transform: rotate(-2deg); } }
+    @keyframes badgePop { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .exch-bell {
+      position: relative; width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      font-size: 1.15rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: border-color .2s, background .2s;
+    }
+    .exch-bell:hover { border-color: var(--purple); }
+    .exch-bell.actif { background: linear-gradient(135deg, rgba(168,85,247,.18), rgba(236,72,153,.14)); border-color: var(--purple); }
+    .exch-bell.actif .exch-bell-icon { animation: bellRing 2.2s ease-in-out infinite; display: inline-block; }
+    .exch-bell-badge {
+      position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; border-radius: 99px;
+      background: linear-gradient(135deg, var(--purple), var(--pink)); color: #fff; font-size: .68rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; padding: 0 4px;
+      box-shadow: 0 0 10px rgba(236,72,153,.6), 0 0 0 2px var(--bg-card);
+      animation: badgePop .35s ease;
+    }
 
     .bubble-row { display: flex; animation: bubbleIn .3s ease both; }
     .bubble-row.me { justify-content: flex-end; }
@@ -427,6 +447,16 @@
     </div>
   </div>
 
+  <!-- ═══ MODAL : PROPOSITIONS & ÉCHANGES DE CETTE CONVERSATION ═══ -->
+  <div class="modal-overlay" id="modalExchange" onclick="closeModalOutside(event,'modalExchange')">
+    <div class="modal wide">
+      <button class="modal-close" onclick="closeModal('modalExchange')">✕</button>
+      <h2 id="exchModalTitle">Propositions & échanges</h2>
+      <p>Tout ce qui se passe entre vous deux, sans encombrer le fil de discussion.</p>
+      <div id="exchModalListe"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -530,7 +560,11 @@
       document.getElementById('chatFoot').style.display = 'flex';
       document.getElementById('chatHead').innerHTML = `
         <div class="avatar-conv ${av}" style="cursor:pointer;" onclick="window.location.href='utilisateur.html?id=${idUser}'">${avatarHtml(photo, init)}</div>
-        <div class="chat-head-name" style="cursor:pointer;" onclick="window.location.href='utilisateur.html?id=${idUser}'">${escapeHtml(nom)}</div>`;
+        <div class="chat-head-name" style="cursor:pointer;" onclick="window.location.href='utilisateur.html?id=${idUser}'">${escapeHtml(nom)}</div>
+        <button class="exch-bell" id="exchBell" onclick="openExchangeModal()" title="Propositions et échanges">
+          <span class="exch-bell-icon">🔄</span>
+          <span class="exch-bell-badge" id="exchBellBadge" style="display:none;">0</span>
+        </button>`;
       renderConvList();
       await chargerMessages();
       await chargerSessions();
@@ -657,27 +691,54 @@
       return { classe: 'terminee', label: 'QCM en attente' };
     }
 
+    let dernierBadgeCount = 0; // pour ne faire "sonner" la cloche que si le nombre augmente
+
+    // Une proposition/troc réclame ton attention tant qu'il n'est pas complètement terminé
+    function demandeAttention(g) {
+      if (g.type === 'troc') return !(g.mien.statut === 'validee' && g.autre.statut === 'validee');
+      return g.s.statut !== 'validee';
+    }
+
     function renderSessionCards() {
       // "Définir une session" reste toujours actif : on peut en proposer plusieurs à la fois.
       document.getElementById('btnDefinirSession').disabled = false;
 
-      document.querySelectorAll('.session-card-row').forEach(el => el.remove());
-      if (activeSessions.length === 0) return;
+      const groupes = grouperSessions();
+      const compte = groupes.filter(demandeAttention).length;
 
-      const body = document.getElementById('chatBody');
-      grouperSessions().forEach(g => {
-        const wrap = document.createElement('div');
-        wrap.className = 'session-card-row';
-        if (g.type === 'troc') {
-          wrap.id = 'sessionCardRow-' + g.mien.idSession;
-          wrap.innerHTML = pairedCardHtml(g.mien, g.autre);
+      const bell = document.getElementById('exchBell');
+      const badge = document.getElementById('exchBellBadge');
+      if (bell && badge) {
+        if (compte > 0) {
+          badge.textContent = compte;
+          badge.style.display = 'flex';
+          bell.classList.add('actif');
+          if (compte > dernierBadgeCount) {
+            badge.style.animation = 'none';
+            requestAnimationFrame(() => { badge.style.animation = 'badgePop .35s ease'; });
+          }
         } else {
-          wrap.id = 'sessionCardRow-' + g.s.idSession;
-          wrap.innerHTML = sessionCardHtml(g.s);
+          badge.style.display = 'none';
+          bell.classList.remove('actif');
         }
-        body.appendChild(wrap);
-      });
-      body.scrollTop = body.scrollHeight;
+      }
+      dernierBadgeCount = compte;
+
+      const zone = document.getElementById('exchModalListe');
+      if (zone) {
+        if (groupes.length === 0) {
+          zone.innerHTML = `<div class="mes-sessions-empty">Clique sur 📅 <strong>Définir une session</strong> dans le chat pour proposer l'une de tes compétences.</div>`;
+        } else {
+          zone.innerHTML = groupes.map(g => `<div class="session-card-row">${g.type === 'troc' ? pairedCardHtml(g.mien, g.autre) : sessionCardHtml(g.s)}</div>`).join('');
+        }
+      }
+    }
+
+    function openExchangeModal() {
+      if (!activeConv) return;
+      document.getElementById('exchModalTitle').textContent = `Propositions & échanges avec ${activeConv.nom}`;
+      renderSessionCards();
+      document.getElementById('modalExchange').classList.add('visible');
     }
 
     function pairedCardHtml(mien, autre) {
@@ -841,7 +902,6 @@
       }
 
       groupes.forEach(g => {
-        const idAncre = g.type === 'troc' ? g.mien.idSession : g.s.idSession;
         let headline, miniBox = '';
 
         if (g.type === 'troc') {
@@ -854,7 +914,7 @@
           miniBox = `<div class="exch-mini-box"><div class="exch-mini-label">${escapeHtml(g.s.ensPrenom)} enseigne</div><div class="exch-mini-title">${escapeHtml(g.s.competence)}</div><div class="exch-mini-meta">🗓 ${formatDate(g.s.dateSession)} · ${g.s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div></div>`;
         }
 
-        html += `<div class="exch-group" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${idAncre}')?.scrollIntoView({behavior:'smooth', block:'center'})">
+        html += `<div class="exch-group" style="cursor:pointer;" onclick="openExchangeModal()">
           <div class="exch-headline">${headline}</div>
           ${miniBox}
           <div class="exch-steps">`;
@@ -968,6 +1028,7 @@
 
     async function openSessionModal(idSessionReponsePour) {
       if (!activeConv) return;
+      closeModal('modalExchange');
       const propOriginale = idSessionReponsePour ? activeSessions.find(x => x.idSession === idSessionReponsePour) : null;
 
       try {
@@ -1018,6 +1079,7 @@
     function openEditSessionModal(idSession) {
       const s = activeSessions.find(x => x.idSession === idSession);
       if (!s || s.statut !== 'proposee' || !estEnseignant(s)) return;
+      closeModal('modalExchange');
 
       sessionEnModification = s.idSession;
       contrePropositionPour = null;
@@ -1111,6 +1173,7 @@
     }
 
     function openCreateQcm(idSession) {
+      closeModal('modalExchange');
       currentQcmSessionId = idSession;
       document.getElementById('createQcmTitle').textContent = `Crée ton QCM`;
       qcmBlockCounter = 0;
@@ -1158,6 +1221,7 @@
     let questionsCourantes = [];
 
     async function openAnswerQcm(idSession) {
+      closeModal('modalExchange');
       currentQcmSessionId = idSession;
       try {
         const rep = await fetch(`api/qcm.php?action=questions&idSession=${idSession}`);
