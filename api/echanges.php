@@ -30,6 +30,12 @@ switch ($action) {
     case 'definir':
         definir($pdo);
         break;
+    case 'modifier':
+        modifier($pdo);
+        break;
+    case 'annuler':
+        annuler($pdo);
+        break;
     case 'repondre':
         repondre($pdo);
         break;
@@ -93,6 +99,77 @@ function definir(PDO $pdo): void
     http_response_code(201);
     echo json_encode(['idSession' => (int) $pdo->lastInsertId()]);
 }
+
+// L'enseignant modifie une session tant qu'elle n'a pas encore été acceptée/refusée
+function modifier(PDO $pdo): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        erreur(405, 'Méthode non autorisée.');
+    }
+
+    $data      = json_decode(file_get_contents('php://input'), true) ?? [];
+    $idSession = (int) ($data['idSession'] ?? 0);
+    $idUser    = (int) ($data['idUser'] ?? 0);
+    $titre     = trim((string) ($data['titre'] ?? ''));
+    $date      = trim((string) ($data['date'] ?? ''));
+    $heure     = trim((string) ($data['heure'] ?? ''));
+    $format    = ($data['format'] ?? 'virtuel') === 'presentiel' ? 'presentiel' : 'virtuel';
+
+    if ($titre === '' || $date === '' || $heure === '') {
+        erreur(400, 'Tous les champs sont requis.');
+    }
+
+    $session = chargerSession($pdo, $idSession);
+    if (!estEnseignant($session, $idUser)) {
+        erreur(403, 'Seul·e la personne qui a proposé cette compétence peut modifier la session.');
+    }
+    if ($session['statut'] !== 'proposee') {
+        erreur(409, 'Cette session ne peut plus être modifiée.');
+    }
+
+    try {
+        $stmt = $pdo->prepare(
+            'UPDATE SESSION_ECHANGE SET titre = ?, dateSession = ?, heureSession = ?, format = ? WHERE idSession = ?'
+        );
+        $stmt->execute([$titre, $date, $heure, $format, $idSession]);
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (modifier) : ' . $e->getMessage());
+    }
+
+    echo json_encode(chargerSession($pdo, $idSession));
+}
+
+// L'enseignant ou l'apprenant annule une session pas encore terminée
+function annuler(PDO $pdo): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        erreur(405, 'Méthode non autorisée.');
+    }
+
+    $data      = json_decode(file_get_contents('php://input'), true) ?? [];
+    $idSession = (int) ($data['idSession'] ?? 0);
+    $idUser    = (int) ($data['idUser'] ?? 0);
+
+    $session = chargerSession($pdo, $idSession);
+    if (!estEnseignant($session, $idUser) && !estApprenant($session, $idUser)) {
+        erreur(403, 'Tu ne fais pas partie de cette session.');
+    }
+    if (!in_array($session['statut'], ['proposee', 'en_cours'], true)) {
+        erreur(409, 'Cette session ne peut plus être annulée.');
+    }
+
+    try {
+        $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = \'annulee\' WHERE idSession = ?');
+        $stmt->execute([$idSession]);
+    } catch (PDOException $e) {
+        erreur(500, 'Erreur base de données (annuler) : ' . $e->getMessage());
+    }
+
+    echo json_encode(chargerSession($pdo, $idSession));
+}
+
+function estEnseignant(array $session, int $idUser): bool { return (int) $session['idEnseignant'] === $idUser; }
+function estApprenant(array $session, int $idUser): bool { return (int) $session['idApprenant'] === $idUser; }
 
 // L'apprenant accepte ou refuse la session proposée
 function repondre(PDO $pdo): void

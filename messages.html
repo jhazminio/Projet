@@ -193,7 +193,10 @@
       background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
       padding: .6rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem; font-weight: 600; transition: opacity .2s;
     }
-    .btn-refuse { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: .6rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem; }
+    .btn-refuse { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: .6rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem; transition: border-color .2s, color .2s; }
+    .btn-refuse:hover { border-color: #f43f5e; color: #f43f5e; }
+    .btn-session-edit { background: transparent; border: 1px solid var(--border); color: var(--text); padding: .6rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem; transition: border-color .2s; }
+    .btn-session-edit:hover { border-color: var(--purple); }
     .btn-confirm.done { background: #0f5c4c; color: #6ee7b7; }
     .btn-qcm.pink { background: linear-gradient(135deg, #db2777, var(--pink)); }
     .btn-confirm:hover, .btn-qcm:hover, .btn-accept:hover { opacity: .88; }
@@ -328,11 +331,13 @@
   <div class="modal-overlay" id="modalSession" onclick="closeModalOutside(event,'modalSession')">
     <div class="modal">
       <button class="modal-close" onclick="closeModal('modalSession')">✕</button>
-      <h2>Définir une session</h2>
-      <p>Choisis la compétence que <strong>toi</strong> tu enseignes. La personne en face devra accepter.</p>
+      <h2 id="sessModalTitle">Définir une session</h2>
+      <p id="sessModalIntro">Choisis la compétence que <strong>toi</strong> tu enseignes. La personne en face devra accepter.</p>
 
-      <label class="field-label">Ta compétence (parmi tes publications)</label>
-      <div class="chip-row" id="sessSkills"></div>
+      <div id="sessSkillField">
+        <label class="field-label">Ta compétence (parmi tes publications)</label>
+        <div class="chip-row" id="sessSkills"></div>
+      </div>
 
       <label class="field-label">Titre de la session</label>
       <input type="text" id="sessTitle" oninput="this.dataset.userEdited='1'" />
@@ -610,13 +615,18 @@
             <button class="btn-refuse" onclick="repondreSession(${s.idSession}, 'refuser')">Refuser</button>
           </div>`;
         } else {
-          inner += `<div class="sess-note">En attente de la réponse de ${escapeHtml(s.appPrenom)}.</div>`;
+          inner += `<div class="sess-note">En attente de la réponse de ${escapeHtml(s.appPrenom)}.</div>
+          <div class="sess-btn-row">
+            <button class="btn-session-edit" onclick="openEditSessionModal()">✏️ Modifier</button>
+            <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Supprimer</button>
+          </div>`;
         }
       } else if (s.statut === 'en_cours') {
         const jaiConfirme = estEnseignant(s) ? s.confirmeEnseignant : s.confirmeApprenant;
         inner += `<div class="sess-note ok">Session <strong>en cours</strong>. Les deux doivent valider la fin du cours.</div>
         <div class="sess-btn-row">
           <button class="btn-confirm ${jaiConfirme ? 'done' : ''}" onclick="confirmerFin(${s.idSession})" ${jaiConfirme ? 'disabled' : ''}>${jaiConfirme ? '✓ Tu as confirmé' : 'Marquer la session comme terminée'}</button>
+          <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
         </div>`;
       } else if (s.statut === 'terminee' || s.statut === 'validee') {
         inner += `<div class="sess-note ok">✓ Session terminée. ${escapeHtml(s.ensPrenom)} fait passer un QCM à ${escapeHtml(s.appPrenom)} — 100% requis pour valider.</div>
@@ -699,8 +709,23 @@
       } catch (e) { afficherToast('Erreur réseau.'); }
     }
 
+    async function annulerSession(idSession) {
+      if (!confirm('Annuler cette session ? Cette action est définitive.')) return;
+      try {
+        const rep = await fetch('api/echanges.php?action=annuler', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idSession, idUser: user.idUser })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        afficherToast('Session annulée. Tu peux en définir une nouvelle.');
+        chargerSession();
+      } catch (e) { afficherToast('Erreur réseau.'); }
+    }
+
     /* ══════════════ DÉFINIR UNE SESSION ══════════════ */
     let mesCompetencesPourSession = [];
+    let sessionEnModification = null; // idSession en cours d'édition, ou null pour une nouvelle proposition
 
     async function openSessionModal() {
       if (!activeConv) return;
@@ -721,6 +746,12 @@
         return;
       }
 
+      sessionEnModification = null;
+      document.getElementById('sessModalTitle').textContent = 'Définir une session';
+      document.getElementById('sessModalIntro').textContent = 'Choisis la compétence que toi tu enseignes. La personne en face devra accepter.';
+      document.getElementById('sessSkillField').style.display = '';
+      document.getElementById('btnEnvoyerSession').textContent = 'Envoyer la proposition';
+
       document.getElementById('sessSkills').innerHTML = mesCompetencesPourSession.map((c, i) =>
         `<span class="chip" data-idx="${i}" onclick="selectSessSkill(this)">${escapeHtml(c.competence)} <small>· ${c.coutHeure} 🪙/h</small></span>`
       ).join('');
@@ -733,6 +764,25 @@
       document.getElementById('sessTime').value = '';
       document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('selected'));
       document.querySelector('.fmt-btn[data-fmt="virtuel"]').classList.add('selected');
+      document.getElementById('modalSession').classList.add('visible');
+    }
+
+    function openEditSessionModal() {
+      const s = activeSession;
+      if (!s || s.statut !== 'proposee' || !estEnseignant(s)) return;
+
+      sessionEnModification = s.idSession;
+      document.getElementById('sessModalTitle').textContent = 'Modifier la session';
+      document.getElementById('sessModalIntro').textContent = `Ajuste les détails de la session « ${s.competence} ».`;
+      document.getElementById('sessSkillField').style.display = 'none';
+      document.getElementById('btnEnvoyerSession').textContent = 'Enregistrer les modifications';
+
+      document.getElementById('sessTitle').value = s.titre;
+      document.getElementById('sessTitle').dataset.userEdited = '1';
+      document.getElementById('sessDate').value = s.dateSession;
+      document.getElementById('sessDate').min = new Date().toISOString().slice(0, 10);
+      document.getElementById('sessTime').value = s.heureSession.slice(0, 5);
+      document.querySelectorAll('.fmt-btn').forEach(b => b.classList.toggle('selected', b.dataset.fmt === s.format));
       document.getElementById('modalSession').classList.add('visible');
     }
 
@@ -751,30 +801,41 @@
     }
 
     async function envoyerProposition() {
-      const skillChip = document.querySelector('#sessSkills .chip.selected');
       const titre = document.getElementById('sessTitle').value.trim();
       const date = document.getElementById('sessDate').value;
       const heure = document.getElementById('sessTime').value;
       const fmtBtn = document.querySelector('.fmt-btn.selected');
+      const skillChip = document.querySelector('#sessSkills .chip.selected');
 
-      if (!skillChip || !titre || !date || !heure || !fmtBtn) {
+      if (!titre || !date || !heure || !fmtBtn || (!sessionEnModification && !skillChip)) {
         afficherToast('Complète tous les champs pour envoyer la proposition.');
         return;
       }
 
-      const idEchange = mesCompetencesPourSession[skillChip.dataset.idx].idEchange;
       const btn = document.getElementById('btnEnvoyerSession');
       btn.disabled = true;
 
       try {
-        const rep = await fetch('api/echanges.php?action=definir', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idEchange, idUser: user.idUser, idApprenant: activeConv.idUser, titre, date, heure, format: fmtBtn.dataset.fmt })
-        });
-        const json = await rep.json();
-        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        let rep, json;
+        if (sessionEnModification) {
+          rep = await fetch('api/echanges.php?action=modifier', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idSession: sessionEnModification, idUser: user.idUser, titre, date, heure, format: fmtBtn.dataset.fmt })
+          });
+          json = await rep.json();
+          if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+          afficherToast('Session modifiée !');
+        } else {
+          const idEchange = mesCompetencesPourSession[skillChip.dataset.idx].idEchange;
+          rep = await fetch('api/echanges.php?action=definir', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idEchange, idUser: user.idUser, idApprenant: activeConv.idUser, titre, date, heure, format: fmtBtn.dataset.fmt })
+          });
+          json = await rep.json();
+          if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+          afficherToast('Proposition envoyée !');
+        }
         closeModal('modalSession');
-        afficherToast('Proposition envoyée !');
         chargerSession();
       } catch (e) {
         afficherToast('Erreur réseau.');
