@@ -38,6 +38,26 @@ const NOTE_SUBQUERY = '
        WHERE s.idEchange = e.idEchange AND s.statut = \'validee\') AS nbEchanges
 ';
 
+// PDO (préparations émulées, activées par défaut) renvoie les colonnes en chaînes de
+// caractères, ce qui casse les comparaisons strictes et les tests numériques côté JS.
+function normaliserEchange(array $e): array
+{
+    foreach (['idEchange', 'coutHeure', 'idUser', 'idCompetences', 'nbAvis', 'nbEchanges'] as $champ) {
+        if (isset($e[$champ])) {
+            $e[$champ] = (int) $e[$champ];
+        }
+    }
+    if (array_key_exists('noteMoyenne', $e) && $e['noteMoyenne'] !== null) {
+        $e['noteMoyenne'] = (float) $e['noteMoyenne'];
+    }
+    return $e;
+}
+
+function normaliserEchanges(array $echanges): array
+{
+    return array_map('normaliserEchange', $echanges);
+}
+
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
@@ -76,7 +96,7 @@ function liste(PDO $pdo): void
          JOIN COMPETENCES c ON c.idCompetences = e.idComp
          ORDER BY e.dateEchange DESC'
     );
-    echo json_encode($stmt->fetchAll());
+    echo json_encode(normaliserEchanges($stmt->fetchAll()));
 }
 
 // Détail d'une compétence publiée précise (utilisé pour définir une session)
@@ -104,7 +124,7 @@ function detail(PDO $pdo): void
         erreur(404, 'Compétence introuvable.');
     }
 
-    echo json_encode($row);
+    echo json_encode(normaliserEchange($row));
 }
 
 // Compétences publiées par un utilisateur précis (pour Mon profil / profil public)
@@ -126,7 +146,7 @@ function mesCompetences(PDO $pdo): void
          ORDER BY e.dateEchange DESC'
     );
     $stmt->execute([$idUser]);
-    echo json_encode($stmt->fetchAll());
+    echo json_encode(normaliserEchanges($stmt->fetchAll()));
 }
 
 function trouverOuCreerCompetence(PDO $pdo, string $nom): int
