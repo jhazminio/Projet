@@ -72,12 +72,48 @@
     }
     .btn-back:hover { border-color: var(--purple); }
 
-    .layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; max-width: 1100px; }
+    .layout {
+      display: grid; grid-template-columns: 1fr 380px; gap: 1.8rem;
+      max-width: 1280px; margin: 0 auto; position: relative;
+    }
+
+    /* Halos décoratifs immersifs derrière le contenu */
+    .layout::before, .layout::after {
+      content: ''; position: absolute; z-index: -1; border-radius: 50%; pointer-events: none;
+    }
+    .layout::before {
+      top: -120px; left: -10%; width: 460px; height: 460px;
+      background: radial-gradient(circle, rgba(168,85,247,.22) 0%, transparent 70%);
+    }
+    .layout::after {
+      bottom: -160px; right: -5%; width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(236,72,153,.18) 0%, transparent 70%);
+    }
 
     .main-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
 
-    .thumb { height: 220px; display: flex; align-items: center; justify-content: center; position: relative; }
-    .thumb-icon { font-size: 5rem; }
+    .thumb { height: 260px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .thumb::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background-image: radial-gradient(rgba(255,255,255,.09) 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
+    }
+    .thumb-icon { font-size: 5.5rem; filter: drop-shadow(0 6px 18px rgba(0,0,0,.35)); }
+
+    .floating-rating {
+      position: absolute; top: 1rem; right: 1rem; z-index: 2;
+      background: rgba(13,11,26,.55); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.15); border-radius: 99px;
+      padding: .45rem .9rem; font-size: .82rem; font-weight: 700; color: #fbbf24;
+    }
+
+    .floating-cost {
+      position: absolute; bottom: 1rem; left: 1rem; z-index: 2;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 10px; padding: .5rem 1rem; font-size: .85rem; font-weight: 700;
+      box-shadow: 0 10px 28px rgba(168,85,247,.4);
+      display: flex; align-items: center; gap: .35rem;
+    }
 
     .thumb.Musique       { background: linear-gradient(135deg, #3a1c71, #6a0572); }
     .thumb.Programmation { background: linear-gradient(135deg, #0f0c29, #302b63); }
@@ -119,28 +155,49 @@
 
     .description { font-size: .92rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.6rem; }
 
-    .info-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; }
-    .info-chip { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1rem; }
+    .info-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .info-chip {
+      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.1rem 1.1rem 1rem; position: relative; overflow: hidden; transition: border-color .2s, transform .2s;
+    }
+    .info-chip:hover { border-color: var(--purple); transform: translateY(-2px); }
+    .info-chip::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(180deg, var(--purple), var(--cyan));
+    }
+    .info-chip .icon { font-size: 1.3rem; display: block; margin-bottom: .5rem; }
     .info-chip .label { font-size: .85rem; font-weight: 700; margin-bottom: .3rem; }
     .info-chip .sub { font-size: .76rem; color: var(--text-muted); line-height: 1.4; }
 
     /* ── Colonne de droite ── */
-    .side-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; height: fit-content; }
+    .side-col {
+      background: linear-gradient(160deg, var(--bg-card), var(--bg-card2));
+      border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; height: fit-content;
+      position: relative; overflow: hidden;
+    }
+    .side-col::before {
+      content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(34,211,238,.16) 0%, transparent 70%); pointer-events: none;
+    }
 
-    .author-block { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 1.4rem; cursor: pointer; }
+    .author-block { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 1.4rem; cursor: pointer; position: relative; z-index: 1; }
     .author-avatar {
-      width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #7c3aed, #a855f7);
-      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem;
-      margin-bottom: .8rem; overflow: hidden;
+      width: 68px; height: 68px; border-radius: 18px; background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.35rem;
+      margin-bottom: .8rem; overflow: hidden; box-shadow: 0 0 0 3px rgba(168,85,247,.25);
     }
     .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .author-name { font-size: 1rem; font-weight: 700; }
     .author-name:hover { color: var(--purple-light); }
     .author-sub { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
 
-    .cost-box { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: center; margin-bottom: 1.2rem; }
+    .cost-box {
+      background: linear-gradient(135deg, rgba(168,85,247,.18), rgba(236,72,153,.12));
+      border: 1px solid rgba(168,85,247,.3); border-radius: 12px; padding: 1.2rem; text-align: center;
+      margin-bottom: 1.2rem; position: relative; z-index: 1;
+    }
     .cost-box .bal-label { font-size: .78rem; color: var(--text-muted); margin-bottom: .4rem; }
-    .cost-box .bal-amount { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: .4rem; }
+    .cost-box .bal-amount { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: .4rem; }
 
     .btn-primary {
       width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
@@ -215,6 +272,12 @@
       Photographie: '<span class="thumb-icon">📷</span>',
       Dessin: '<span class="thumb-icon">✏️</span>',
       Autre: '<span class="thumb-icon">✨</span>',
+    };
+
+    const FORMAT_LABELS = {
+      virtuel: { label: '💻 En visio', sub: 'Sessions à distance uniquement' },
+      presentiel: { label: '📍 Sur le campus', sub: 'Sessions en présentiel uniquement' },
+      les_deux: { label: '💻📍 Visio ou campus', sub: "Au choix selon ce qui arrange les deux" },
     };
 
     function escapeHtml(str) {
@@ -298,18 +361,36 @@
 
         document.title = `SkillSwap – ${item.competence}`;
 
+        const fmt = FORMAT_LABELS[item.format] || FORMAT_LABELS.virtuel;
+
         conteneur.innerHTML = `
           <div class="main-col">
-            <div class="thumb ${cat}">${CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre}</div>
+            <div class="thumb ${cat}">
+              ${CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre}
+              <div class="floating-rating">${ratingTxt}</div>
+              <div class="floating-cost">🪙 ${item.coutHeure} jeton${item.coutHeure > 1 ? 's' : ''}/h</div>
+            </div>
             <div class="content">
               <span class="cat-badge">${escapeHtml(cat)}</span>
               <h1>${escapeHtml(item.competence)}</h1>
-              <div class="meta-line">${ratingTxt} · ${item.nbEchanges} échange${item.nbEchanges === 1 ? '' : 's'} réalisé${item.nbEchanges === 1 ? '' : 's'}</div>
+              <div class="meta-line">${item.nbEchanges} échange${item.nbEchanges === 1 ? '' : 's'} réalisé${item.nbEchanges === 1 ? '' : 's'} avec cette compétence</div>
               <p class="description">${item.description ? escapeHtml(item.description) : "Aucune description fournie pour l'instant."}</p>
               <div class="info-chips">
-                <div class="info-chip"><div class="label">1h / séance</div><div class="sub">en visio ou sur le campus</div></div>
-                <div class="info-chip"><div class="label">Format libre</div><div class="sub">virtuel ou présentiel, à définir</div></div>
-                <div class="info-chip"><div class="label">${item.coutHeure} jeton${item.coutHeure > 1 ? 's' : ''}</div><div class="sub">rendu en donnant à ton tour</div></div>
+                <div class="info-chip">
+                  <span class="icon">🗓️</span>
+                  <div class="label">1h / séance</div>
+                  <div class="sub">${fmt.label}</div>
+                </div>
+                <div class="info-chip">
+                  <span class="icon">🎁</span>
+                  <div class="label">Support inclus</div>
+                  <div class="sub">${item.support ? escapeHtml(item.support) : 'Aucun support précisé pour l’instant'}</div>
+                </div>
+                <div class="info-chip">
+                  <span class="icon">🪙</span>
+                  <div class="label">${item.coutHeure} jeton${item.coutHeure > 1 ? 's' : ''}</div>
+                  <div class="sub">rendu en donnant à ton tour</div>
+                </div>
               </div>
             </div>
           </div>

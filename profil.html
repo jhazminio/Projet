@@ -492,8 +492,14 @@
       <label class="field-label">Catégorie</label>
       <div class="cat-row" id="catRow"></div>
 
+      <label class="field-label">Format</label>
+      <div class="cost-row" id="formatRow"></div>
+
       <label class="field-label">Description / informations utiles</label>
       <textarea id="inputDescription" rows="3" placeholder="Niveau, déroulé d'une séance, ce que l'autre apprendra, supports fournis…"></textarea>
+
+      <label class="field-label">Support inclus</label>
+      <input type="text" id="inputSupport" maxlength="150" placeholder="Ex. : exercices & ressources fournis" />
 
       <label class="field-label">Coût par heure</label>
       <div class="cost-row" id="costRow"></div>
@@ -646,7 +652,10 @@
 
     let catSelectionnee = 'Musique';
     let coutSelectionne = 1;
+    let formatSelectionne = 'virtuel';
     let idEchangeEnEdition = null;
+
+    const FORMAT_LABELS = { virtuel: '💻 Virtuel', presentiel: '📍 Présentiel', les_deux: '🔀 Les deux' };
 
     function initCatRow() {
       document.getElementById('catRow').innerHTML = CATEGORIES.map(c =>
@@ -654,6 +663,9 @@
       ).join('');
       document.getElementById('costRow').innerHTML = [1, 2, 3].map(n =>
         `<button type="button" class="cost-btn" data-cost="${n}" onclick="choisirCout(${n})">${n} 🪙</button>`
+      ).join('');
+      document.getElementById('formatRow').innerHTML = Object.keys(FORMAT_LABELS).map(f =>
+        `<button type="button" class="cost-btn" data-format="${f}" onclick="choisirFormat('${f}')">${FORMAT_LABELS[f]}</button>`
       ).join('');
     }
 
@@ -667,7 +679,12 @@
 
     function choisirCout(n) {
       coutSelectionne = n;
-      document.querySelectorAll('.cost-btn').forEach(b => b.classList.toggle('selected', Number(b.dataset.cost) === n));
+      document.querySelectorAll('.cost-btn[data-cost]').forEach(b => b.classList.toggle('selected', Number(b.dataset.cost) === n));
+    }
+
+    function choisirFormat(f) {
+      formatSelectionne = f;
+      document.querySelectorAll('.cost-btn[data-format]').forEach(b => b.classList.toggle('selected', b.dataset.format === f));
     }
 
     function ouvrirPublier() {
@@ -676,8 +693,10 @@
       document.getElementById('btnPublier').textContent = 'Publier ma compétence';
       document.getElementById('inputTitre').value = '';
       document.getElementById('inputDescription').value = '';
+      document.getElementById('inputSupport').value = '';
       choisirCategorie('Musique');
       choisirCout(1);
+      choisirFormat('virtuel');
       document.getElementById('modalPublier').classList.add('visible');
     }
 
@@ -687,21 +706,24 @@
       document.getElementById('btnPublier').textContent = 'Enregistrer les modifications';
       document.getElementById('inputTitre').value = item.competence;
       document.getElementById('inputDescription').value = item.description || '';
+      document.getElementById('inputSupport').value = item.support || '';
       choisirCategorie(item.categorie || 'Autre');
       choisirCout(item.coutHeure || 1);
+      choisirFormat(item.format || 'virtuel');
       document.getElementById('modalPublier').classList.add('visible');
     }
 
     async function soumettrePublication() {
       const nom = document.getElementById('inputTitre').value.trim();
       const description = document.getElementById('inputDescription').value.trim();
+      const support = document.getElementById('inputSupport').value.trim();
       if (!nom) { afficherToast('Indique le titre de la compétence.'); return; }
 
       const btn = document.getElementById('btnPublier');
       btn.disabled = true;
 
       const action = idEchangeEnEdition ? 'modifier' : 'publier';
-      const body = { idUser: user.idUser, nom, categorie: catSelectionnee, description, coutHeure: coutSelectionne };
+      const body = { idUser: user.idUser, nom, categorie: catSelectionnee, description, coutHeure: coutSelectionne, format: formatSelectionne, support };
       if (idEchangeEnEdition) body.idEchange = idEchangeEnEdition;
 
       try {
