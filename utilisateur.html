@@ -59,12 +59,6 @@
 
     .main { margin-left: 180px; flex: 1; padding: 2rem 3rem; }
 
-    .theme-pill { display: flex; align-items: center; gap: .6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 99px; padding: .4rem .9rem; font-size: .68rem; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; }
-    .theme-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
-    .theme-dot.d1 { background: var(--purple); }
-    .theme-dot.d2 { background: var(--pink); }
-    .theme-dot.d3 { background: var(--cyan); }
-
     .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.6rem; }
 
     .btn-back {
@@ -160,7 +154,6 @@
   <main class="main">
     <div class="top-bar">
       <button class="btn-back" onclick="history.back()">← Retour</button>
-      <div class="theme-pill">Theme <span class="theme-dot d1"></span><span class="theme-dot d2"></span><span class="theme-dot d3"></span></div>
     </div>
 
     <div class="wrap" id="wrap">
@@ -248,14 +241,18 @@
           fetch(`api/avis.php?action=statsUtilisateur&idUser=${idProfil}`),
           fetch(`api/avis.php?action=pourUtilisateur&idUser=${idProfil}`),
         ]);
-        const competences = await competencesRes.json();
-        const stats = await statsRes.json();
-        const avisListe = await avisRes.json();
+        const competencesData = await competencesRes.json();
+        const statsData = await statsRes.json();
+        const avisData = await avisRes.json();
 
-        if (competences.length === 0 && !competencesRes.ok) {
-          wrap.innerHTML = `<div class="empty-page">${escapeHtml(competences.erreur || 'Profil introuvable.')}</div>`;
+        if (!competencesRes.ok) {
+          wrap.innerHTML = `<div class="empty-page">${escapeHtml(competencesData.erreur || 'Profil introuvable.')}</div>`;
           return;
         }
+
+        const competences = competencesData;
+        const stats = statsRes.ok ? statsData : { moyenne: 0, totalAvis: 0, totalEchanges: 0 };
+        const avisListe = avisRes.ok ? avisData : [];
 
         // Infos de base déduites des compétences publiées (pas d'endpoint dédié "utilisateur")
         const premiere = competences[0];
@@ -337,6 +334,7 @@
       try {
         const rep = await fetch(`api/avis.php?action=sessionsAEvaluer&idUser=${moi.idUser}`);
         const sessions = await rep.json();
+        if (!rep.ok) return;
         sessionAEvaluer = sessions.find(s => String(s.idAutre) === String(idProfil));
 
         if (!sessionAEvaluer) return;
