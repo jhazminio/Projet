@@ -164,25 +164,52 @@ function repondre(PDO $pdo): void
 
         if ($score === 100) {
             $heures = (int) ($session['heuresReelles'] ?? $session['nbHeures'] ?? 1);
-            $cout   = (int) $session['coutHeure'] * $heures;
+            $idMiroir = !empty($session['idSessionMiroir']) ? (int) $session['idSessionMiroir'] : null;
 
-            $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET qcmValide = 1, statut = \'validee\' WHERE idSession = ?');
+            $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET qcmValide = 1 WHERE idSession = ?');
             $stmt->execute([$idSession]);
 
-            $motifSuffixe = $heures > 1 ? " ({$heures}h)" : '';
-            $stmt = $pdo->prepare('INSERT INTO JETON_HISTORIQUE (idUser, montant, motif, idSession) VALUES (?, ?, ?, ?)');
-            $stmt->execute([
-                (int) $session['idEnseignant'],
-                $cout,
-                'Cours de ' . $session['competence'] . ' donné' . $motifSuffixe,
-                $idSession,
-            ]);
-            $stmt->execute([
-                (int) $session['idApprenant'],
-                -$cout,
-                'Cours de ' . $session['competence'] . ' reçu' . $motifSuffixe,
-                $idSession,
-            ]);
+            if ($idMiroir) {
+                // Vrai troc : jetons versés aux DEUX (chacun gagne pour avoir enseigné, personne ne paie)
+                // seulement une fois que les DEUX QCM sont validés à 100%.
+                $miroir = chargerSession($pdo, $idMiroir);
+
+                if ($miroir['qcmValide']) {
+                    $heuresMiroir = (int) ($miroir['heuresReelles'] ?? $miroir['nbHeures'] ?? 1);
+
+                    $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = \'validee\' WHERE idSession IN (?, ?)');
+                    $stmt->execute([$idSession, $idMiroir]);
+
+                    $suffixe = $heures > 1 ? " ({$heures}h)" : '';
+                    $suffixeMiroir = $heuresMiroir > 1 ? " ({$heuresMiroir}h)" : '';
+
+                    $stmt = $pdo->prepare('INSERT INTO JETON_HISTORIQUE (idUser, montant, motif, idSession) VALUES (?, ?, ?, ?)');
+                    $stmt->execute([(int) $session['idEnseignant'], $heures, 'Troc : ' . $session['competence'] . ' enseigné' . $suffixe, $idSession]);
+                    $stmt->execute([(int) $miroir['idEnseignant'], $heuresMiroir, 'Troc : ' . $miroir['competence'] . ' enseigné' . $suffixeMiroir, $idMiroir]);
+                }
+                // Sinon : ce côté est validé, on attend que l'autre passe aussi son QCM à 100%.
+            } else {
+                // Session isolée (pas de troc en face) : modèle classique, coût en jetons de la compétence
+                $cout = (int) $session['coutHeure'] * $heures;
+
+                $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = \'validee\' WHERE idSession = ?');
+                $stmt->execute([$idSession]);
+
+                $motifSuffixe = $heures > 1 ? " ({$heures}h)" : '';
+                $stmt = $pdo->prepare('INSERT INTO JETON_HISTORIQUE (idUser, montant, motif, idSession) VALUES (?, ?, ?, ?)');
+                $stmt->execute([
+                    (int) $session['idEnseignant'],
+                    $cout,
+                    'Cours de ' . $session['competence'] . ' donné' . $motifSuffixe,
+                    $idSession,
+                ]);
+                $stmt->execute([
+                    (int) $session['idApprenant'],
+                    -$cout,
+                    'Cours de ' . $session['competence'] . ' reçu' . $motifSuffixe,
+                    $idSession,
+                ]);
+            }
         }
 
         $pdo->commit();

@@ -268,6 +268,10 @@
     .mes-sessions-meta { font-size: .76rem; color: var(--text-muted); }
     .mes-sessions-empty { color: var(--text-muted); font-size: .85rem; padding: 1rem 0; text-align: center; }
 
+    .pair-card .session-card-head span:first-child { background: linear-gradient(135deg, var(--purple-light), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+    .pair-sub { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: .8rem .9rem; display: flex; flex-direction: column; gap: .6rem; }
+    .pair-sub-label { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--purple-light); }
+
     .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1728; border: 1px solid #a855f7; color: #f1f0f5; padding: .75rem 1.5rem; border-radius: 99px; font-size: .86rem; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; max-width: 90vw; text-align: center; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -615,6 +619,35 @@
 
     const STATUT_LABEL = { proposee: 'En attente', en_cours: 'En cours', terminee: 'Terminée', validee: 'Validée', annulee: 'Annulée' };
 
+    // Regroupe les sessions actives en trocs (paire enseigner ⇌ apprendre) et sessions isolées
+    function grouperSessions() {
+      const groupes = [];
+      const traitees = new Set();
+      activeSessions.forEach(s => {
+        if (traitees.has(s.idSession)) return;
+        traitees.add(s.idSession);
+        if (s.idSessionMiroir) {
+          const miroir = activeSessions.find(x => x.idSession === s.idSessionMiroir);
+          if (miroir) {
+            traitees.add(miroir.idSession);
+            const mien = estEnseignant(s) ? s : miroir;
+            const autre = estEnseignant(s) ? miroir : s;
+            groupes.push({ type: 'troc', mien, autre });
+            return;
+          }
+        }
+        groupes.push({ type: 'solo', s });
+      });
+      return groupes;
+    }
+
+    function badgeTroc(mien, autre) {
+      if (mien.statut === 'validee' && autre.statut === 'validee') return { classe: 'validee', label: 'Terminé ✓' };
+      if (mien.statut === 'proposee' || autre.statut === 'proposee') return { classe: 'proposee', label: 'En attente' };
+      if (mien.statut === 'en_cours' || autre.statut === 'en_cours') return { classe: 'en_cours', label: 'En cours' };
+      return { classe: 'terminee', label: 'QCM en attente' };
+    }
+
     function renderSessionCards() {
       // "Définir une session" reste toujours actif : on peut en proposer plusieurs à la fois.
       document.getElementById('btnDefinirSession').disabled = false;
@@ -623,14 +656,88 @@
       if (activeSessions.length === 0) return;
 
       const body = document.getElementById('chatBody');
-      activeSessions.forEach(s => {
+      grouperSessions().forEach(g => {
         const wrap = document.createElement('div');
         wrap.className = 'session-card-row';
-        wrap.id = 'sessionCardRow-' + s.idSession;
-        wrap.innerHTML = sessionCardHtml(s);
+        if (g.type === 'troc') {
+          wrap.id = 'sessionCardRow-' + g.mien.idSession;
+          wrap.innerHTML = pairedCardHtml(g.mien, g.autre);
+        } else {
+          wrap.id = 'sessionCardRow-' + g.s.idSession;
+          wrap.innerHTML = sessionCardHtml(g.s);
+        }
         body.appendChild(wrap);
       });
       body.scrollTop = body.scrollHeight;
+    }
+
+    function pairedCardHtml(mien, autre) {
+      const badge = badgeTroc(mien, autre);
+      let inner = `<div class="session-card pair-card">
+        <div class="session-card-head"><span>🔄 Troc : ${escapeHtml(mien.competence)} ⇌ ${escapeHtml(autre.competence)}</span> <span class="sess-badge ${badge.classe}">${badge.label}</span></div>
+        <div class="pair-sub">
+          <div class="pair-sub-label">Toi, tu enseignes</div>
+          ${subSessionHtml(mien, true)}
+        </div>
+        <div class="pair-sub">
+          <div class="pair-sub-label">${escapeHtml(autre.ensPrenom)} enseigne</div>
+          ${subSessionHtml(autre, false)}
+        </div>`;
+
+      if (mien.statut === 'validee' && autre.statut === 'validee') {
+        const mesJetons = mien.heuresReelles ?? mien.nbHeures;
+        const sesJetons = autre.heuresReelles ?? autre.nbHeures;
+        inner += `<div class="sess-note success">🎉 Troc complété ! Tu as gagné ${mesJetons} jeton${mesJetons > 1 ? 's' : ''}, ${escapeHtml(autre.ensPrenom)} a gagné ${sesJetons} jeton${sesJetons > 1 ? 's' : ''}.</div>
+        <button class="btn-qcm" onclick="window.location.href='utilisateur.html?id=${activeConv.idUser}'">⭐ Laisser un avis</button>`;
+      }
+
+      inner += `</div>`;
+      return inner;
+    }
+
+    function subSessionHtml(s, cestMoiQuiEnseigne) {
+      const heuresTxt = `${s.nbHeures} h${s.nbHeures > 1 ? 'eures' : 'eure'}`;
+      let html = `<div class="sess-side">
+        <div class="sess-side-title">${escapeHtml(s.titre)} · ${heuresTxt}</div>
+        <div class="sess-side-meta">🗓 ${formatDate(s.dateSession)} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'}</div>
+      </div>`;
+
+      if (s.statut === 'proposee') {
+        if (cestMoiQuiEnseigne) {
+          html += `<div class="sess-note">En attente de la réponse de ${escapeHtml(s.appPrenom)}.</div>
+          <div class="sess-btn-row">
+            <button class="btn-session-edit" onclick="openEditSessionModal(${s.idSession})">✏️ Modifier</button>
+            <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Supprimer</button>
+          </div>`;
+        } else {
+          html += `<div class="sess-btn-row">
+            <button class="btn-accept" onclick="repondreSession(${s.idSession}, 'accepter')">Accepter</button>
+            <button class="btn-refuse" onclick="repondreSession(${s.idSession}, 'refuser')">Refuser</button>
+          </div>`;
+        }
+      } else if (s.statut === 'en_cours') {
+        const jaiConfirme = cestMoiQuiEnseigne ? s.confirmeEnseignant : s.confirmeApprenant;
+        html += `<div class="sess-btn-row">
+          <button class="btn-confirm ${jaiConfirme ? 'done' : ''}" onclick="confirmerFin(${s.idSession})" ${jaiConfirme ? 'disabled' : ''}>${jaiConfirme ? '✓ Tu as confirmé' : 'Marquer comme terminé'}</button>
+          <button class="btn-refuse" onclick="annulerSession(${s.idSession})">🗑️ Annuler</button>
+        </div>`;
+      } else if (s.statut === 'terminee' || s.statut === 'validee') {
+        html += `<div class="sess-btn-row">`;
+        if (cestMoiQuiEnseigne) {
+          html += `<button class="btn-qcm pink" onclick="openCreateQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? 'QCM validé ✓' : 'Créer / modifier le QCM'}</button>`;
+        } else {
+          html += `<button class="btn-qcm" onclick="openAnswerQcm(${s.idSession})" ${s.qcmValide ? 'disabled' : ''}>${s.qcmValide ? '✓ QCM réussi' : 'Répondre au QCM'}</button>`;
+        }
+        html += `</div>`;
+        if (s.qcmValide && s.statut !== 'validee') {
+          html += `<div class="sess-note ok">✓ Ton QCM est validé, en attente de l'autre moitié du troc.</div>`;
+        } else if (!s.qcmValide && s.qcmScore !== null && s.qcmScore !== undefined) {
+          html += `<div class="sess-note">Dernier score : ${s.qcmScore}%.</div>`;
+        }
+      } else if (s.statut === 'annulee') {
+        html += `<div class="sess-note">Annulée.</div>`;
+      }
+      return html;
     }
 
     function sessionCardHtml(s) {
@@ -640,9 +747,10 @@
       let inner = `<div class="session-card">
         <div class="session-card-head"><span>📅 ${escapeHtml(s.titre)}</span> <span class="sess-badge ${s.statut}">${STATUT_LABEL[s.statut] || s.statut}</span></div>
         <div class="sess-side">
-          <div class="sess-side-title">${escapeHtml(s.competence)} · ${heuresTxt} · ${s.coutHeure * s.nbHeures} 🪙</div>
+          <div class="sess-side-title">${escapeHtml(s.competence)} · ${heuresTxt}</div>
           <div class="sess-side-meta">🗓 ${formatDate(s.dateSession)} · ${s.heureSession.slice(0,5)} · ${s.format === 'virtuel' ? '💻 Virtuel' : '📍 Présentiel'} · avec ${escapeHtml(autreNom)}</div>
-        </div>`;
+        </div>
+        <div class="sess-note">Session hors troc : proposée sans échange en retour, payée en jetons (${s.coutHeure * s.nbHeures} 🪙).</div>`;
 
       if (s.statut === 'proposee') {
         if (estApprenant(s)) {
@@ -704,10 +812,17 @@
       }
 
       html += `<div class="exch-steps">`;
-      activeSessions.forEach(s => {
-        html += `<div class="exch-step done" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${s.idSession}')?.scrollIntoView({behavior:'smooth', block:'center'})">
-          <span class="exch-step-num">${s.statut === 'validee' ? '✓' : '📅'}</span> ${escapeHtml(s.titre)} <span class="sess-badge ${s.statut}" style="margin-left:auto;">${STATUT_LABEL[s.statut] || s.statut}</span>
-        </div>`;
+      grouperSessions().forEach(g => {
+        if (g.type === 'troc') {
+          const badge = badgeTroc(g.mien, g.autre);
+          html += `<div class="exch-step done" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${g.mien.idSession}')?.scrollIntoView({behavior:'smooth', block:'center'})">
+            <span class="exch-step-num">${badge.classe === 'validee' ? '✓' : '🔄'}</span> ${escapeHtml(g.mien.competence)} ⇌ ${escapeHtml(g.autre.competence)} <span class="sess-badge ${badge.classe}" style="margin-left:auto;">${badge.label}</span>
+          </div>`;
+        } else {
+          html += `<div class="exch-step done" style="cursor:pointer;" onclick="document.getElementById('sessionCardRow-${g.s.idSession}')?.scrollIntoView({behavior:'smooth', block:'center'})">
+            <span class="exch-step-num">${g.s.statut === 'validee' ? '✓' : '📅'}</span> ${escapeHtml(g.s.titre)} <span class="sess-badge ${g.s.statut}" style="margin-left:auto;">${STATUT_LABEL[g.s.statut] || g.s.statut}</span>
+          </div>`;
+        }
       });
       html += `</div>`;
 
@@ -1077,6 +1192,17 @@
     }
 
     if (user) init();
+
+    // Rafraîchit automatiquement les conversations et la session active, pour ne pas
+    // dépendre d'un F5 manuel quand l'autre personne écrit ou répond.
+    setInterval(async () => {
+      if (document.hidden || !user) return;
+      await chargerConversations();
+      if (activeConv) {
+        await chargerMessages();
+        await chargerSessions();
+      }
+    }, 6000);
   </script>
 
 </body>

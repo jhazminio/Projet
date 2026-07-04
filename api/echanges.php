@@ -13,7 +13,7 @@ function erreur(int $code, string $message): void
 const SELECT_SESSION = '
     SELECT s.idSession, s.idEchange, s.idApprenant, s.titre, s.dateSession, s.heureSession,
            s.format, s.statut, s.confirmeEnseignant, s.confirmeApprenant, s.qcmValide, s.qcmScore,
-           s.nbHeures, s.heuresReelles,
+           s.nbHeures, s.heuresReelles, s.idSessionMiroir,
            e.idUser AS idEnseignant, e.categorie, e.coutHeure,
            c.nom AS competence,
            ens.nomUser AS ensNom, ens.prenomUser AS ensPrenom,
@@ -103,12 +103,38 @@ function definir(PDO $pdo): void
              VALUES (?, ?, ?, ?, ?, ?, ?, \'proposee\')'
         );
         $stmt->execute([$idEchange, $idApprenant, $titre, $date, $heure, $format, $nbHeures]);
+        $idSession = (int) $pdo->lastInsertId();
+
+        // Le troc SkillSwap : si l'autre personne t'a déjà proposé une session en retour
+        // (elle t'enseigne, tu ne lui as encore rien proposé), on jumelle les deux sessions.
+        jumelerSiPossible($pdo, $idSession, $idEnseignant, $idApprenant);
     } catch (PDOException $e) {
         erreur(500, 'Erreur base de données (definir) : ' . $e->getMessage());
     }
 
     http_response_code(201);
-    echo json_encode(['idSession' => (int) $pdo->lastInsertId()]);
+    echo json_encode(chargerSession($pdo, $idSession));
+}
+
+// Jumelle deux sessions réciproques (A enseigne à B, B enseigne à A) pour former un vrai troc 1h = 1h.
+function jumelerSiPossible(PDO $pdo, int $idSession, int $idEnseignant, int $idApprenant): void
+{
+    $stmt = $pdo->prepare(
+        'SELECT s.idSession FROM SESSION_ECHANGE s
+         JOIN ECHANGE e ON e.idEchange = s.idEchange
+         WHERE e.idUser = ? AND s.idApprenant = ?
+           AND s.idSessionMiroir IS NULL
+           AND s.statut IN (\'proposee\', \'en_cours\')
+         ORDER BY s.dateCreation DESC LIMIT 1'
+    );
+    $stmt->execute([$idApprenant, $idEnseignant]);
+    $miroir = $stmt->fetch();
+
+    if ($miroir) {
+        $idMiroir = (int) $miroir['idSession'];
+        $pdo->prepare('UPDATE SESSION_ECHANGE SET idSessionMiroir = ? WHERE idSession = ?')->execute([$idMiroir, $idSession]);
+        $pdo->prepare('UPDATE SESSION_ECHANGE SET idSessionMiroir = ? WHERE idSession = ?')->execute([$idSession, $idMiroir]);
+    }
 }
 
 // L'enseignant modifie une session tant qu'elle n'a pas encore été acceptée/refusée
@@ -173,11 +199,21 @@ function annuler(PDO $pdo): void
     try {
         $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = \'annulee\' WHERE idSession = ?');
         $stmt->execute([$idSession]);
+        annulerMiroirSiPresent($pdo, $session);
     } catch (PDOException $e) {
         erreur(500, 'Erreur base de données (annuler) : ' . $e->getMessage());
     }
 
     echo json_encode(chargerSession($pdo, $idSession));
+}
+
+// Si la session fait partie d'un troc, l'autre moitié n'a plus lieu d'être : on l'annule aussi.
+function annulerMiroirSiPresent(PDO $pdo, array $session): void
+{
+    if (!empty($session['idSessionMiroir'])) {
+        $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = \'annulee\' WHERE idSession = ? AND statut IN (\'proposee\', \'en_cours\')')
+            ->execute([(int) $session['idSessionMiroir']]);
+    }
 }
 
 function estEnseignant(array $session, int $idUser): bool { return (int) $session['idEnseignant'] === $idUser; }
@@ -206,6 +242,10 @@ function repondre(PDO $pdo): void
     $nouveauStatut = $reponse === 'accepter' ? 'en_cours' : 'annulee';
     $stmt = $pdo->prepare('UPDATE SESSION_ECHANGE SET statut = ? WHERE idSession = ?');
     $stmt->execute([$nouveauStatut, $idSession]);
+
+    if ($nouveauStatut === 'annulee') {
+        annulerMiroirSiPresent($pdo, $session);
+    }
 
     echo json_encode(['statut' => $nouveauStatut]);
 }
