@@ -31,6 +31,31 @@ function nbHeuresValide($v): int
     return $n >= 1 && $n <= 12 ? $n : 1;
 }
 
+// PDO (avec les préparations émulées, activées par défaut) renvoie les colonnes en chaînes
+// de caractères : "0" est vrai en JavaScript ! On force ici les types numériques/booléens
+// avant de renvoyer une session au frontend, pour que ses tests `if (s.qcmValide)` etc.
+// fonctionnent correctement.
+function normaliserSession(array $s): array
+{
+    foreach (['idSession', 'idEchange', 'idApprenant', 'confirmeEnseignant', 'confirmeApprenant',
+              'qcmValide', 'nbHeures', 'idEnseignant', 'coutHeure'] as $champ) {
+        if (isset($s[$champ])) {
+            $s[$champ] = (int) $s[$champ];
+        }
+    }
+    foreach (['heuresReelles', 'qcmScore', 'idSessionMiroir'] as $champ) {
+        if (array_key_exists($champ, $s) && $s[$champ] !== null) {
+            $s[$champ] = (int) $s[$champ];
+        }
+    }
+    return $s;
+}
+
+function normaliserSessions(array $sessions): array
+{
+    return array_map('normaliserSession', $sessions);
+}
+
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
@@ -312,7 +337,7 @@ function pourConversation(PDO $pdo): void
             ORDER BY s.dateCreation ASC'
         );
         $stmt->execute([$idUser, $idAutre, $idAutre, $idUser]);
-        echo json_encode($stmt->fetchAll());
+        echo json_encode(normaliserSessions($stmt->fetchAll()));
     } catch (PDOException $e) {
         erreur(500, 'Erreur base de données (pourConversation) : ' . $e->getMessage());
     }
@@ -329,9 +354,9 @@ function mesSessions(PDO $pdo): void
     try {
         $stmt = $pdo->prepare(SELECT_SESSION . ' WHERE e.idUser = ? OR s.idApprenant = ? ORDER BY s.dateCreation DESC');
         $stmt->execute([$idUser, $idUser]);
-        $sessions = $stmt->fetchAll();
+        $sessions = normaliserSessions($stmt->fetchAll());
         foreach ($sessions as &$s) {
-            $s['monRole'] = (int) $s['idEnseignant'] === $idUser ? 'enseignant' : 'apprenant';
+            $s['monRole'] = $s['idEnseignant'] === $idUser ? 'enseignant' : 'apprenant';
         }
         echo json_encode($sessions);
     } catch (PDOException $e) {
@@ -350,7 +375,7 @@ function mesSessionsApprenant(PDO $pdo): void
     try {
         $stmt = $pdo->prepare(SELECT_SESSION . ' WHERE s.idApprenant = ? ORDER BY s.dateCreation DESC');
         $stmt->execute([$idUser]);
-        echo json_encode($stmt->fetchAll());
+        echo json_encode(normaliserSessions($stmt->fetchAll()));
     } catch (PDOException $e) {
         erreur(500, 'Erreur base de données (mesSessionsApprenant) : ' . $e->getMessage());
     }
@@ -372,5 +397,5 @@ function chargerSession(PDO $pdo, int $idSession): array
     if (!$session) {
         erreur(404, 'Session introuvable.');
     }
-    return $session;
+    return normaliserSession($session);
 }
