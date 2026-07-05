@@ -694,7 +694,9 @@
     };
 
     function defaultThumbHtml(cat) {
-      const fichier = CATEGORY_IMG[cat];
+      // Une catégorie personnalisée (ajoutée via "Autre") n'a pas sa propre photo :
+      // comme elle sera enregistrée en tant que "Autre" côté serveur, on prévisualise déjà cette photo.
+      const fichier = CATEGORY_IMG[cat] || CATEGORY_IMG.Autre;
       return fichier
         ? `<img src="${encodeURI('assets/img/' + fichier)}" alt="" onerror="manejarErreurImgCat(this, '${cat}')">`
         : (CAT_PREVIEW_HTML[cat] || CAT_PREVIEW_HTML.Autre);
@@ -709,7 +711,7 @@
     function miniThumbHtml(c) {
       const cat = c.categorie || 'Autre';
       if (c.image) return `<img src="${c.image}" alt="">`;
-      const fichier = CATEGORY_IMG[cat];
+      const fichier = CATEGORY_IMG[cat] || CATEGORY_IMG.Autre;
       return fichier
         ? `<img src="${encodeURI('assets/img/' + fichier)}" alt="" onerror="this.parentElement.textContent='✨'">`
         : '✨';

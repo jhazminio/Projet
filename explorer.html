@@ -361,7 +361,7 @@
     };
 
     function defaultThumbHtml(cat) {
-      const fichier = CATEGORY_IMG[cat];
+      const fichier = CATEGORY_IMG[cat] || CATEGORY_IMG.Autre;
       return fichier
         ? `<img class="thumb-img" src="${encodeURI('assets/img/' + fichier)}" alt="" onerror="manejarErreurImgCat(this, '${cat}')">`
         : (CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre);

@@ -201,7 +201,7 @@
     function miniThumbHtml(c) {
       const cat = c.categorie || 'Autre';
       if (c.image) return `<img src="${c.image}" alt="">`;
-      const fichier = CATEGORY_IMG[cat];
+      const fichier = CATEGORY_IMG[cat] || CATEGORY_IMG.Autre;
       return fichier
         ? `<img src="${encodeURI('assets/img/' + fichier)}" alt="" onerror="this.parentElement.textContent='✨'">`
         : '✨';
