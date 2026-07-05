@@ -122,8 +122,9 @@
     .review-form select:focus { border-color: var(--purple); }
     .field-label { display: block; margin-bottom: .4rem; font-size: .8rem; color: var(--text-muted); }
     .star-picker { display: flex; gap: .4rem; margin-bottom: 1rem; }
-    .star-btn { background: none; border: none; font-size: 1.6rem; cursor: pointer; opacity: .35; transition: opacity .15s; }
-    .star-btn.active { opacity: 1; }
+    .star-btn { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--text-muted); transition: color .15s, transform .1s; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { color: #fbbf24; }
     .review-form textarea {
       width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
       padding: .75rem 1rem; color: var(--text); font-size: .88rem; outline: none; margin-bottom: 1rem; resize: vertical;
