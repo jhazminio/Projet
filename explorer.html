@@ -177,6 +177,7 @@
     .thumb.Autre         { background: linear-gradient(135deg, #27272a, #3f3f46); }
 
     .thumb-icon { font-size: 3.2rem; }
+    .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
 
     .cat-tag {
       position: absolute; top: .65rem; left: .65rem; padding: .2rem .6rem; border-radius: 6px;
@@ -497,7 +498,7 @@
           <div class="thumb ${cat}">
             <span class="cat-tag">${escapeHtml(cat)}</span>
             <span class="rating">${ratingHtml}</span>
-            ${CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre}
+            ${item.image ? `<img class="thumb-img" src="${item.image}" alt="">` : (CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre)}
           </div>
           <div class="card-body">
             <h3>${escapeHtml(item.competence)}${estMoi ? '<span class="own-badge">Ta publication</span>' : ''}</h3>

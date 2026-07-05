@@ -383,6 +383,10 @@
       padding: .55rem 1rem; border-radius: 8px; cursor: pointer; font-size: .82rem;
     }
     .btn-file:hover { border-color: var(--purple); }
+    .cat-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .comp-photo-actions { display: flex; align-items: center; gap: .8rem; margin-top: -.6rem; margin-bottom: 1.1rem; }
+    .btn-file-remove { background: none; border: none; color: var(--text-muted); font-size: .8rem; cursor: pointer; text-decoration: underline; }
+    .btn-file-remove:hover { color: var(--text); }
 
     hr.sep { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
 
@@ -473,6 +477,13 @@
 
       <div class="cat-preview Musique" id="catPreview">
         <span class="music-icon">🎸</span>
+      </div>
+      <div class="comp-photo-actions">
+        <label class="btn-file">
+          Ajouter une photo
+          <input type="file" id="inputCompImage" accept="image/*" style="display:none" onchange="previewCompImage(this)" />
+        </label>
+        <button type="button" class="btn-file-remove" id="btnRetirerCompImage" style="display:none" onclick="retirerCompImage()">Revenir à l'image par défaut</button>
       </div>
 
       <label class="field-label">Titre de la compétence</label>
@@ -643,6 +654,7 @@
     let coutSelectionne = 1;
     let formatSelectionne = 'virtuel';
     let idEchangeEnEdition = null;
+    let compImageActuelle = null; // null = image par défaut de la catégorie ; sinon base64
 
     const FORMAT_LABELS = { virtuel: '💻 Virtuel', presentiel: '📍 Présentiel', les_deux: '🔀 Les deux' };
 
@@ -661,9 +673,35 @@
     function choisirCategorie(cat) {
       catSelectionnee = cat;
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('selected', b.dataset.cat === cat));
+      renderCatPreview();
+    }
+
+    // Affiche la photo personnalisée si l'utilisateur en a mis une, sinon l'illustration par défaut de la catégorie
+    function renderCatPreview() {
       const preview = document.getElementById('catPreview');
-      preview.className = 'cat-preview ' + cat;
-      preview.innerHTML = CAT_PREVIEW_HTML[cat] || CAT_PREVIEW_HTML.Autre;
+      preview.className = 'cat-preview ' + catSelectionnee;
+      preview.innerHTML = compImageActuelle
+        ? `<img src="${compImageActuelle}" alt="">`
+        : (CAT_PREVIEW_HTML[catSelectionnee] || CAT_PREVIEW_HTML.Autre);
+      document.getElementById('btnRetirerCompImage').style.display = compImageActuelle ? 'inline' : 'none';
+    }
+
+    function previewCompImage(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 2_500_000) { afficherToast('Image trop lourde (2,5 Mo max).'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        compImageActuelle = reader.result;
+        renderCatPreview();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function retirerCompImage() {
+      compImageActuelle = null;
+      document.getElementById('inputCompImage').value = '';
+      renderCatPreview();
     }
 
     function choisirCout(n) {
@@ -678,6 +716,8 @@
 
     function ouvrirPublier() {
       idEchangeEnEdition = null;
+      compImageActuelle = null;
+      document.getElementById('inputCompImage').value = '';
       document.getElementById('publierTitre').textContent = 'Publier une compétence';
       document.getElementById('btnPublier').textContent = 'Publier ma compétence';
       document.getElementById('inputTitre').value = '';
@@ -691,6 +731,8 @@
 
     function ouvrirModifier(item) {
       idEchangeEnEdition = item.idEchange;
+      compImageActuelle = item.image || null;
+      document.getElementById('inputCompImage').value = '';
       document.getElementById('publierTitre').textContent = 'Modifier ma compétence';
       document.getElementById('btnPublier').textContent = 'Enregistrer les modifications';
       document.getElementById('inputTitre').value = item.competence;
@@ -712,7 +754,7 @@
       btn.disabled = true;
 
       const action = idEchangeEnEdition ? 'modifier' : 'publier';
-      const body = { idUser: user.idUser, nom, categorie: catSelectionnee, description, coutHeure: coutSelectionne, format: formatSelectionne, support };
+      const body = { idUser: user.idUser, nom, categorie: catSelectionnee, description, coutHeure: coutSelectionne, format: formatSelectionne, support, image: compImageActuelle };
       if (idEchangeEnEdition) body.idEchange = idEchangeEnEdition;
 
       try {

@@ -87,7 +87,7 @@ switch ($action) {
 function liste(PDO $pdo): void
 {
     $stmt = $pdo->query(
-        'SELECT e.idEchange, e.dateEchange, e.categorie, e.description, e.coutHeure, e.format, e.support,
+        'SELECT e.idEchange, e.dateEchange, e.categorie, e.description, e.coutHeure, e.format, e.support, e.imageEchange AS image,
                 u.idUser, u.nomUser, u.prenomUser, u.universite, u.photo,
                 c.idCompetences, c.nom AS competence,
                 ' . NOTE_SUBQUERY . '
@@ -108,7 +108,7 @@ function detail(PDO $pdo): void
     }
 
     $stmt = $pdo->prepare(
-        'SELECT e.idEchange, e.categorie, e.description, e.coutHeure, e.format, e.support,
+        'SELECT e.idEchange, e.categorie, e.description, e.coutHeure, e.format, e.support, e.imageEchange AS image,
                 u.idUser, u.nomUser, u.prenomUser, u.universite, u.photo,
                 c.idCompetences, c.nom AS competence,
                 ' . NOTE_SUBQUERY . '
@@ -136,7 +136,7 @@ function mesCompetences(PDO $pdo): void
     }
 
     $stmt = $pdo->prepare(
-        'SELECT e.idEchange, e.dateEchange, e.categorie, e.description, e.coutHeure, e.format, e.support,
+        'SELECT e.idEchange, e.dateEchange, e.categorie, e.description, e.coutHeure, e.format, e.support, e.imageEchange AS image,
                 u.idUser, u.nomUser, u.prenomUser, u.universite, u.photo,
                 c.idCompetences, c.nom AS competence
          FROM ECHANGE e
@@ -179,6 +179,7 @@ function publier(PDO $pdo): void
     $coutHeure  = (int) ($data['coutHeure'] ?? 1);
     $format     = formatValide(trim((string) ($data['format'] ?? 'virtuel')));
     $support    = trim((string) ($data['support'] ?? ''));
+    $image      = isset($data['image']) ? trim((string) $data['image']) : null;
 
     if ($idUser <= 0) {
         erreur(400, 'Utilisateur invalide.');
@@ -191,6 +192,9 @@ function publier(PDO $pdo): void
     }
     if (mb_strlen($support) > 150) {
         $support = mb_substr($support, 0, 150);
+    }
+    if ($image !== null && strlen($image) > 3_500_000) {
+        erreur(400, 'Image trop lourde.');
     }
 
     $stmt = $pdo->prepare('SELECT idUser FROM USER WHERE idUser = ?');
@@ -208,9 +212,9 @@ function publier(PDO $pdo): void
     }
 
     $stmt = $pdo->prepare(
-        'INSERT INTO ECHANGE (idUser, idComp, categorie, description, coutHeure, format, support) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO ECHANGE (idUser, idComp, categorie, description, coutHeure, format, support, imageEchange) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$idUser, $idComp, $categorie, $description ?: null, $coutHeure, $format, $support ?: null]);
+    $stmt->execute([$idUser, $idComp, $categorie, $description ?: null, $coutHeure, $format, $support ?: null, $image ?: null]);
 
     http_response_code(201);
     echo json_encode([
@@ -222,6 +226,7 @@ function publier(PDO $pdo): void
         'coutHeure'     => $coutHeure,
         'format'        => $format,
         'support'       => $support,
+        'image'         => $image ?: null,
     ]);
 }
 
@@ -241,6 +246,7 @@ function modifier(PDO $pdo): void
     $coutHeure  = (int) ($data['coutHeure'] ?? 1);
     $format     = formatValide(trim((string) ($data['format'] ?? 'virtuel')));
     $support    = trim((string) ($data['support'] ?? ''));
+    $image      = isset($data['image']) ? trim((string) $data['image']) : null;
 
     if ($idEchange <= 0 || $idUser <= 0) {
         erreur(400, 'Paramètres invalides.');
@@ -253,6 +259,9 @@ function modifier(PDO $pdo): void
     }
     if (mb_strlen($support) > 150) {
         $support = mb_substr($support, 0, 150);
+    }
+    if ($image !== null && strlen($image) > 3_500_000) {
+        erreur(400, 'Image trop lourde.');
     }
 
     $stmt = $pdo->prepare('SELECT idUser FROM ECHANGE WHERE idEchange = ?');
@@ -269,9 +278,9 @@ function modifier(PDO $pdo): void
     $idComp = trouverOuCreerCompetence($pdo, $nom);
 
     $stmt = $pdo->prepare(
-        'UPDATE ECHANGE SET idComp = ?, categorie = ?, description = ?, coutHeure = ?, format = ?, support = ? WHERE idEchange = ?'
+        'UPDATE ECHANGE SET idComp = ?, categorie = ?, description = ?, coutHeure = ?, format = ?, support = ?, imageEchange = ? WHERE idEchange = ?'
     );
-    $stmt->execute([$idComp, $categorie, $description ?: null, $coutHeure, $format, $support ?: null, $idEchange]);
+    $stmt->execute([$idComp, $categorie, $description ?: null, $coutHeure, $format, $support ?: null, $image ?: null, $idEchange]);
 
     echo json_encode([
         'idEchange'   => $idEchange,
@@ -281,6 +290,7 @@ function modifier(PDO $pdo): void
         'coutHeure'   => $coutHeure,
         'format'      => $format,
         'support'     => $support,
+        'image'       => $image ?: null,
     ]);
 }
 

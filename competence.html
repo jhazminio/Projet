@@ -93,6 +93,7 @@
       background-size: 22px 22px;
     }
     .thumb-icon { font-size: 5.5rem; filter: drop-shadow(0 6px 18px rgba(0,0,0,.35)); }
+    .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
 
     .floating-rating {
       position: absolute; top: 1rem; right: 1rem; z-index: 2;
@@ -359,7 +360,7 @@
         conteneur.innerHTML = `
           <div class="main-col">
             <div class="thumb ${cat}">
-              ${CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre}
+              ${item.image ? `<img class="thumb-img" src="${item.image}" alt="">` : (CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre)}
               <div class="floating-rating">${ratingTxt}</div>
               <div class="floating-cost">🪙 ${item.coutHeure} jeton${item.coutHeure > 1 ? 's' : ''}/h</div>
             </div>
