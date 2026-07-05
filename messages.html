@@ -162,19 +162,27 @@
 
     .bubble-row { display: flex; animation: bubbleIn .3s ease both; }
     .bubble-row.me { justify-content: flex-end; }
-    .bubble { max-width: 70%; padding: .7rem 1rem; border-radius: 14px; font-size: .88rem; line-height: 1.5; }
+    .bubble-col { display: flex; flex-direction: column; max-width: 70%; }
+    .bubble-row.me .bubble-col { align-items: flex-end; }
+    .bubble-row.them .bubble-col { align-items: flex-start; }
+    .bubble { padding: .7rem 1rem; border-radius: 14px; font-size: .88rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
     .bubble.them { background: var(--bg-card2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
     .bubble.me { background: linear-gradient(135deg, var(--purple), var(--pink)); border-bottom-right-radius: 4px; box-shadow: 0 4px 14px rgba(168,85,247,.3); }
+    .bubble-time { font-size: .68rem; color: var(--text-muted); margin-top: .25rem; padding: 0 .2rem; }
 
     .system-msg { text-align: center; font-size: .78rem; color: var(--text-muted); background: var(--bg-card2); border: 1px solid var(--border); border-radius: 99px; padding: .4rem 1rem; align-self: center; }
 
-    .chat-foot { display: flex; align-items: center; gap: .7rem; padding: 1rem 1.2rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .chat-foot { display: flex; align-items: flex-end; gap: .7rem; padding: 1rem 1.2rem; border-top: 1px solid var(--border); flex-shrink: 0; }
     .btn-session { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text); padding: .65rem 1rem; border-radius: 10px; cursor: pointer; font-size: .85rem; font-weight: 600; white-space: nowrap; transition: border-color .2s, opacity .2s, transform .15s; }
     .btn-session:hover { border-color: var(--purple); transform: translateY(-1px); }
     .btn-session:disabled { opacity: .4; cursor: not-allowed; }
     .msg-input-wrap { flex: 1; position: relative; border-radius: 10px; transition: box-shadow .2s; }
     .msg-input-wrap:focus-within { box-shadow: 0 0 0 2px rgba(168,85,247,.4), 0 0 16px rgba(168,85,247,.25); }
-    .msg-input { width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: .7rem 1rem; color: var(--text); font-size: .9rem; outline: none; transition: border-color .2s; }
+    .msg-input {
+      width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px;
+      padding: .7rem 1rem; color: var(--text); font-size: .9rem; outline: none; transition: border-color .2s;
+      font-family: inherit; line-height: 1.4; resize: none; overflow-y: auto; max-height: 140px; display: block;
+    }
     .msg-input:focus { border-color: var(--purple); }
     .btn-send { background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: opacity .2s, box-shadow .2s, transform .15s; flex-shrink: 0; box-shadow: 0 4px 16px rgba(168,85,247,.35); }
     .btn-send:hover { opacity: .88; box-shadow: 0 4px 20px rgba(168,85,247,.55); transform: translateY(-1px) scale(1.04); }
@@ -363,7 +371,7 @@
         <div class="chat-body" id="chatBody"></div>
         <div class="chat-foot" id="chatFoot" style="display:none;">
           <button class="btn-session" id="btnDefinirSession" onclick="openSessionModal()">📅 Définir une session</button>
-          <div class="msg-input-wrap"><input class="msg-input" id="msgInput" placeholder="Écris un message…" /></div>
+          <div class="msg-input-wrap"><textarea class="msg-input" id="msgInput" placeholder="Écris un message…" rows="1"></textarea></div>
           <button class="btn-send" onclick="sendMessage()">→</button>
         </div>
       </div>
@@ -607,13 +615,31 @@
         const mine = String(m.idEnvoyeur) === String(user.idUser);
         const row = document.createElement('div');
         row.className = 'bubble-row ' + (mine ? 'me' : 'them');
+
+        const col = document.createElement('div');
+        col.className = 'bubble-col';
+
         const bubble = document.createElement('div');
         bubble.className = 'bubble ' + (mine ? 'me' : 'them');
         bubble.textContent = m.contenu;
-        row.appendChild(bubble);
+
+        const heure = document.createElement('div');
+        heure.className = 'bubble-time';
+        heure.textContent = formatHeureMessage(m.dateMessage);
+
+        col.appendChild(bubble);
+        col.appendChild(heure);
+        row.appendChild(col);
         body.appendChild(row);
       });
       body.scrollTop = body.scrollHeight;
+    }
+
+    function formatHeureMessage(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(String(dateStr).replace(' ', 'T'));
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     }
 
     async function sendMessage() {
@@ -633,6 +659,7 @@
           return;
         }
         input.value = '';
+        redimensionnerMsgInput(input);
         pendingContact = null;
         await chargerMessages();
         await chargerSessions();
@@ -643,8 +670,21 @@
       }
     }
 
+    // Fait grandir le champ de message au fil du texte, jusqu'à une hauteur max (au-delà, ça défile)
+    function redimensionnerMsgInput(el) {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+
+    document.addEventListener('input', e => {
+      if (e.target && e.target.id === 'msgInput') redimensionnerMsgInput(e.target);
+    });
+
     document.addEventListener('keydown', e => {
-      if (e.target && e.target.id === 'msgInput' && e.key === 'Enter') sendMessage();
+      if (e.target && e.target.id === 'msgInput' && e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
     });
 
     /* ══════════════ SESSIONS DE LA CONVERSATION (plusieurs à la fois possibles) ══════════════ */
