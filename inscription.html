@@ -8,296 +8,184 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0d0b1a;
-      --card: #1a1728;
-      --card2: #211d30;
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
       --purple: #a855f7;
-      --purple-l: #c084fc;
+      --purple-light: #c084fc;
       --pink: #ec4899;
-      --text: #6a6874;
-      --muted: #9490a8;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
       --border: #2e2a42;
     }
 
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
+      background: var(--bg-dark);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      max-width: 1180px; margin: 0 auto; padding: 3.5rem 2rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; min-height: 100vh;
+    }
+
+    .logo { display: flex; align-items: center; gap: .6rem; font-weight: 800; font-size: 1.05rem; margin-bottom: 2.4rem; }
+    .logo-icon {
+      width: 34px; height: 34px; background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .9rem;
+    }
+
+    .left h1 { font-size: 2.6rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.3rem; }
+    .left h1 .accent { color: var(--purple-light); }
+    .left p.lead { font-size: .95rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 2.2rem; max-width: 420px; }
+    .left p.lead strong { color: var(--text); }
+
+    .benefits { display: flex; flex-direction: column; gap: 1.1rem; }
+    .benefit { display: flex; align-items: center; gap: .9rem; font-size: .92rem; }
+    .benefit .ico {
+      width: 34px; height: 34px; flex-shrink: 0; background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2.5rem 2.8rem;
-      width: 100%;
-      max-width: 460px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 2.4rem 2.6rem;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      font-weight: 800;
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-    }
-
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: .9rem;
-    }
-
-    h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: .4rem; }
-
-    .subtitle { font-size: .88rem; color: var(--muted); margin-bottom: 2rem; }
 
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
     .field { display: flex; flex-direction: column; gap: .35rem; margin-bottom: 1.1rem; }
-
-    .field label {
-      font-size: .78rem;
-      color: var(--muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-
+    .field label { font-size: .78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
     .field input {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: .78rem 1rem;
-      color: var(--text);
-      font-size: .95rem;
-      outline: none;
-      transition: border-color .2s;
-      width: 100%;
+      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 9px;
+      padding: .78rem 1rem; color: var(--text); font-size: .95rem; outline: none; transition: border-color .2s; width: 100%;
     }
-
-    .field input::placeholder { color: var(--muted); }
+    .field input::placeholder { color: var(--text-muted); }
     .field input:focus { border-color: var(--purple); }
 
-    .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .4rem; }
+    .label-row { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+    .label-row .req { color: var(--pink); text-transform: none; font-weight: 600; }
+    .compte-chips { font-size: .76rem; color: var(--text-muted); text-transform: none; letter-spacing: normal; font-weight: 600; white-space: nowrap; }
 
+    .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; margin-bottom: 1rem; }
     .chip {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      padding: .35rem .9rem;
-      font-size: .82rem;
-      cursor: pointer;
-      transition: background .15s, border-color .15s, color .15s;
-      user-select: none;
+      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 99px;
+      padding: .35rem .9rem; font-size: .82rem; cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s; user-select: none;
+      display: inline-flex; align-items: center; gap: .35rem;
     }
+    .chip:hover { border-color: var(--purple); color: var(--purple-light); }
+    .chip.on { background: rgba(168,85,247,.2); border-color: var(--purple); color: var(--purple-light); font-weight: 600; }
+    .chip-remove { font-size: .72rem; opacity: .7; }
+    .chip-remove:hover { opacity: 1; }
 
-    .chip:hover { border-color: var(--purple); color: var(--purple-l); }
-
-    .chip.on {
-      background: rgba(168,85,247,.2);
-      border-color: var(--purple);
-      color: var(--purple-l);
-      font-weight: 600;
+    .autre-row { display: flex; gap: .6rem; }
+    .autre-row input { flex: 1; }
+    .btn-ajouter {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      padding: 0 1.1rem; border-radius: 9px; cursor: pointer; font-size: .85rem; font-weight: 600;
+      white-space: nowrap; transition: border-color .2s;
     }
+    .btn-ajouter:hover { border-color: var(--purple); color: var(--purple-light); }
 
     .btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border: none;
-      color: #fff;
-      padding: .95rem;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: .5rem;
-      margin-bottom: 1.2rem;
-      transition: opacity .2s;
+      width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .95rem; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer;
+      margin-top: .5rem; margin-bottom: 1.2rem; transition: opacity .2s;
     }
-
     .btn:hover { opacity: .88; }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
 
-    .login-link { text-align: center; font-size: .85rem; color: var(--muted); }
-
-    .login-link a {
-      color: var(--purple-l);
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
+    .login-link { text-align: center; font-size: .85rem; color: var(--text-muted); }
+    .login-link a { color: var(--purple-light); font-weight: 600; }
     .login-link a:hover { text-decoration: underline; }
 
     .toast {
-      position: fixed;
-      bottom: 2rem; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--card);
-      border: 1px solid var(--purple);
-      color: var(--text);
-      padding: .75rem 1.6rem;
-      border-radius: 99px;
-      font-size: .88rem;
-      font-weight: 600;
-      opacity: 0;
-      transition: all .3s;
-      z-index: 999;
-      white-space: nowrap;
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--bg-card); border: 1px solid var(--purple); color: var(--text);
+      padding: .75rem 1.6rem; border-radius: 99px; font-size: .88rem; font-weight: 600;
+      opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap;
     }
-
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.err  { border-color: var(--pink); }
+    .toast.err { border-color: var(--pink); }
 
-    .overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200;
-      opacity: 0; pointer-events: none;
-      transition: opacity .25s;
+    @media (max-width: 900px) {
+      .wrap { grid-template-columns: 1fr; padding: 2.5rem 1.5rem; min-height: auto; }
+      .left { margin-bottom: 1rem; }
     }
-
-    .overlay.open { opacity: 1; pointer-events: all; }
-
-    .modal {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 2.2rem;
-      width: 100%;
-      max-width: 370px;
-      text-align: center;
-    }
-
-    .modal h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: .4rem; }
-    .modal p  { font-size: .85rem; color: var(--muted); margin-bottom: 1.4rem; }
-
-    .modal input {
-      width: 100%;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: .78rem 1rem;
-      color: var(--text);
-      font-size: .92rem;
-      outline: none;
-      margin-bottom: .8rem;
-      transition: border-color .2s;
-    }
-
-    .modal input:focus { border-color: var(--purple); }
-    .modal input::placeholder { color: var(--muted); }
-
-    .btn-primary {
-      width: 100%;
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      border: none; color: #fff;
-      padding: .85rem; border-radius: 10px;
-      font-size: .95rem; font-weight: 700;
-      cursor: pointer; margin-bottom: .6rem;
-      transition: opacity .2s;
-    }
-
-    .btn-primary:hover { opacity: .88; }
-
-    .btn-ghost {
-      width: 100%;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: .85rem; border-radius: 10px;
-      font-size: .9rem; cursor: pointer;
-      transition: border-color .2s;
-    }
-
-    .btn-ghost:hover { border-color: var(--purple); color: var(--text); }
-
     @media (max-width: 500px) {
-      .card { padding: 2rem 1.5rem; }
-      .row  { grid-template-columns: 1fr; }
+      .card { padding: 1.8rem 1.4rem; }
+      .row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
+  <div class="wrap">
+    <div class="left">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">S</div>
+        SkillSwap
+      </a>
 
-    <a href="index.html" class="logo" style="text-decoration:none;color:inherit">
-      <div class="logo-icon">S</div>
-      SkillSwap
-    </a>
+      <h1>Crée ton <span class="accent">compte étudiant</span></h1>
+      <p class="lead">Inscris-toi avec ton email personnel. Pour rejoindre la communauté, tu dois proposer <strong>au moins une compétence</strong> — c'est ce que tu pourras échanger.</p>
 
-    <h2>Créer mon compte</h2>
-    <p class="subtitle">Rejoins la communauté et échange tes compétences.</p>
+      <div class="benefits">
+        <div class="benefit"><span class="ico">🎁</span> 3 jetons offerts à l'inscription</div>
+        <div class="benefit"><span class="ico">🤝</span> Donne 1h, gagne 1 jeton</div>
+        <div class="benefit"><span class="ico">🔒</span> Profil visible, contact réservé aux membres</div>
+      </div>
+    </div>
 
-    <div class="row">
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label>Prénom</label>
+          <input type="text" id="prenom" placeholder="Camille" />
+        </div>
+        <div class="field">
+          <label>Nom</label>
+          <input type="text" id="nom" placeholder="Durand" />
+        </div>
+      </div>
+
       <div class="field">
-        <label>Nom</label>
-        <input type="text" id="nom" placeholder="Durand" />
+        <label>Université</label>
+        <input type="text" id="universite" placeholder="Université de Lyon" />
       </div>
+
       <div class="field">
-        <label>Prénom</label>
-        <input type="text" id="prenom" placeholder="Camille" />
+        <label>Email</label>
+        <input type="email" id="email" placeholder="camille.durand@email.com" />
       </div>
-    </div>
 
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="email" placeholder="camille.durand@email.com" />
-    </div>
-
-    <div class="field">
-      <label>Université</label>
-      <input type="text" id="universite" placeholder="Université de Lyon" />
-    </div>
-
-    <div class="field">
-      <label>Mot de passe</label>
-      <input type="password" id="mdp" placeholder="••••••••" />
-    </div>
-
-    <div class="field">
-      <label>Compétences <span style="color:var(--pink)">· min. 1</span></label>
-      <div class="chips" id="chips">
-        <span class="chip" onclick="toggle(this)">Musique</span>
-        <span class="chip" onclick="toggle(this)">Programmation</span>
-        <span class="chip" onclick="toggle(this)">Sport</span>
-        <span class="chip" onclick="toggle(this)">Mathématiques</span>
-        <span class="chip" onclick="toggle(this)">Langues</span>
-        <span class="chip" onclick="toggle(this)">Danse</span>
-        <span class="chip" onclick="toggle(this)">Informatique</span>
-        <span class="chip" onclick="toggle(this)">Sciences</span>
-        <span class="chip" onclick="toggle(this)">Arts</span>
-        <span class="chip" onclick="toggle(this)">Théâtre</span>
-        <span class="chip" onclick="toggle(this)">Photographie</span>
-        <span class="chip" onclick="toggle(this)">Dessin</span>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="mdp" placeholder="••••••••" />
       </div>
-    </div>
 
-    <button class="btn" id="btnSubmit" onclick="inscrire()">Créer mon compte</button>
+      <div class="field">
+        <div class="label-row">
+          <label>Compétences que tu proposes <span class="req">· min. 1</span></label>
+          <span class="compte-chips" id="compteChips">0 sélectionné(s)</span>
+        </div>
+        <div class="chips" id="chips"></div>
 
-    <p class="login-link">Déjà membre ? <a onclick="ouvrirModal()">Se connecter</a></p>
-  </div>
+        <label>Autre — tu ne la trouves pas ?</label>
+        <div class="autre-row">
+          <input type="text" id="inputAutre" placeholder="Ex. : Blender, Droit, Cuisine…" />
+          <button type="button" class="btn-ajouter" onclick="ajouterAutre()">+ Ajouter</button>
+        </div>
+      </div>
 
-  <div class="overlay" id="overlay" onclick="fermerSiDehors(event)">
-    <div class="modal">
-      <h3>Connecte-toi</h3>
-      <p>Entre tes identifiants pour accéder à ton profil.</p>
-      <input type="email"    id="l-email" placeholder="Email" />
-      <input type="password" id="l-mdp"   placeholder="Mot de passe" />
-      <button class="btn-primary" onclick="connecter()">Se connecter</button>
-      <button class="btn-ghost"   onclick="fermerModal()">Annuler</button>
+      <button class="btn" id="btnSubmit" onclick="inscrire()">Créer mon compte</button>
+
+      <p class="login-link">Déjà membre ? <a href="connexion.html">Se connecter</a></p>
     </div>
   </div>
 
@@ -306,6 +194,19 @@
   <script>
     const API = 'api';
 
+    const COMPETENCES_SUGGEREES = [
+      'Python', 'Java', 'JavaScript', 'C++', 'HTML / CSS', 'Anglais', 'Espagnol',
+      'Allemand', 'Italien', 'Chinois', 'UI Design', 'Figma', 'Photoshop', 'Montage vidéo',
+      'Guitare', 'Piano', 'Chant', 'Algèbre', 'Statistiques', 'Physique', 'Chimie',
+      'Marketing', 'Excel', 'Comptabilité', 'Photo', 'Rédaction', 'Prise de parole',
+    ];
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str == null ? '' : String(str);
+      return div.innerHTML;
+    }
+
     function toast(msg, err = false) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -313,29 +214,69 @@
       setTimeout(() => t.className = 'toast', 3000);
     }
 
-    function toggle(el) { el.classList.toggle('on'); }
+    function initChips() {
+      document.getElementById('chips').innerHTML = COMPETENCES_SUGGEREES.map(nom =>
+        `<span class="chip" data-nom="${escapeHtml(nom)}" onclick="toggle(this)">${escapeHtml(nom)}</span>`
+      ).join('');
+    }
+    initChips();
+
+    function toggle(el) {
+      el.classList.toggle('on');
+      majCompteur();
+    }
+
+    function majCompteur() {
+      const n = document.querySelectorAll('.chip.on').length;
+      document.getElementById('compteChips').textContent = `${n} sélectionné(s)`;
+    }
+
+    function ajouterAutre() {
+      const input = document.getElementById('inputAutre');
+      const nom = input.value.trim();
+      if (!nom) return;
+
+      const existe = [...document.querySelectorAll('#chips .chip')].some(c => c.dataset.nom.toLowerCase() === nom.toLowerCase());
+      if (existe) { toast('Cette compétence est déjà dans la liste.', true); return; }
+
+      const chip = document.createElement('span');
+      chip.className = 'chip on';
+      chip.dataset.nom = nom;
+      chip.onclick = () => toggle(chip);
+      chip.innerHTML = `${escapeHtml(nom)} <span class="chip-remove" title="Retirer">✕</span>`;
+      chip.querySelector('.chip-remove').onclick = (e) => { e.stopPropagation(); chip.remove(); majCompteur(); };
+      document.getElementById('chips').appendChild(chip);
+
+      input.value = '';
+      input.focus();
+      majCompteur();
+    }
+
+    document.getElementById('inputAutre').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); ajouterAutre(); }
+    });
 
     async function inscrire() {
-      const nom         = document.getElementById('nom').value.trim();
-      const prenom      = document.getElementById('prenom').value.trim();
-      const email       = document.getElementById('email').value.trim();
-      const universite  = document.getElementById('universite').value.trim();
-      const mdp         = document.getElementById('mdp').value;
-      const competences = [...document.querySelectorAll('.chip.on')].map(c => c.textContent);
+      const nom = document.getElementById('nom').value.trim();
+      const prenom = document.getElementById('prenom').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const universite = document.getElementById('universite').value.trim();
+      const mdp = document.getElementById('mdp').value;
+      const competences = [...document.querySelectorAll('.chip.on')].map(c => c.dataset.nom);
 
-      if (!nom)                    { toast('Le nom est obligatoire.', true); return; }
-      if (!prenom)                 { toast('Le prénom est obligatoire.', true); return; }
-      if (!email)                  { toast("L'email est obligatoire.", true); return; }
-      if (!mdp)                    { toast('Le mot de passe est obligatoire.', true); return; }
-      if (competences.length === 0){ toast('Sélectionne au moins une compétence.', true); return; }
+      if (!nom) { toast('Le nom est obligatoire.', true); return; }
+      if (!prenom) { toast('Le prénom est obligatoire.', true); return; }
+      if (!email) { toast("L'email est obligatoire.", true); return; }
+      if (!mdp) { toast('Le mot de passe est obligatoire.', true); return; }
+      if (competences.length === 0) { toast('Sélectionne au moins une compétence.', true); return; }
 
       const btn = document.getElementById('btnSubmit');
       btn.disabled = true;
       btn.textContent = 'Création en cours…';
 
       try {
-        const rep  = await fetch(`${API}/auth.php?action=inscription`, {
-          method:  'POST',
+        const rep = await fetch(`${API}/auth.php?action=inscription`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nomUser: nom, prenomUser: prenom, email, universite, motDePasse: mdp, competences })
         });
@@ -351,39 +292,12 @@
         localStorage.setItem('user', JSON.stringify(json));
         toast('Compte créé ! Redirection…');
         setTimeout(() => window.location.href = 'explorer.html', 1200);
-
       } catch (e) {
         toast('Erreur réseau. XAMPP est-il lancé ?', true);
         btn.disabled = false;
         btn.textContent = 'Créer mon compte';
       }
     }
-
-    async function connecter() {
-      const email = document.getElementById('l-email').value.trim();
-      const mdp   = document.getElementById('l-mdp').value;
-      if (!email || !mdp) { toast('Remplis les deux champs.', true); return; }
-
-      try {
-        const rep  = await fetch(`${API}/auth.php?action=connexion`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, motDePasse: mdp })
-        });
-        const json = await rep.json();
-        if (!rep.ok) { toast(json.erreur, true); return; }
-
-        localStorage.setItem('user', JSON.stringify(json.user));
-        window.location.href = 'profil.html';
-
-      } catch (e) {
-        toast('Erreur réseau. XAMPP est-il lancé ?', true);
-      }
-    }
-
-    function ouvrirModal()     { document.getElementById('overlay').classList.add('open'); }
-    function fermerModal()     { document.getElementById('overlay').classList.remove('open'); }
-    function fermerSiDehors(e) { if (e.target === document.getElementById('overlay')) fermerModal(); }
   </script>
 
 </body>

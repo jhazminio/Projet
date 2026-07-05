@@ -10,9 +10,9 @@ function erreur(int $code, string $message): void
     exit;
 }
 
-// Fait correspondre une compétence choisie à l'inscription (chip du formulaire,
-// qui utilise exactement les mêmes catégories que "Publier une compétence")
-// à l'une des catégories utilisées dans le reste de l'app.
+// Fait correspondre une compétence choisie à l'inscription (chip du formulaire :
+// soit une catégorie telle quelle, soit une compétence précise comme "Python" ou
+// "Guitare") à l'une des catégories utilisées dans le reste de l'app.
 function categorieDepuisChip(string $nomComp): string
 {
     $categories = [
@@ -25,6 +25,22 @@ function categorieDepuisChip(string $nomComp): string
         if (mb_strtolower($categorie) === mb_strtolower($nomComp)) {
             return $categorie;
         }
+    }
+
+    $competencesPrecises = [
+        'python' => 'Programmation', 'java' => 'Programmation', 'javascript' => 'Programmation',
+        'c++' => 'Programmation', 'html / css' => 'Programmation', 'html/css' => 'Programmation',
+        'anglais' => 'Langues', 'espagnol' => 'Langues', 'allemand' => 'Langues',
+        'italien' => 'Langues', 'chinois' => 'Langues', 'rédaction' => 'Langues',
+        'ui design' => 'Arts', 'figma' => 'Arts', 'photoshop' => 'Arts', 'montage vidéo' => 'Arts',
+        'guitare' => 'Musique', 'piano' => 'Musique', 'chant' => 'Musique',
+        'algèbre' => 'Mathématiques', 'statistiques' => 'Mathématiques',
+        'physique' => 'Sciences', 'chimie' => 'Sciences',
+        'excel' => 'Informatique', 'photo' => 'Photographie',
+    ];
+    $cle = mb_strtolower($nomComp);
+    if (isset($competencesPrecises[$cle])) {
+        return $competencesPrecises[$cle];
     }
 
     return 'Autre';

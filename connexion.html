@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap – Se connecter</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0b1a;
+      --bg-card: #1a1728;
+      --bg-card2: #211d30;
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --pink: #ec4899;
+      --text: #f1f0f5;
+      --text-muted: #9490a8;
+      --border: #2e2a42;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2.8rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .logo { display: flex; align-items: center; gap: .6rem; font-weight: 800; font-size: 1.1rem; margin-bottom: 2rem; }
+    .logo-icon {
+      width: 36px; height: 36px; background: linear-gradient(135deg, var(--purple), var(--pink));
+      border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .9rem;
+    }
+
+    h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: .4rem; }
+    .subtitle { font-size: .88rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+    .field { display: flex; flex-direction: column; gap: .35rem; margin-bottom: 1.1rem; }
+    .field label { font-size: .78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .field input {
+      background: var(--bg-card2); border: 1px solid var(--border); border-radius: 9px;
+      padding: .78rem 1rem; color: var(--text); font-size: .95rem; outline: none; transition: border-color .2s; width: 100%;
+    }
+    .field input::placeholder { color: var(--text-muted); }
+    .field input:focus { border-color: var(--purple); }
+
+    .btn {
+      width: 100%; background: linear-gradient(135deg, var(--purple), var(--pink)); border: none; color: #fff;
+      padding: .95rem; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer;
+      margin-top: .5rem; margin-bottom: 1.2rem; transition: opacity .2s;
+    }
+    .btn:hover { opacity: .88; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .signup-link { text-align: center; font-size: .85rem; color: var(--text-muted); }
+    .signup-link a { color: var(--purple-light); font-weight: 600; }
+    .signup-link a:hover { text-decoration: underline; }
+
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--bg-card); border: 1px solid var(--purple); color: var(--text);
+      padding: .75rem 1.6rem; border-radius: 99px; font-size: .88rem; font-weight: 600;
+      opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.err { border-color: var(--pink); }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">S</div>
+      SkillSwap
+    </a>
+
+    <h2>Connecte-toi</h2>
+    <p class="subtitle">Accède à ton compte pour échanger tes compétences.</p>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="camille.durand@email.com" />
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="mdp" placeholder="••••••••" />
+    </div>
+
+    <button class="btn" id="btnSubmit" onclick="connecter()">Se connecter</button>
+
+    <p class="signup-link">Pas encore de compte ? <a href="inscription.html">Créer un compte</a></p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = 'api';
+
+    function toast(msg, err = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (err ? ' err' : '');
+      setTimeout(() => t.className = 'toast', 3000);
+    }
+
+    async function connecter() {
+      const email = document.getElementById('email').value.trim();
+      const mdp = document.getElementById('mdp').value;
+      if (!email || !mdp) { toast('Remplis les deux champs.', true); return; }
+
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.textContent = 'Connexion en cours…';
+
+      try {
+        const rep = await fetch(`${API}/auth.php?action=connexion`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, motDePasse: mdp })
+        });
+        const json = await rep.json();
+        if (!rep.ok) {
+          toast(json.erreur, true);
+          btn.disabled = false;
+          btn.textContent = 'Se connecter';
+          return;
+        }
+
+        localStorage.setItem('user', JSON.stringify(json.user));
+        window.location.href = 'explorer.html';
+      } catch (e) {
+        toast('Erreur réseau. XAMPP est-il lancé ?', true);
+        btn.disabled = false;
+        btn.textContent = 'Se connecter';
+      }
+    }
+
+    document.getElementById('mdp').addEventListener('keydown', e => { if (e.key === 'Enter') connecter(); });
+  </script>
+
+</body>
+</html>
