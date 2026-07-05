@@ -307,12 +307,13 @@
 
     .field-label { font-size: .78rem; color: var(--text-muted); font-weight: 600; margin-bottom: .5rem; display: block; }
 
-    .modal-box input[type="text"], .modal-box input[type="password"], .modal-box textarea {
+    .modal-box input[type="text"], .modal-box input[type="password"], .modal-box textarea, .modal-box select {
       width: 100%; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 8px;
       padding: .75rem 1rem; color: var(--text); font-size: .9rem; outline: none; margin-bottom: 1.1rem;
       transition: border-color .2s; resize: vertical;
     }
-    .modal-box input:focus, .modal-box textarea:focus { border-color: var(--purple); }
+    .modal-box select { cursor: pointer; }
+    .modal-box input:focus, .modal-box textarea:focus, .modal-box select:focus { border-color: var(--purple); }
 
     /* Aperçu illustré selon la catégorie */
     .cat-preview {
@@ -512,7 +513,7 @@
       <textarea id="inputDescription" rows="3" placeholder="Niveau, déroulé d'une séance, ce que l'autre apprendra, supports fournis…"></textarea>
 
       <label class="field-label">Support inclus</label>
-      <input type="text" id="inputSupport" maxlength="150" placeholder="Ex. : exercices & ressources fournis" />
+      <select id="inputSupport"></select>
 
       <label class="field-label">Coût par heure</label>
       <div class="cost-row" id="costRow"></div>
@@ -677,6 +678,7 @@
       Théâtre: 'Théâtre.jpg',
       Photographie: 'Photographie.jpg',
       Dessin: 'Dessin.jpg',
+      Autre: 'competences.jpeg',
     };
 
     function defaultThumbHtml(cat) {
@@ -709,6 +711,16 @@
 
     const FORMAT_LABELS = { virtuel: '💻 Virtuel', presentiel: '📍 Présentiel', les_deux: '🔀 Les deux' };
 
+    const SUPPORTS = [
+      'Aucun support supplémentaire',
+      'Exercices et ressources fournis',
+      'Support de cours (PDF)',
+      'Enregistrement de la session',
+      'Accès à un espace de travail partagé',
+      'Liens et vidéos complémentaires',
+      'Quiz et exercices pratiques',
+    ];
+
     function initCatRow() {
       document.getElementById('catRow').innerHTML = CATEGORIES.map(c =>
         `<button type="button" class="cat-btn" data-cat="${c}" onclick="choisirCategorie('${c}')">${c}</button>`
@@ -719,6 +731,19 @@
       document.getElementById('formatRow').innerHTML = Object.keys(FORMAT_LABELS).map(f =>
         `<button type="button" class="cost-btn" data-format="${f}" onclick="choisirFormat('${f}')">${FORMAT_LABELS[f]}</button>`
       ).join('');
+      document.getElementById('inputSupport').innerHTML = SUPPORTS.map(s =>
+        `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`
+      ).join('');
+    }
+
+    // Si une compétence existante a un support qui ne correspond à aucune option prédéfinie
+    // (ancienne donnée en texte libre), on l'ajoute telle quelle pour ne pas la perdre en silence.
+    function selectionnerSupport(valeur) {
+      const select = document.getElementById('inputSupport');
+      if (valeur && !SUPPORTS.includes(valeur)) {
+        select.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(valeur)}">${escapeHtml(valeur)}</option>`);
+      }
+      select.value = valeur || SUPPORTS[0];
     }
 
     function choisirCategorie(cat) {
@@ -773,7 +798,7 @@
       document.getElementById('btnPublier').textContent = 'Publier ma compétence';
       document.getElementById('inputTitre').value = '';
       document.getElementById('inputDescription').value = '';
-      document.getElementById('inputSupport').value = '';
+      selectionnerSupport(SUPPORTS[0]);
       choisirCategorie('Musique');
       choisirCout(1);
       choisirFormat('virtuel');
@@ -788,7 +813,7 @@
       document.getElementById('btnPublier').textContent = 'Enregistrer les modifications';
       document.getElementById('inputTitre').value = item.competence;
       document.getElementById('inputDescription').value = item.description || '';
-      document.getElementById('inputSupport').value = item.support || '';
+      selectionnerSupport(item.support || '');
       choisirCategorie(item.categorie || 'Autre');
       choisirCout(item.coutHeure || 1);
       choisirFormat(item.format || 'virtuel');
@@ -798,7 +823,7 @@
     async function soumettrePublication() {
       const nom = document.getElementById('inputTitre').value.trim();
       const description = document.getElementById('inputDescription').value.trim();
-      const support = document.getElementById('inputSupport').value.trim();
+      const support = document.getElementById('inputSupport').value;
       if (!nom) { afficherToast('Indique le titre de la compétence.'); return; }
 
       const btn = document.getElementById('btnPublier');
