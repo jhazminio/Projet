@@ -650,6 +650,29 @@
       Autre: '<span class="autre-icon">✨</span>',
     };
 
+    // Photo par défaut par catégorie (remplace le dégradé + emoji quand disponible)
+    const CATEGORY_IMG = {
+      Musique: 'musique.jpg',
+      Programmation: 'Programmation.jpg',
+      Sport: 'Sport.jpg',
+      Mathématiques: 'Mathématiques.jpg',
+      Langues: 'Langues.jpg',
+      Danse: 'Danse.jpg',
+      Informatique: 'Informatique.jpg',
+      Sciences: 'Sciences.jpg',
+      Arts: 'Arts.jpg',
+      Théâtre: 'Théâtre.jpg',
+      Photographie: 'Photographie.jpg',
+      Dessin: 'Dessin.jpg',
+    };
+
+    function defaultThumbHtml(cat) {
+      const fichier = CATEGORY_IMG[cat];
+      return fichier
+        ? `<img src="${encodeURI('assets/img/' + fichier)}" alt="">`
+        : (CAT_PREVIEW_HTML[cat] || CAT_PREVIEW_HTML.Autre);
+    }
+
     let catSelectionnee = 'Musique';
     let coutSelectionne = 1;
     let formatSelectionne = 'virtuel';
@@ -682,7 +705,7 @@
       preview.className = 'cat-preview ' + catSelectionnee;
       preview.innerHTML = compImageActuelle
         ? `<img src="${compImageActuelle}" alt="">`
-        : (CAT_PREVIEW_HTML[catSelectionnee] || CAT_PREVIEW_HTML.Autre);
+        : defaultThumbHtml(catSelectionnee);
       document.getElementById('btnRetirerCompImage').style.display = compImageActuelle ? 'inline' : 'none';
     }
 
