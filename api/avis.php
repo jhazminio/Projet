@@ -38,7 +38,7 @@ switch ($action) {
 // Force le typage des champs numériques/booléens (PDO renvoie des chaînes avec MySQL)
 function normaliserAvis(array $a): array
 {
-    foreach (['idAvis', 'idSession', 'idAuteur', 'idAutre', 'note'] as $champ) {
+    foreach (['idAvis', 'idSession', 'idAuteur', 'idAutre', 'note', 'autreEstEnseignant'] as $champ) {
         if (isset($a[$champ])) {
             $a[$champ] = (int) $a[$champ];
         }
@@ -177,6 +177,7 @@ function sessionsAEvaluer(PDO $pdo): void
     $stmt = $pdo->prepare(
         'SELECT s.idSession, s.titre, c.nom AS competence,
                 CASE WHEN e.idUser = ? THEN s.idApprenant ELSE e.idUser END AS idAutre,
+                CASE WHEN e.idUser = ? THEN 0 ELSE 1 END AS autreEstEnseignant,
                 autre.nomUser AS autreNom, autre.prenomUser AS autrePrenom
          FROM SESSION_ECHANGE s
          JOIN ECHANGE e ON e.idEchange = s.idEchange
@@ -187,7 +188,7 @@ function sessionsAEvaluer(PDO $pdo): void
            AND NOT EXISTS (SELECT 1 FROM AVIS a WHERE a.idSession = s.idSession AND a.idAuteur = ?)
          ORDER BY s.dateCreation DESC'
     );
-    $stmt->execute([$idUser, $idUser, $idUser, $idUser, $idUser]);
+    $stmt->execute([$idUser, $idUser, $idUser, $idUser, $idUser, $idUser]);
     echo json_encode(normaliserAvisListe($stmt->fetchAll()));
 }
 

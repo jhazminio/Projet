@@ -424,7 +424,9 @@
         const rep = await fetch(`api/avis.php?action=sessionsAEvaluer&idUser=${moi.idUser}`);
         const sessions = await rep.json();
         if (!rep.ok) return;
-        sessionsAEvaluerProfil = sessions.filter(s => String(s.idAutre) === String(idProfil));
+        // On ne peut noter que la compétence publiée par CE profil (celle qu'il a enseignée),
+        // pas celle que "moi" a enseignée dans un troc croisé.
+        sessionsAEvaluerProfil = sessions.filter(s => String(s.idAutre) === String(idProfil) && s.autreEstEnseignant);
 
         if (sessionsAEvaluerProfil.length === 0) { sessionAEvaluer = null; return; }
         sessionAEvaluer = sessionsAEvaluerProfil[0];
