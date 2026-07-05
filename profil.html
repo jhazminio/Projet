@@ -356,6 +356,14 @@
       padding: .45rem 1rem; border-radius: 99px; cursor: pointer; font-size: .82rem; transition: all .15s;
     }
     .cat-btn.selected { background: rgba(168,85,247,.2); border-color: var(--purple); color: var(--purple-light); font-weight: 600; }
+    .autre-row { display: flex; gap: .6rem; margin-bottom: 1.1rem; }
+    .autre-row input { flex: 1; }
+    .btn-ajouter {
+      background: var(--bg-card2); border: 1px solid var(--border); color: var(--text);
+      padding: 0 1.1rem; border-radius: 9px; cursor: pointer; font-size: .85rem; font-weight: 600;
+      white-space: nowrap; transition: border-color .2s;
+    }
+    .btn-ajouter:hover { border-color: var(--purple); color: var(--purple-light); }
 
     .cost-row { display: flex; gap: .6rem; margin-bottom: 1.3rem; }
     .cost-btn {
@@ -505,6 +513,10 @@
 
       <label class="field-label">Catégorie</label>
       <div class="cat-row" id="catRow"></div>
+      <div class="autre-row">
+        <input type="text" id="inputAutreCategorie" placeholder="Autre — tu ne la trouves pas ?" onkeydown="if(event.key==='Enter'){event.preventDefault();ajouterAutreCategorie();}" />
+        <button type="button" class="btn-ajouter" onclick="ajouterAutreCategorie()">+ Ajouter</button>
+      </div>
 
       <label class="field-label">Format</label>
       <div class="cost-row" id="formatRow"></div>
@@ -752,6 +764,28 @@
       renderCatPreview();
     }
 
+    // Ajoute une catégorie personnalisée si aucune des 12 proposées ne convient
+    // (elle sera enregistrée comme "Autre" côté serveur, comme toute catégorie non reconnue).
+    function ajouterAutreCategorie() {
+      const input = document.getElementById('inputAutreCategorie');
+      const nom = input.value.trim();
+      if (!nom) return;
+
+      const existant = [...document.querySelectorAll('#catRow .cat-btn')].find(b => b.dataset.cat.toLowerCase() === nom.toLowerCase());
+      if (existant) { input.value = ''; choisirCategorie(existant.dataset.cat); return; }
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cat-btn';
+      btn.dataset.cat = nom;
+      btn.textContent = nom;
+      btn.onclick = () => choisirCategorie(nom);
+      document.getElementById('catRow').appendChild(btn);
+
+      input.value = '';
+      choisirCategorie(nom);
+    }
+
     // Affiche la photo personnalisée si l'utilisateur en a mis une, sinon l'illustration par défaut de la catégorie
     function renderCatPreview() {
       const preview = document.getElementById('catPreview');
@@ -798,6 +832,8 @@
       document.getElementById('btnPublier').textContent = 'Publier ma compétence';
       document.getElementById('inputTitre').value = '';
       document.getElementById('inputDescription').value = '';
+      document.getElementById('inputAutreCategorie').value = '';
+      initCatRow();
       selectionnerSupport(SUPPORTS[0]);
       choisirCategorie('Musique');
       choisirCout(1);
@@ -813,6 +849,8 @@
       document.getElementById('btnPublier').textContent = 'Enregistrer les modifications';
       document.getElementById('inputTitre').value = item.competence;
       document.getElementById('inputDescription').value = item.description || '';
+      document.getElementById('inputAutreCategorie').value = '';
+      initCatRow();
       selectionnerSupport(item.support || '');
       choisirCategorie(item.categorie || 'Autre');
       choisirCout(item.coutHeure || 1);
