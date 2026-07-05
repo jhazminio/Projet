@@ -25,8 +25,30 @@ switch ($action) {
     case 'sessionsAEvaluer':
         sessionsAEvaluer($pdo);
         break;
+    case 'modifier':
+        modifier($pdo);
+        break;
+    case 'supprimer':
+        supprimer($pdo);
+        break;
     default:
         erreur(404, 'Action inconnue.');
+}
+
+// Force le typage des champs numériques/booléens (PDO renvoie des chaînes avec MySQL)
+function normaliserAvis(array $a): array
+{
+    foreach (['idAvis', 'idSession', 'idAuteur', 'idAutre', 'note'] as $champ) {
+        if (isset($a[$champ])) {
+            $a[$champ] = (int) $a[$champ];
+        }
+    }
+    return $a;
+}
+
+function normaliserAvisListe(array $liste): array
+{
+    return array_map('normaliserAvis', $liste);
 }
 
 function chargerSessionValidee(PDO $pdo, int $idSession): array
@@ -114,7 +136,7 @@ function pourUtilisateur(PDO $pdo): void
          ORDER BY a.dateAvis DESC'
     );
     $stmt->execute([$idUser]);
-    echo json_encode($stmt->fetchAll());
+    echo json_encode(normaliserAvisListe($stmt->fetchAll()));
 }
 
 // Statistiques agrégées (note moyenne, nb d'avis, nb d'échanges validés) pour un profil
@@ -166,5 +188,71 @@ function sessionsAEvaluer(PDO $pdo): void
          ORDER BY s.dateCreation DESC'
     );
     $stmt->execute([$idUser, $idUser, $idUser, $idUser, $idUser]);
-    echo json_encode($stmt->fetchAll());
+    echo json_encode(normaliserAvisListe($stmt->fetchAll()));
+}
+
+// Modifie un avis déjà laissé (seul l'auteur peut le faire)
+function modifier(PDO $pdo): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        erreur(405, 'Méthode non autorisée.');
+    }
+
+    $data        = json_decode(file_get_contents('php://input'), true) ?? [];
+    $idAvis      = (int) ($data['idAvis'] ?? 0);
+    $idAuteur    = (int) ($data['idAuteur'] ?? 0);
+    $note        = (int) ($data['note'] ?? 0);
+    $commentaire = trim((string) ($data['commentaire'] ?? ''));
+
+    if ($idAvis <= 0 || $idAuteur <= 0) {
+        erreur(400, 'Paramètres invalides.');
+    }
+    if ($note < 1 || $note > 5) {
+        erreur(400, 'La note doit être comprise entre 1 et 5.');
+    }
+
+    $stmt = $pdo->prepare('SELECT idAuteur FROM AVIS WHERE idAvis = ?');
+    $stmt->execute([$idAvis]);
+    $avis = $stmt->fetch();
+    if (!$avis) {
+        erreur(404, 'Avis introuvable.');
+    }
+    if ((int) $avis['idAuteur'] !== $idAuteur) {
+        erreur(403, "Tu ne peux modifier que tes propres avis.");
+    }
+
+    $stmt = $pdo->prepare('UPDATE AVIS SET note = ?, commentaire = ? WHERE idAvis = ?');
+    $stmt->execute([$note, $commentaire ?: null, $idAvis]);
+
+    echo json_encode(['ok' => true]);
+}
+
+// Supprime un avis déjà laissé (seul l'auteur peut le faire)
+function supprimer(PDO $pdo): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        erreur(405, 'Méthode non autorisée.');
+    }
+
+    $data     = json_decode(file_get_contents('php://input'), true) ?? [];
+    $idAvis   = (int) ($data['idAvis'] ?? 0);
+    $idAuteur = (int) ($data['idAuteur'] ?? 0);
+
+    if ($idAvis <= 0 || $idAuteur <= 0) {
+        erreur(400, 'Paramètres invalides.');
+    }
+
+    $stmt = $pdo->prepare('SELECT idAuteur FROM AVIS WHERE idAvis = ?');
+    $stmt->execute([$idAvis]);
+    $avis = $stmt->fetch();
+    if (!$avis) {
+        erreur(404, 'Avis introuvable.');
+    }
+    if ((int) $avis['idAuteur'] !== $idAuteur) {
+        erreur(403, "Tu ne peux supprimer que tes propres avis.");
+    }
+
+    $pdo->prepare('DELETE FROM AVIS WHERE idAvis = ?')->execute([$idAvis]);
+
+    echo json_encode(['ok' => true]);
 }

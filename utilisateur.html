@@ -110,11 +110,17 @@
     .avis-stars { color: #fbbf24; font-size: .85rem; }
     .avis-comment { font-size: .85rem; color: var(--text-muted); line-height: 1.5; }
     .avis-date { font-size: .72rem; color: var(--text-muted); margin-top: .3rem; }
+    .avis-actions { display: flex; gap: .9rem; margin-top: .6rem; }
+    .avis-action-btn { background: none; border: none; color: var(--text-muted); font-size: .75rem; cursor: pointer; padding: .2rem 0; }
+    .avis-action-btn:hover { color: var(--purple-light); }
 
     .empty-state { color: var(--text-muted); font-size: .88rem; padding: .5rem 0; }
 
     .review-form { margin-top: 1rem; }
     .review-target { font-size: .85rem; color: var(--text-muted); margin-bottom: .8rem; }
+    .review-form select { width: 100%; margin-bottom: 1rem; background: var(--bg-card2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: .6rem .8rem; font-size: .88rem; outline: none; }
+    .review-form select:focus { border-color: var(--purple); }
+    .field-label { display: block; margin-bottom: .4rem; font-size: .8rem; color: var(--text-muted); }
     .star-picker { display: flex; gap: .4rem; margin-bottom: 1rem; }
     .star-btn { background: none; border: none; font-size: 1.6rem; cursor: pointer; opacity: .35; transition: opacity .15s; }
     .star-btn.active { opacity: 1; }
@@ -228,6 +234,91 @@
 
     let etoileChoisie = 0;
     let sessionAEvaluer = null;
+    let sessionsAEvaluerProfil = [];
+    let avisListeCourante = [];
+    const editNotes = {};
+
+    function avisRowHtml(a) {
+      const esMoi = moi && String(a.idAuteur) === String(moi.idUser);
+      return `
+        <div class="avis-row" id="avisRow${a.idAvis}">
+          <div class="avis-head">
+            <span class="avis-author">${escapeHtml(a.prenomUser)} ${escapeHtml(a.nomUser)}</span>
+            <span class="avis-stars">${'★'.repeat(a.note)}${'☆'.repeat(5 - a.note)}</span>
+          </div>
+          ${a.commentaire ? `<div class="avis-comment">${escapeHtml(a.commentaire)}</div>` : ''}
+          <div class="avis-date">${escapeHtml(a.competence)} · ${new Date(a.dateAvis).toLocaleDateString('fr-FR')}</div>
+          ${esMoi ? `
+            <div class="avis-actions">
+              <button type="button" class="avis-action-btn" onclick="activerEditionAvis(${a.idAvis})">✏️ Modifier</button>
+              <button type="button" class="avis-action-btn" onclick="supprimerAvis(${a.idAvis})">🗑️ Supprimer</button>
+            </div>` : ''}
+        </div>`;
+    }
+
+    function activerEditionAvis(idAvis) {
+      const a = avisListeCourante.find(x => x.idAvis === idAvis);
+      if (!a) return;
+      editNotes[idAvis] = a.note;
+      const row = document.getElementById(`avisRow${idAvis}`);
+      if (!row) return;
+
+      row.innerHTML = `
+        <div class="review-target">Modifie ton avis sur « ${escapeHtml(a.competence)} »</div>
+        <div class="star-picker">
+          ${[1, 2, 3, 4, 5].map(n => `<button type="button" class="star-btn${n <= a.note ? ' active' : ''}" data-n="${n}">★</button>`).join('')}
+        </div>
+        <textarea id="commentaireEdit${idAvis}" rows="3" placeholder="Un commentaire sur cette session (facultatif)…">${escapeHtml(a.commentaire || '')}</textarea>
+        <div class="avis-actions">
+          <button type="button" class="btn-primary" onclick="enregistrerEditionAvis(${idAvis})">Enregistrer</button>
+          <button type="button" class="avis-action-btn" onclick="charger()">Annuler</button>
+        </div>`;
+
+      const boutons = row.querySelectorAll('.star-btn');
+      boutons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          editNotes[idAvis] = Number(btn.dataset.n);
+          boutons.forEach(b => b.classList.toggle('active', Number(b.dataset.n) <= editNotes[idAvis]));
+        });
+      });
+    }
+
+    async function enregistrerEditionAvis(idAvis) {
+      const note = editNotes[idAvis] || 0;
+      if (note === 0) { afficherToast('Choisis une note de 1 à 5 étoiles.'); return; }
+      const commentaire = document.getElementById(`commentaireEdit${idAvis}`).value.trim();
+
+      try {
+        const rep = await fetch('api/avis.php?action=modifier', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idAvis, idAuteur: moi.idUser, note, commentaire })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        afficherToast('Avis modifié.');
+        charger();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      }
+    }
+
+    async function supprimerAvis(idAvis) {
+      if (!confirm('Supprimer cet avis ?')) return;
+      try {
+        const rep = await fetch('api/avis.php?action=supprimer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idAvis, idAuteur: moi.idUser })
+        });
+        const json = await rep.json();
+        if (!rep.ok) { afficherToast(json.erreur || 'Erreur.'); return; }
+        afficherToast('Avis supprimé.');
+        charger();
+      } catch (e) {
+        afficherToast('Erreur réseau.');
+      }
+    }
 
     async function charger() {
       const wrap = document.getElementById('wrap');
@@ -253,6 +344,7 @@
         const competences = competencesData;
         const stats = statsRes.ok ? statsData : { moyenne: 0, totalAvis: 0, totalEchanges: 0 };
         const avisListe = avisRes.ok ? avisData : [];
+        avisListeCourante = avisListe;
 
         // Infos de base déduites des compétences publiées (pas d'endpoint dédié "utilisateur")
         const premiere = competences[0];
@@ -301,15 +393,7 @@
             <div id="listeAvis">
               ${avisListe.length === 0
                 ? '<div class="empty-state">Aucun avis pour l’instant.</div>'
-                : avisListe.map(a => `
-                  <div class="avis-row">
-                    <div class="avis-head">
-                      <span class="avis-author">${escapeHtml(a.prenomUser)} ${escapeHtml(a.nomUser)}</span>
-                      <span class="avis-stars">${'★'.repeat(a.note)}${'☆'.repeat(5 - a.note)}</span>
-                    </div>
-                    ${a.commentaire ? `<div class="avis-comment">${escapeHtml(a.commentaire)}</div>` : ''}
-                    <div class="avis-date">${escapeHtml(a.competence)} · ${new Date(a.dateAvis).toLocaleDateString('fr-FR')}</div>
-                  </div>`).join('')}
+                : avisListe.map(a => avisRowHtml(a)).join('')}
             </div>
           </div>
 
@@ -328,35 +412,64 @@
       window.location.href = 'messages.html?' + p.toString();
     }
 
-    // N'affiche le formulaire d'avis que si une session validée avec CE profil n'a pas encore été évaluée
+    function texteCibleAvis(s) {
+      return `Après ta session « ${escapeHtml(s.competence)} » avec ${escapeHtml(s.autrePrenom)} ${escapeHtml(s.autreNom)}, comment ça s'est passé ?`;
+    }
+
+    // N'affiche le formulaire d'avis que si au moins une session validée avec CE profil n'a pas encore été évaluée.
+    // Un même profil peut avoir plusieurs sessions à évaluer (plusieurs compétences échangées) : on les propose toutes.
     async function chargerZoneAvis() {
       const zone = document.getElementById('zoneLaisserAvis');
       try {
         const rep = await fetch(`api/avis.php?action=sessionsAEvaluer&idUser=${moi.idUser}`);
         const sessions = await rep.json();
         if (!rep.ok) return;
-        sessionAEvaluer = sessions.find(s => String(s.idAutre) === String(idProfil));
+        sessionsAEvaluerProfil = sessions.filter(s => String(s.idAutre) === String(idProfil));
 
-        if (!sessionAEvaluer) return;
+        if (sessionsAEvaluerProfil.length === 0) { sessionAEvaluer = null; return; }
+        sessionAEvaluer = sessionsAEvaluerProfil[0];
+
+        const selecteur = sessionsAEvaluerProfil.length > 1 ? `
+          <label class="field-label">Quelle session veux-tu évaluer ?</label>
+          <select id="choixSessionAvis" onchange="changerSessionAEvaluer(this.value)">
+            ${sessionsAEvaluerProfil.map((s, i) => `<option value="${i}">${escapeHtml(s.competence)}${s.titre ? ' — ' + escapeHtml(s.titre) : ''}</option>`).join('')}
+          </select>` : '';
 
         zone.innerHTML = `
           <div class="section-title">Laisser un avis</div>
           <div class="panel review-form">
-            <div class="review-target">Après ta session « ${escapeHtml(sessionAEvaluer.competence)} » avec ${escapeHtml(sessionAEvaluer.autrePrenom)} ${escapeHtml(sessionAEvaluer.autreNom)}, comment ça s'est passé ?</div>
+            ${selecteur}
+            <div class="review-target" id="reviewTarget">${texteCibleAvis(sessionAEvaluer)}</div>
             <div class="star-picker" id="starPicker">
-              ${[1, 2, 3, 4, 5].map(n => `<button type="button" class="star-btn" data-n="${n}" onclick="choisirEtoile(${n})">★</button>`).join('')}
+              ${[1, 2, 3, 4, 5].map(n => `<button type="button" class="star-btn" data-n="${n}">★</button>`).join('')}
             </div>
             <textarea id="commentaireAvis" rows="3" placeholder="Un commentaire sur cette session (facultatif)…"></textarea>
             <button class="btn-primary" style="width:100%" onclick="envoyerAvis()">Envoyer mon avis</button>
           </div>`;
+
+        initStarPicker();
       } catch (e) {
         // silencieux : la zone d'avis est un bonus, pas bloquant
       }
     }
 
-    function choisirEtoile(n) {
-      etoileChoisie = n;
-      document.querySelectorAll('.star-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.n) <= n));
+    function changerSessionAEvaluer(idx) {
+      sessionAEvaluer = sessionsAEvaluerProfil[Number(idx)];
+      document.getElementById('reviewTarget').innerHTML = texteCibleAvis(sessionAEvaluer);
+      etoileChoisie = 0;
+      document.querySelectorAll('#starPicker .star-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('commentaireAvis').value = '';
+    }
+
+    function initStarPicker() {
+      etoileChoisie = 0;
+      const boutons = document.querySelectorAll('#starPicker .star-btn');
+      boutons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          etoileChoisie = Number(btn.dataset.n);
+          boutons.forEach(b => b.classList.toggle('active', Number(b.dataset.n) <= etoileChoisie));
+        });
+      });
     }
 
     async function envoyerAvis() {
