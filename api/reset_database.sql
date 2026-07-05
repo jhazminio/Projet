@@ -4,10 +4,12 @@
 -- À exécuter dans phpMyAdmin, sur la base "skillswap", onglet SQL,
 -- en collant TOUT le script d'un coup et en cliquant une seule fois sur "Exécuter".
 --
--- (On utilise DELETE plutôt que TRUNCATE : TRUNCATE refuse de vider une table tant
--- qu'une autre table la référence par clé étrangère, même avec FOREIGN_KEY_CHECKS=0.)
+-- On supprime dans l'ordre enfant → parent (au lieu de compter sur
+-- FOREIGN_KEY_CHECKS=0, qui ne semble pas persister entre les requêtes sur
+-- certains hébergeurs). SESSION_ECHANGE se référence elle-même (idSessionMiroir,
+-- pour lier les deux moitiés d'un troc) : on casse d'abord ce lien avant de supprimer.
 
-SET FOREIGN_KEY_CHECKS = 0;
+UPDATE SESSION_ECHANGE SET idSessionMiroir = NULL;
 
 DELETE FROM AVIS;
 DELETE FROM JETON_HISTORIQUE;
@@ -26,5 +28,3 @@ ALTER TABLE MESSAGE AUTO_INCREMENT = 1;
 ALTER TABLE ECHANGE AUTO_INCREMENT = 1;
 ALTER TABLE COMPETENCES AUTO_INCREMENT = 1;
 ALTER TABLE USER AUTO_INCREMENT = 1;
-
-SET FOREIGN_KEY_CHECKS = 1;
