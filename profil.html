@@ -244,6 +244,11 @@
     .skill-row:last-child { border-bottom: none; }
 
     .skill-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .skill-thumb {
+      width: 44px; height: 44px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+      background: var(--bg-card2); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+    .skill-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .skill-dot.active   { background: #34d399; }
     .skill-dot.proposee { background: var(--text-muted); }
     .skill-dot.en_cours { background: var(--purple); }
@@ -384,9 +389,15 @@
     }
     .btn-file:hover { border-color: var(--purple); }
     .cat-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .comp-photo-actions { display: flex; align-items: center; gap: .8rem; margin-top: -.6rem; margin-bottom: 1.1rem; }
-    .btn-file-remove { background: none; border: none; color: var(--text-muted); font-size: .8rem; cursor: pointer; text-decoration: underline; }
-    .btn-file-remove:hover { color: var(--text); }
+    .cat-preview-wrap { position: relative; }
+    .comp-photo-actions { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.1rem; }
+    .btn-remove-photo {
+      position: absolute; top: .6rem; right: .6rem; width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(13,11,26,.65); border: 1px solid rgba(255,255,255,.25); color: #fff;
+      cursor: pointer; font-size: .85rem; display: flex; align-items: center; justify-content: center; z-index: 3;
+      transition: background .15s;
+    }
+    .btn-remove-photo:hover { background: rgba(13,11,26,.9); border-color: var(--purple); }
 
     hr.sep { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
 
@@ -475,15 +486,17 @@
       <h2 id="publierTitre">Publier une compétence</h2>
       <p>Décris ce que tu sais enseigner. Les autres étudiant·e·s pourront te proposer une session.</p>
 
-      <div class="cat-preview Musique" id="catPreview">
-        <span class="music-icon">🎸</span>
+      <div class="cat-preview-wrap">
+        <div class="cat-preview Musique" id="catPreview">
+          <span class="music-icon">🎸</span>
+        </div>
+        <button type="button" class="btn-remove-photo" id="btnRetirerCompImage" style="display:none" onclick="retirerCompImage()" title="Revenir à l'image par défaut">✕</button>
       </div>
       <div class="comp-photo-actions">
         <label class="btn-file">
           Ajouter une photo
           <input type="file" id="inputCompImage" accept="image/*" style="display:none" onchange="previewCompImage(this)" />
         </label>
-        <button type="button" class="btn-file-remove" id="btnRetirerCompImage" style="display:none" onclick="retirerCompImage()">Revenir à l'image par défaut</button>
       </div>
 
       <label class="field-label">Titre de la compétence</label>
@@ -669,8 +682,23 @@
     function defaultThumbHtml(cat) {
       const fichier = CATEGORY_IMG[cat];
       return fichier
-        ? `<img src="${encodeURI('assets/img/' + fichier)}" alt="">`
+        ? `<img src="${encodeURI('assets/img/' + fichier)}" alt="" onerror="manejarErreurImgCat(this, '${cat}')">`
         : (CAT_PREVIEW_HTML[cat] || CAT_PREVIEW_HTML.Autre);
+    }
+
+    // Si la photo par défaut de la catégorie ne charge pas (fichier manquant, réseau…), on retombe sur l'emoji
+    function manejarErreurImgCat(imgEl, cat) {
+      imgEl.outerHTML = CAT_PREVIEW_HTML[cat] || CAT_PREVIEW_HTML.Autre;
+    }
+
+    // Petite vignette pour "Mes compétences" : photo personnalisée, sinon photo par défaut de la catégorie, sinon ✨
+    function miniThumbHtml(c) {
+      const cat = c.categorie || 'Autre';
+      if (c.image) return `<img src="${c.image}" alt="">`;
+      const fichier = CATEGORY_IMG[cat];
+      return fichier
+        ? `<img src="${encodeURI('assets/img/' + fichier)}" alt="" onerror="this.parentElement.textContent='✨'">`
+        : '✨';
     }
 
     let catSelectionnee = 'Musique';
@@ -819,7 +847,7 @@
 
         conteneur.innerHTML = data.map((c, i) => `
           <div class="skill-row">
-            <div class="skill-dot active"></div>
+            <div class="skill-thumb">${miniThumbHtml(c)}</div>
             <div class="skill-row-info">
               <span class="skill-cat-badge">${escapeHtml(c.categorie || 'Autre')}</span>
               <div class="skill-row-name">${escapeHtml(c.competence)}</div>

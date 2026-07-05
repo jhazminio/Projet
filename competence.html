@@ -287,8 +287,13 @@
     function defaultThumbHtml(cat) {
       const fichier = CATEGORY_IMG[cat];
       return fichier
-        ? `<img class="thumb-img" src="${encodeURI('assets/img/' + fichier)}" alt="">`
+        ? `<img class="thumb-img" src="${encodeURI('assets/img/' + fichier)}" alt="" onerror="manejarErreurImgCat(this, '${cat}')">`
         : (CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre);
+    }
+
+    // Si la photo par défaut de la catégorie ne charge pas (fichier manquant, réseau…), on retombe sur l'emoji
+    function manejarErreurImgCat(imgEl, cat) {
+      imgEl.outerHTML = CAT_ICON_HTML[cat] || CAT_ICON_HTML.Autre;
     }
 
     const FORMAT_LABELS = {
